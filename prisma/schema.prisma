@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Models
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("KADER") // SUPER_ADMIN, PENGURUS, KADER
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  kaderProfile  KaderProfile?
+}
+
+model KaderProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  rayon       String?
+  komisariat  String?
+  mapabaYear  String?
+  pkdYear     String?
+  pklYear     String?
+  
+  // New Fields
+  campus      String?
+  major       String? // Prodi / Fakultas
+  address     String?
+  noInduk     String?
+  birthPlace  String?
+  birthDate   DateTime?
+  phone       String?
+  
+  // Verification Queue
+  status      String    @default("PENDING") // PENDING, VERIFIED
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String
+  image     String?
+  published Boolean  @default(false)
+  author    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String?
+  imageUrl    String
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model Material {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  featuredImage String?
+  isPublished   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  chapters      MaterialChapter[]
+}
+
+model MaterialChapter {
+  id          String   @id @default(cuid())
+  title       String?  // Bab Title
+  description String?
+  type        String   @default("DOCUMENT") // DOCUMENT, YOUTUBE
+  fileUrl     String?
+  youtubeUrl  String?
+  sortOrder   Int      @default(0)
+  
+  materialId  String
+  material    Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model Letter {
+  id          String   @id @default(cuid())
+  number      String
+  type        String   @default("MASUK") // MASUK, KELUAR
+  date        DateTime @default(now())
+  sender      String?
+  receiver    String?
+  subject     String?
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  description String
+  type        String   @default("DEBIT") // DEBIT (Masuk), CREDIT (Keluar)
+  amount      Float
+  balance     Float    @default(0)
+  createdAt   DateTime @default(now())
+}
