@@ -5,7 +5,21 @@ import { uploadFile } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+async function checkSuperAdmin() {
+    const session = await getServerSession(authOptions);
+    // Allow SUPER_ADMIN and PENGURUS (if we want Pengurus to manage learning, but UI hides it. 
+    // Safest is SUPER_ADMIN only for now as per dashboard logic).
+    if (session?.user?.role !== "SUPER_ADMIN") {
+        throw new Error("Unauthorized: Only Super Admin can perform this action.");
+    }
+}
+
 export async function createMaterial(formData: FormData) {
+    await checkSuperAdmin();
+
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const isPublished = formData.get("isPublished") === "true";
@@ -78,11 +92,13 @@ export async function createMaterial(formData: FormData) {
 }
 
 export async function deleteMaterial(id: string) {
+    await checkSuperAdmin();
     await prisma.material.delete({ where: { id } });
     revalidatePath("/dashboard/learning");
 }
 
 export async function updateMaterial(id: string, formData: FormData) {
+    await checkSuperAdmin();
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const isPublished = formData.get("isPublished") === "true";
