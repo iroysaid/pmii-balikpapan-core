@@ -1,64 +1,94 @@
-# Panduan Deployment ke Vercel
+# Panduan Deployment via Docker (Rekomendasi Utama)
 
-Project ini menggunakan **Next.js**. Platform deployment terbaik dan termudah (serta Gratis untuk hobi/personal) adalah **Vercel**.
+Aplikasi PMII Balikpapan ini telah dikonfigurasi untuk berjalan secara optimal dan aman menggunakan **Docker**. Metode ini sangat disarankan untuk VPS/Server (Ubuntu, AlmaLinux, MacOS, Windows) karena bersifat *plug-and-play* dan tidak akan kehilangan data (unggah gambar & database) saat di-restart.
 
-## 1. Persiapan Database (Penting!)
-Saat ini project menggunakan **SQLite** (`dev.db`). SQLite **TIDAK BISA** digunakan di Vercel secara persistent (data akan hilang setiap deploy). Anda harus beralih ke Database Cloud seperti **PostgreSQL**.
+## ✅ Prasyarat Sistem
+Pastikan server/komputer Anda sudah terinstal:
+1.  **Git** (Untuk mengambil source code)
+2.  **Docker** & **Docker Compose**
 
-### Solusi Termudah: Vercel Postgres
-1.  Login ke [Vercel](https://vercel.com).
-2.  Buat Project baru -> Import dari GitHub Repository Anda (`pmii-balikpapan-core`).
-3.  Di halaman konfigurasi Vercel:
-    *   Klik tab **Storage** (atau nanti setelah project dibuat).
-    *   Buat Database **Postgres** baru.
-    *   Vercel akan memberikan *Environment Variables* (`POSTGRES_PRISMA_URL`, dll).
+---
 
-### Update Kode untuk PostgreSQL
-Anda perlu mengubah `prisma/schema.prisma` sebelum deploy:
+## 🚀 Langkah-langkah Deployment Lengkap
 
-```prisma
-// prisma/schema.prisma
+Ikuti baris perintah (*command line / cmd*) di bawah ini secara berurutan di terminal server Anda:
 
-datasource db {
-  provider = "postgresql" // Ubah dari sqlite
-  url      = env("POSTGRES_PRISMA_URL") // Gunakan env dari Vercel
-  directUrl = env("POSTGRES_URL_NON_POOLING") // Optional, untuk Vercel Postgres
-}
-```
-
-Jalankan perintah ini lokal untuk generate ulang client:
+### 1. Kloning Repository
+Ambil kode terbaru dari GitHub ke dalam server Anda:
 ```bash
-npm install pg
-npx prisma generate
+git clone https://github.com/iroysaid/pmii-balikpapan-core.git
+cd pmii-balikpapan-core
 ```
 
-## 2. Environment Variables
-Di Dashboard Vercel (Settings -> Environment Variables), pastikan Anda memasukkan KEY yang sama dengan file `.env` lokal Anda:
-
-*   `NEXTAUTH_SECRET`: Generate string acak baru (bisa pakai `openssl rand -base64 32`).
-*   `NEXTAUTH_URL`: Isi dengan domain Vercel Anda (misal `https://pmii-balikpapan.vercel.app`).
-
-## 3. Build Command
-Vercel otomatis mendeteksi Next.js. Namun untuk pertama kali, Anda perlu menjalankan migrasi database saat build.
-Update `package.json` Anda:
-
-```json
-"scripts": {
-  "build": "prisma generate && prisma db push && next build",
-  ...
-}
+### 2. Siapkan File Konfigurasi (.env)
+Salin `.env.example` (atau buat file `.env` baru) untuk mengatur konfigurasi alamat web Anda:
+```bash
+cp .env .env.production
+# Buka file .env dan ubah jika perlu
+nano .env
 ```
-*Catatan: `prisma db push` akan mensinkronkan skema ke database Postgres baru Anda.*
+**PENTING di dalam `.env`:**
+*   Pastikan `DATABASE_URL="file:./dev.db"`
+*   Ubah `NEXTAUTH_URL` sesuai nama domain Anda, contoh: `NEXTAUTH_URL=https://pmii-balikpapan.com`
+*   Ubah `NEXTAUTH_SECRET` menjadi teks acak rahasia untuk keamanan *login*.
 
-## 4. Deploy
-Setelah setup di atas:
-1.  Push perubahan (`schema.prisma`, `package.json`) ke GitHub.
-2.  Vercel akan otomatis mendeteksi commit baru dan melakukan deployment.
-3.  Tunggu hingga status "Ready".
+### 3. Eksekusi Docker Compose
+Jalankan perintah ini untuk mulai mengunduh OS (*Debian*), menginstal dependencies, mem-*build* Next.js, dan menyalakan server secara otomatis di latar belakang (*background*):
 
-## Alternatif: VPS (Tanpa Ganti Database)
-Jika ingin tetap pakai SQLite, Anda harus sewa VPS (Linux Server) dan menjalankan manual:
-1.  Upload file ke server.
-2.  `npm install` & `npm run build`.
-3.  Jalanan dengan `pm2 start npm --name "pmii-app" -- start`.
-4.  Setup Nginx sebagai reverse proxy.
+```bash
+docker-compose up --build -d
+```
+*Tunggu beberapa menit hingga proses build selesai. Ini hanya memakan waktu agak lama pada percobaan pertama.*
+
+### 4. Cek Status Aplikasi
+Untuk memastikan aplikasi berjalan dengan baik:
+```bash
+# Melihat daftar docker yang hidup (Status harusnya: Up)
+docker ps
+
+# Melihat log aplikasi jika terjadi error
+docker-compose logs -f
+```
+
+---
+
+## 💼 Manajemen Lanjutan (CMD Penting)
+
+Jika Anda ingin melakukan update atau menghentikan website, gunakan perintah berikut di dalam folder proyek (`pmii-balikpapan-core`):
+
+**1. Mengambil Update Fitur Baru (Pull & Rebuild):**
+Jika ada fitur baru yang di-*push* ke GitHub, Anda bisa memperbaruinya di server dengan cara:
+```bash
+git pull origin main
+docker-compose up --build -d
+```
+*Catatan: Semua data akun, berita, kegiatan, dan foto galeri **TIDAK AKAN HILANG** karena kita telah menguncinya menggunakan sistem Volume yang aman pada `./uploads` dan `dev.db`.*
+
+**2. Mematikan Website (Tanpa Menghapus Data):**
+```bash
+docker-compose stop
+```
+
+**3. Menyalakan Kembali Website:**
+```bash
+docker-compose start
+```
+
+**4. Mereset / Menghapus Container (Data tetap aman):**
+```bash
+docker-compose down
+```
+
+---
+
+## 🛡️ Hak Akses (Troubleshooting)
+Sistem ini menggunakan *Node Debian-Slim*. Jika terdapat pesan *error* "Permission Denied" pada saat Anda meng-upload galeri melalui website yang sudah live, jalankan perintah ini di OS Ubuntu/Server Anda untuk memberi izin pada folder unggahan:
+
+```bash
+sudo chmod -R 777 public/uploads
+sudo chmod 777 dev.db
+```
+
+## 🌐 Koneksi ke Domain Publik (Opsional)
+Aplikasi Docker ini secara default berjalan di `http://localhost:3005`. 
+Untuk mengarahkan domain asli (contoh: `pmii.org`) agar langsung terbuka, Anda perlu memasang **Nginx Proxy Manager**, **Cloudflare Tunnels**, atau **Nginx Reverse Proxy** yang meneruskan Port `80/443` ke Port `3005` milik Docker.
