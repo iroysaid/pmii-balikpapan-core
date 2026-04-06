@@ -1,49 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistem Manajemen & Kaderisasi PC PMII Balikpapan 🌟
 
-## Getting Started
+Selamat datang di repositori resmi **Website & Sistem Manajemen Internal Pengurus Cabang Pergerakan Mahasiswa Islam Indonesia (PMII) Kota Balikpapan**.
 
-First, run the development server:
+Proyek ini dibangun menggunakan teknologi modern (Next.js, Prisma, Tailwind CSS) untuk melayani kebutuhan administrasi, pendataan kader, E-Learning, manajemen kegiatan, hingga laporan keuangan secara terpadu dan aman.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Fitur Utama
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Dashboard Terpadu**: Panel manajemen khusus untuk Super Admin, Pengurus, dan Kader.
+- **Galeri & Berita Otomatis**: Sistem album foto cerdas dan jurnal kegiatan. Konversi otomatis ke format WebP untuk performa super cepat.
+- **E-Learning PMII**: Pusat materi pendidikan (MAPABA, PKD, dll) terintegrasi berbasis digital.
+- **Database Kader**: Integrasi penuh data base keanggotaan dalam satu pintu.
+- **Optimasi Filososfis**: Aplikasi ini berjalan di Port `1960` — terinspirasi dari tahun berdirinya PMII (17 April 1960).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💻 Pengembangan Lokal (Development)
 
-## Learn More
+Untuk ikut mengembangkan website ini di komputer lokal Anda:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Docker Deployment (recommended for local server)
-
-To deploy this on a local server or a different PC using Docker:
-
-1. **Prerequisites**: Make sure Docker and Docker Compose are installed.
-2. **Build and Start**:
+1. **Clone & Install**
    ```bash
-   docker compose up -d --build
+   git clone https://github.com/iroysaid/pmii-balikpapan-core.git
+   cd pmii-balikpapan-core
+   npm install
    ```
-3. **Access**: Open [http://localhost:3005](http://localhost:3005) (configured port) in your browser.
 
-**Note**: This setup uses SQLite (`dev.db`). For high-availability production, consider switching to PostgreSQL.
+2. **Generate Database & Jalankan Server**
+   ```bash
+   npx prisma generate
+   npm run dev -p 1960
+   ```
+
+3. Buka browser Anda di [http://localhost:1960](http://localhost:1960) untuk melihat hasilnya.
+
+---
+
+## 🐳 Panduan Deployment (Server/Production)
+
+Aplikasi ini sudah dipersiapkan dan dioptimasi secara penuh untuk berjalan di atas server manapun menggunakan ekosistem **Docker (Debian Slim Node)** yang kebal dan aman terhadap kehilangan data.
+
+Langkah deployment **TIDAK DIJELASKAN** di sini. Segala instruksi lengkap mengenai prosedur keamanan, penyesuaian ENV, instalasi server, hingga konfigurasi proxy telah kami rangkum di:
+
+👉 **[BACA PANDUAN DEPLOYMENT (DEPLOYMENT.md)](./DEPLOYMENT.md)**
+
+---
+
+*Tumbuh subur kader PMII, Dzikir, Fikir, dan Amal Shaleh.*
