@@ -1,0 +1,9 @@
+# Koneksi Database
+DATABASE_URL="file:./dev.db"
+
+# Kemananan Auth
+NEXTAUTH_SECRET="pmii-bpp-rahasia-windows-dev"
+
+# URL Utama Aplikasi 
+# (Ini penting diisi sesuai dengan nama custom domain komputer Anda agar form Login berhasil me-redirect)
+NEXTAUTH_URL="http://pmii:1960"
