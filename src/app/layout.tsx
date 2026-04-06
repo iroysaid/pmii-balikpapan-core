@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "PC PMII BALIKPAPAN",
   description: "Website Resmi Pengurus Cabang Pergerakan Mahasiswa Islam Indonesia Kota Balikpapan",
   icons: {
-    icon: "/PMII.png", // Using the provided logo as favicon
+    icon: "/favicon.png", // Using the provided logo as favicon
   }
 };
 

@@ -41,7 +41,7 @@ export default function Footer() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/register" className="hover:text-accent transition">
+                            <Link href="/daftar" className="hover:text-accent transition">
                                 Pendaftaran Anggota
                             </Link>
                         </li>

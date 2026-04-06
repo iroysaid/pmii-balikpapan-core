@@ -1,15 +1,22 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Calendar } from "lucide-react";
+import { ArrowRight, BookOpen, Calendar, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import ActivitySlider from "@/components/ActivitySlider";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  
   const latestPosts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: "desc" },
     take: 3,
+  });
+
+  const latestActivities = await prisma.activity.findMany({
+    orderBy: { eventDate: "desc" },
+    take: 5,
   });
 
   return (
@@ -187,42 +194,49 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Announcements / Features */}
-      <section className="bg-gray-50 py-16">
+      {/* Informas & Kegiatan - Dynamic Slider */}
+      <section className="bg-gray-50/50 py-24 relative overflow-hidden">
+        {/* Abstract Background Element */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10"></div>
+        
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl font-bold text-primary">Informasi & Kegiatan</h2>
-              <p className="text-secondary leading-relaxed">
-                Ikuti perkembangan kegiatan PMII Balikpapan. Mulai dari pelatihan kaderisasi (MAPABA, PKD, PKL) hingga kajian rutin keislaman dan keindonesiaan.
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-5xl font-black text-primary mb-6 relative inline-block">
+                Informasi & Kegiatan
+                <span className="absolute -bottom-2 left-0 w-1/2 h-2 bg-accent/50 rounded-full"></span>
+              </h2>
+              <p className="text-xl text-secondary leading-relaxed">
+                Ikuti perkembangan kegiatan PMII Balikpapan. Mulai dari pelatihan kaderisasi hingga aksi kemanusiaan.
               </p>
-
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="bg-white p-3 rounded-lg shadow-sm mr-4 text-accent">
-                    <BookOpen className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-primary">E-Learning Kader</h4>
-                    <p className="text-sm text-secondary">Akses materi modul MAPABA dan PKD secara digital.</p>
-                  </div>
-                </div>
-                {/* Add more features here */}
-              </div>
-
-              <div className="pt-4">
-                <Link href="#" className="text-primary font-bold border-b-2 border-accent hover:text-accent transition">
-                  Lihat Agenda Kegiatan
-                </Link>
-              </div>
             </div>
+            
+            <Link href="/kegiatan" className="group flex items-center bg-white text-primary font-bold px-8 py-4 rounded-2xl shadow-sm hover:shadow-md transition border border-primary/5">
+              Lihat Agenda Lengkap 
+              <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
+            </Link>
+          </div>
 
-            <div className="bg-white p-2 rounded-2xl shadow-lg rotate-1 hover:rotate-0 transition duration-500">
-              {/* Placeholder for Poster/Image */}
-              <div className="bg-gray-200 aspect-video rounded-xl flex items-center justify-center text-gray-400">
-                Poster Kegiatan / Highlight Image
-              </div>
+          {/* DYNAMIC SLIDER COMPONENT */}
+          <ActivitySlider kegiatan={latestActivities} />
+          
+          {/* E-Learning CTA Banner */}
+          <div className="mt-16 bg-white p-8 md:p-12 rounded-[2.5rem] border border-primary/5 shadow-lg shadow-blue-900/5 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-8 group">
+            <div className="flex items-center gap-8">
+               <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-primary shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                  <BookOpen className="w-10 h-10" />
+               </div>
+               <div>
+                  <h4 className="text-2xl font-black text-primary mb-2">E-Learning Kader</h4>
+                  <p className="text-secondary leading-relaxed max-w-xl text-lg">
+                    Akses materi modul MAPABA dan PKD secara digital melalui sistem manajemen belajar terpadu kami.
+                  </p>
+               </div>
             </div>
+            <Link href="/materi" className="shrink-0 group/btn relative inline-flex items-center justify-center px-8 py-4 font-bold text-white bg-primary rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                <span className="relative flex items-center gap-2">Mulai Belajar <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" /></span>
+            </Link>
           </div>
         </div>
       </section>
@@ -237,7 +251,7 @@ export default async function Home() {
                 Jadilah bagian dari mahasiswa pergerakan yang siap membawa perubahan positif bagi bangsa dan agama.
               </p>
               <Link
-                href="/register"
+                href="/daftar"
                 className="inline-block bg-accent text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-400 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 Daftar Sekarang

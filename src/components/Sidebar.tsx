@@ -21,12 +21,13 @@ export default function Sidebar() {
 
     const allMenuItems = [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["SUPER_ADMIN", "PENGURUS"] }, // Admin Dashboard
-        { name: "Dashboard Anggota", href: "/dashboard/member", icon: LayoutDashboard, roles: ["KADER"] }, // Member Dashboard
+        { name: "Dashboard Anggota", href: "/dashboard/anggota", icon: LayoutDashboard, roles: ["KADER"] }, // Member Dashboard
+        { name: "Informasi & Kegiatan", href: "/dashboard/kegiatan", icon: Globe, roles: ["SUPER_ADMIN", "PENGURUS"] },
         { name: "Database Kader", href: "/dashboard/kader", icon: Users, roles: ["SUPER_ADMIN", "PENGURUS"] },
-        { name: "Berita / Artikel", href: "/dashboard/posts", icon: FileText, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
-        { name: "E-Learning", href: "/dashboard/learning", icon: BookOpen, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
+        { name: "Berita / Artikel", href: "/dashboard/berita", icon: FileText, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
+        { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
         { name: "Administrasi", href: "/dashboard/surat", icon: Mail, roles: ["SUPER_ADMIN", "PENGURUS"] },
-        { name: "Keuangan", href: "/dashboard/finance", icon: Wallet, roles: ["SUPER_ADMIN", "PENGURUS"] },
+        { name: "Keuangan", href: "/dashboard/keuangan", icon: Wallet, roles: ["SUPER_ADMIN", "PENGURUS"] },
     ];
 
     const menuItems = allMenuItems.filter(item => !role || item.roles.includes(role));
@@ -34,13 +35,16 @@ export default function Sidebar() {
     return (
         <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col hidden md:flex fixed h-full z-10">
             <div className="p-6 border-b border-gray-100 flex items-center space-x-3">
-                <div className="bg-primary w-8 h-8 rounded-lg"></div>
-                <span className="font-bold text-primary text-lg">PMII Internal</span>
+                <div className="relative w-10 h-10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/PMII_BPP.png" alt="Logo PMII" className="w-full h-full object-contain" />
+                </div>
+                <span className="font-bold text-primary text-lg leading-tight">PMII<br /><span className="text-secondary text-xs tracking-widest uppercase opacity-60">Balikpapan</span></span>
             </div>
 
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                 {menuItems.map((item) => {
-                    const isActive = pathname.startsWith(item.href) && item.href !== "/dashboard" && item.href !== "/dashboard/member" || pathname === item.href;
+                    const isActive = pathname.startsWith(item.href) && item.href !== "/dashboard" && item.href !== "/dashboard/anggota" || pathname === item.href;
                     return (
                         <Link
                             key={item.href}
@@ -66,7 +70,7 @@ export default function Sidebar() {
                     <span>Ke Website Utama</span>
                 </Link>
                 <button
-                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    onClick={() => signOut({ callbackUrl: "/masuk" })}
                     className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition"
                 >
                     <LogOut className="w-5 h-5" />

@@ -49,7 +49,7 @@ export default async function DashboardPage() {
                     </div>
                 </Link>
 
-                <Link href="/dashboard/finance" className="block group">
+                <Link href="/dashboard/keuangan" className="block group">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 group-hover:border-green-500/50 transition relative overflow-hidden h-full">
                         <div className="flex justify-between items-start">
                             <div>
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
                     </div>
                 </Link>
 
-                <Link href="/dashboard/learning" className="block group">
+                <Link href="/dashboard/materi" className="block group">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 group-hover:border-blue-500/50 transition relative overflow-hidden h-full">
                         <div className="flex justify-between items-start">
                             <div>
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-bold text-primary">Berita Terbaru</h3>
-                        <Link href="/dashboard/posts" className="text-xs text-blue-600 hover:underline">Lihat Semua</Link>
+                        <Link href="/dashboard/berita" className="text-xs text-blue-600 hover:underline">Lihat Semua</Link>
                     </div>
                     <div className="space-y-4">
                         {recentPosts.length === 0 ? (

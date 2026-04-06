@@ -113,3 +113,25 @@ model Transaction {
   balance     Float    @default(0)
   createdAt   DateTime @default(now())
 }
+
+model Activity {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  eventDate   DateTime
+  image       String?  // Main Banner (Hero)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  photos      ActivityImage[]
+}
+
+model ActivityImage {
+  id          String   @id @default(cuid())
+  url         String
+  createdAt   DateTime @default(now())
+  
+  activityId  String
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}

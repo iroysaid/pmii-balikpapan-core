@@ -75,5 +75,5 @@ export async function registerKader(formData: FormData) {
     });
 
     // Redirect to status page with the new user's ID
-    redirect(`/register/status/${newUser.id}`);
+    redirect(`/daftar/status/${newUser.id}`);
 }

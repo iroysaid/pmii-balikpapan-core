@@ -23,7 +23,7 @@ export default function Navbar() {
     // Role-Based Additions
     if (session) {
         // Kader, Pengurus, Admin: Add E-Learning
-        links.push({ name: "E-Learning", href: "/learning" });
+        links.push({ name: "E-Learning", href: "/materi" });
 
         // Pengurus & Super Admin: Add Keuangan (Report Page)
         if (role === "PENGURUS" || role === "SUPER_ADMIN") {
@@ -45,7 +45,7 @@ export default function Navbar() {
                         <div className="flex items-center space-x-2">
                             <div className="relative w-12 h-12">
                                 <Image
-                                    src="/PMII.png"
+                                    src="/PB_PMII.png"
                                     alt="Logo PMII"
                                     fill
                                     sizes="48px"
@@ -81,14 +81,14 @@ export default function Navbar() {
                         ))}
                         {session ? (
                             <Link
-                                href={role === "KADER" ? "/dashboard/member" : "/dashboard"}
+                                href={role === "KADER" ? "/dashboard/anggota" : "/dashboard"}
                                 className="bg-accent text-primary px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition"
                             >
                                 {session.user?.name?.split(' ')[0] || "Akun"}
                             </Link>
                         ) : (
                             <Link
-                                href="/login"
+                                href="/masuk"
                                 className="bg-accent text-primary px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition"
                             >
                                 Login
@@ -124,7 +124,7 @@ export default function Navbar() {
                         ))}
                         {session ? (
                             <Link
-                                href={role === "KADER" ? "/dashboard/member" : "/dashboard"}
+                                href={role === "KADER" ? "/dashboard/anggota" : "/dashboard"}
                                 onClick={() => setIsOpen(false)}
                                 className="block py-2 text-accent font-bold"
                             >
@@ -132,7 +132,7 @@ export default function Navbar() {
                             </Link>
                         ) : (
                             <Link
-                                href="/login"
+                                href="/masuk"
                                 onClick={() => setIsOpen(false)}
                                 className="block py-2 text-accent font-bold"
                             >
