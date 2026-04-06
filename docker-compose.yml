@@ -13,4 +13,4 @@ services:
       - NEXTAUTH_URL=http://localhost:3005
     volumes:
       - ./dev.db:/app/dev.db
-      - ./public:/app/public
+      - ./uploads:/app/public/uploads

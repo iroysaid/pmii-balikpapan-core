@@ -1,8 +1,7 @@
-FROM node:20-alpine AS base
+FROM node:20-bookworm-slim AS base
 
 # 1. Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -41,6 +40,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
+
+# Ensure uploads directory exists and has correct permissions
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
+# Ensure database file has correct permissions so Nextjs/Prisma can write to it
+RUN chown nextjs:nodejs /app/dev.db
 
 USER nextjs
 
