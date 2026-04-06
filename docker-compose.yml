@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pmii-balikpapan
+    restart: always
+    ports:
+      - "3005:3000"
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - NEXTAUTH_SECRET=your-super-secret-key-123
+      - NEXTAUTH_URL=http://localhost:3005
+    volumes:
+      - ./dev.db:/app/dev.db
+      - ./public:/app/public
