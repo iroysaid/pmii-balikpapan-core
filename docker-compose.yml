@@ -6,11 +6,11 @@ services:
     container_name: pmii-balikpapan
     restart: always
     ports:
-      - "3005:3000"
+      - "1960:3000"
     environment:
       - DATABASE_URL=file:./dev.db
       - NEXTAUTH_SECRET=your-super-secret-key-123
-      - NEXTAUTH_URL=http://localhost:3005
+      - NEXTAUTH_URL=http://localhost:1960
     volumes:
       - ./dev.db:/app/dev.db
       - ./uploads:/app/public/uploads

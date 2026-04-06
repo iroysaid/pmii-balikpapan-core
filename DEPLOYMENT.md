@@ -90,5 +90,5 @@ sudo chmod 777 dev.db
 ```
 
 ## 🌐 Koneksi ke Domain Publik (Opsional)
-Aplikasi Docker ini secara default berjalan di `http://localhost:3005`. 
-Untuk mengarahkan domain asli (contoh: `pmii.org`) agar langsung terbuka, Anda perlu memasang **Nginx Proxy Manager**, **Cloudflare Tunnels**, atau **Nginx Reverse Proxy** yang meneruskan Port `80/443` ke Port `3005` milik Docker.
+Aplikasi Docker ini secara default berjalan di `http://localhost:1960`. 
+Untuk mengarahkan domain asli (contoh: `pmii.org`) agar langsung terbuka, Anda perlu memasang **Nginx Proxy Manager**, **Cloudflare Tunnels**, atau **Nginx Reverse Proxy** yang meneruskan Port `80/443` ke Port `1960` milik Docker.
