@@ -92,3 +92,36 @@ sudo chmod 777 dev.db
 ## 🌐 Koneksi ke Domain Publik (Opsional)
 Aplikasi Docker ini secara default berjalan di `http://localhost:1960`. 
 Untuk mengarahkan domain asli (contoh: `pmii.org`) agar langsung terbuka, Anda perlu memasang **Nginx Proxy Manager**, **Cloudflare Tunnels**, atau **Nginx Reverse Proxy** yang meneruskan Port `80/443` ke Port `1960` milik Docker.
+
+---
+
+## 📡 Akses Jaringan Lokal & Custom Hostname (Windows)
+Jika Anda men-deploy sistem ini di komputer **Windows** milik Anda dan ingin bisa mengaksesnya menggunakan `http://pmii:1960` (serta bisa dibuka oleh HP/Laptop lain di WiFi yang sama), berikut adalah caranya:
+
+### 1. Akses untuk Komputer Windows Anda Sendiri (Edit Hosts)
+Agar kata `pmii` dapat dialihkan ke aplikasi:
+1. Buka **Notepad**, klik kanan dan pilih **Run as Administrator**.
+2. Masuk ke menu `File > Open`, arahkan folder ke `C:\Windows\System32\drivers\etc`.
+3. Ubah Tipe File di pojok kanan bawah menjadi **All Files (\*.\*)**, lalu buka file bernama `hosts`.
+4. Tambahkan baris ini di bagian paling bawah dokumen:
+   ```text
+   127.0.0.1       pmii
+   127.0.0.1       pm11
+   ```
+5. Simpan (Ctrl+S). Anda kini bisa menggunakan tautan `http://pmii:1960` di komputer Anda.
+
+### 2. Berbagi Akses ke Komputer / HP Lain di WiFi yang Sama
+Mengubah file *hosts* hanya efektif untuk komputer itu sendiri. Agar *device* lain di satu jaringan WiFi dapat mengakses *dashboard* PMII Anda:
+
+**Opsi A: Menggunakan IP (Paling Mudah)**
+Buka via alamat IP dari komputer pusat Windows Anda. 
+*   Cari IP komputer Windows Anda (Ketik `ipconfig` di CMD, cari *IPv4 Address*, misal: `192.168.1.15`).
+*   Buka di HP/Device lain: `http://192.168.1.15:1960`
+*(Pastikan pengaturan Windows Defender Firewall Anda mengizinkan lalu-lintas jaringan masuk untuk koneksi lokal Public/Private).*
+
+**Opsi B: Menggunakan Fitur mDNS (Bisa Pakai Nama)**
+Daripada menggunakan IP, Anda bisa mengganti nama Komputer pusat Windows Anda.
+1. Di komputer Windows pusat, masuk ke **Settings > System > About**.
+2. Klik **Rename this PC** dan ganti menjadi `PMII`. *Restart PC.*
+3. Sekarang, dari HP/Mac/Laptop apa pun di WiFi yang sama, Anda bisa langsung mengaksesnya lewat tautan ini tanpa setelan tambahan:
+👉 **`http://pmii.local:1960`**
