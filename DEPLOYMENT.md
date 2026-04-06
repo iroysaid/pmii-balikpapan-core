@@ -20,25 +20,13 @@ git clone https://github.com/iroysaid/pmii-balikpapan-core.git
 cd pmii-balikpapan-core
 ```
 
-### 2. Siapkan File Konfigurasi (.env)
-Salin `.env.example` (atau buat file `.env` baru) untuk mengatur konfigurasi alamat web Anda:
-```bash
-cp .env .env.production
-# Buka file .env dan ubah jika perlu
-nano .env
-```
-**PENTING di dalam `.env`:**
-*   Pastikan `DATABASE_URL="file:./dev.db"`
-*   Ubah `NEXTAUTH_URL` sesuai nama domain Anda, contoh: `NEXTAUTH_URL=https://pmii-balikpapan.com`
-*   Ubah `NEXTAUTH_SECRET` menjadi teks acak rahasia untuk keamanan *login*.
-
-### 3. Eksekusi Docker Compose
-Jalankan perintah ini untuk mulai mengunduh OS (*Debian*), menginstal dependencies, mem-*build* Next.js, dan menyalakan server secara otomatis di latar belakang (*background*):
+### 2. Eksekusi Docker Compose
+Semua konfigurasi (termasuk *database* dan akses *login*) sudah diotomatisasi. Anda tidak perlu lagi membuat file `.env` secara manual! Cukup jalankan perintah ini untuk menginstal dan menyalakan server secara langsung:
 
 ```bash
 docker-compose up --build -d
 ```
-*Tunggu beberapa menit hingga proses build selesai. Ini hanya memakan waktu agak lama pada percobaan pertama.*
+*Tunggu beberapa menit hingga proses build OS dan instalasi dependensi selesai (membutuhkan koneksi internet).*
 
 ### 4. Cek Status Aplikasi
 Untuk memastikan aplikasi berjalan dengan baik:
