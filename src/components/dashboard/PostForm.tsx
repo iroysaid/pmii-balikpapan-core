@@ -1,6 +1,6 @@
 "use client";
 
-import { createPost, updatePost } from "@/app/actions/post";
+import { createPost, updatePost } from "@/app/actions/berita";
 import ContentImageUploader from "@/components/ContentImageUploader";
 import { Save, Edit } from "lucide-react";
 

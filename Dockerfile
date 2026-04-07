@@ -1,5 +1,8 @@
 FROM node:20-bookworm-slim AS base
 
+# Install OpenSSL for Prisma compatibility
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # 1. Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
@@ -14,13 +17,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate
-
 # Environment variables must be present at build time
 # for next build (e.g. DATABASE_URL)
 ENV DATABASE_URL="file:./dev.db"
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Sync schema to existing dev.db (preserves existing data)
+RUN npx prisma db push --accept-data-loss
 
 RUN npm run build
 
@@ -28,8 +34,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -39,19 +45,26 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+
+# Copy database file (seeded dev.db from local)
 COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
 
 # Ensure uploads directory exists and has correct permissions
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
-# Ensure database file has correct permissions so Nextjs/Prisma can write to it
-RUN chown nextjs:nodejs /app/dev.db
+
+# Copy entrypoint script
+COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Note: standalone mode uses server.js
-CMD ["node", "server.js"]
+# Note: standalone mode uses server.js via entrypoint
+CMD ["./entrypoint.sh"]

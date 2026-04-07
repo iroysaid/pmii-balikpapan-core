@@ -98,7 +98,7 @@ export default function DataToolbar({
 
             // Extract headers and data
             const headers = Object.keys(dataForExport[0]);
-            const body = dataForExport.map(row => Object.values(row));
+            const body = dataForExport.map(row => Object.values(row)) as any[];
 
             doc.text(`${exportFilename.replace(/-/g, ' ')}`, 14, 15);
             doc.setFontSize(10);

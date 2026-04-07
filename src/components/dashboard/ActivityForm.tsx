@@ -1,6 +1,6 @@
 "use client";
 
-import { createActivity, updateActivity } from "@/app/actions/activity";
+import { createActivity, updateActivity } from "@/app/actions/kegiatan";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save, Calendar, Image as ImageIcon, Plus, X, Upload, Loader2 } from "lucide-react";

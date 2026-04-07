@@ -9,8 +9,8 @@ interface Activity {
   description: string;
   eventDate: Date | string;
   image: string | null;
-  status: string;
 }
+
 
 export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
   const [current, setCurrent] = useState(0);

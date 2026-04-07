@@ -6,7 +6,7 @@ import { ArrowLeft, Clock, Calendar, Lock, BookOpen } from "lucide-react";
 import { redirect, notFound } from "next/navigation";
 import MaterialDetailClient from "./client";
 
-export default async function MaterialDetailPage({ params }: { params: { id: string } }) {
+export default async function MaterialDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
     const { id } = await params;
 

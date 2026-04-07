@@ -1,6 +1,6 @@
 "use client";
 
-import { createTransaction, updateTransaction } from "@/app/actions/finance";
+import { createTransaction, updateTransaction } from "@/app/actions/keuangan";
 import { Wallet, TrendingUp, TrendingDown, Save } from "lucide-react";
 import { useState } from "react";
 

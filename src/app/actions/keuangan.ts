@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { TransactionType } from "@prisma/client";
+
+type TransactionType = "DEBIT" | "CREDIT";
 
 async function checkSuperAdmin() {
     const session = await getServerSession(authOptions);

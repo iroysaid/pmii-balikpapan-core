@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Calendar } from "lucide-react";
-import { deleteActivity } from "@/app/actions/activity";
+import { deleteActivity } from "@/app/actions/kegiatan";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -34,8 +34,9 @@ export default async function ActivitiesPage({
     const kegiatanForExport = isSuperAdmin ? kegiatan.map(a => ({
         Judul: a.title,
         Tanggal: new Date(a.eventDate).toLocaleDateString("id-ID"),
-        Status: a.status
+        Status: new Date(a.eventDate) > new Date() ? "Coming Soon" : "Past Event"
     })) : [];
+
 
     return (
         <div className="space-y-6">

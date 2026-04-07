@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { deletePost } from "@/app/actions/post";
+import { deletePost } from "@/app/actions/berita";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
