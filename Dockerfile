@@ -53,7 +53,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/
 COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
 
 # Ensure uploads directory exists and has correct permissions
-RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads && chmod -R 777 /app/public/uploads
+
+# Set permission for database
+RUN chmod 777 /app/dev.db
 
 # Copy entrypoint script
 COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
