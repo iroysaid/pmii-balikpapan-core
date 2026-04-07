@@ -58,10 +58,6 @@ RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads &
 # Set permission for database
 RUN chmod 777 /app/dev.db
 
-# Copy entrypoint script
-COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
-
 USER nextjs
 
 EXPOSE 3000
@@ -69,5 +65,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Note: standalone mode uses server.js via entrypoint
-CMD ["./entrypoint.sh"]
+# Note: standalone mode uses server.js directly
+CMD ["node", "server.js"]
