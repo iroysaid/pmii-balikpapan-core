@@ -8,9 +8,23 @@ services:
     ports:
       - "1960:3000"
     environment:
-      - DATABASE_URL=${DATABASE_URL:-file:./dev.db}
+      - DATABASE_URL=file:/app/dev.db
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-super-secret-key-123}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://pmii.local:1960}
     volumes:
-      - ./dev.db:/app/prisma/dev.db
+      - ./dev.db:/app/dev.db
       - ./uploads:/app/public/uploads
+
+  studio:
+    image: node:20-bookworm-slim
+    container_name: pmii-studio
+    working_dir: /app
+    command: sh -c "apt-get update && apt-get install -y openssl && npm install prisma @prisma/client && npx prisma studio --browser none --port 5555 --hostname 0.0.0.0"
+    restart: always
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=file:/app/dev.db
+    volumes:
+      - ./dev.db:/app/dev.db
+      - .:/app
