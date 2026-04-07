@@ -2,8 +2,8 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    // Verified bcrypt hash for "password123" (10 rounds)
-    const passwordHash = '$2a$12$R9h/lIPz0bouBy6DeSLhweCc1YMJPUOS8nd1CfNfC5PrNaJ799SSe'; 
+    // Correct bcrypt hash for "password123"
+    const passwordHash = '$2b$12$12nN1eaECzSS.OkDiNDJm.3RJTauvqIC7dhkhCnbS0NaRYYcL4cTO'; 
 
     console.log('Seeding Super Admin directly into /app/dev.db...');
     

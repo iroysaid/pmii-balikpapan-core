@@ -18,32 +18,44 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
+                console.log("[AUTH DEBUG] Login attempt for email:", credentials?.email);
+                
                 if (!credentials?.email || !credentials?.password) {
+                    console.log("[AUTH DEBUG] Missing credentials");
                     return null;
                 }
 
-                const user = await prisma.user.findUnique({
-                    where: {
-                        email: credentials.email,
-                    },
-                });
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: {
+                            email: credentials.email,
+                        },
+                    });
 
-                if (!user) {
+                    if (!user) {
+                        console.log("[AUTH DEBUG] User not found in database:", credentials.email);
+                        return null;
+                    }
+
+                    console.log("[AUTH DEBUG] Comparing passwords for:", credentials.email);
+                    const isPasswordValid = await compare(credentials.password, user.password);
+
+                    if (!isPasswordValid) {
+                        console.log("[AUTH DEBUG] Invalid password for user:", credentials.email);
+                        return null;
+                    }
+
+                    console.log("[AUTH DEBUG] Login successful for:", credentials.email);
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                    };
+                } catch (error) {
+                    console.error("[AUTH DEBUG] Error in authorize callback:", error);
                     return null;
                 }
-
-                const isPasswordValid = await compare(credentials.password, user.password); // Need bcryptjs
-
-                if (!isPasswordValid) {
-                    return null;
-                }
-
-                return {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                };
             },
         }),
     ],
