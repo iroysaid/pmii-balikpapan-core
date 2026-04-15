@@ -129,12 +129,12 @@ export default async function FinancePage({
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-secondary font-bold uppercase text-xs">
                         <tr>
-                            <th className="px-6 py-4">Tanggal</th>
-                            <th className="px-6 py-4">Keterangan</th>
-                            <th className="px-6 py-4 text-right text-green-600">Debet (Masuk)</th>
-                            <th className="px-6 py-4 text-right text-red-600">Kredit (Keluar)</th>
-                            <th className="px-6 py-4 text-right text-primary">Saldo</th>
-                            {isSuperAdmin && <th className="px-6 py-4 text-right">Aksi</th>}
+                            <th className="px-4 md:px-6 py-4">Tanggal</th>
+                            <th className="px-4 md:px-6 py-4">Keterangan</th>
+                            <th className="px-4 md:px-6 py-4 text-right text-green-600">Debet</th>
+                            <th className="px-4 md:px-6 py-4 text-right text-red-600">Kredit</th>
+                            <th className="px-4 md:px-6 py-4 text-right text-primary">Saldo</th>
+                            {isSuperAdmin && <th className="px-4 md:px-6 py-4 text-right">Aksi</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -147,23 +147,23 @@ export default async function FinancePage({
                         ) : (
                             transactions.map((t) => (
                                 <tr key={t.id} className="hover:bg-gray-50 transition group">
-                                    <td className="px-6 py-4 text-secondary">
+                                    <td className="px-4 md:px-6 py-4 text-secondary whitespace-nowrap text-xs md:text-sm">
                                         {new Date(t.date).toLocaleDateString("id-ID")}
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-primary">
+                                    <td className="px-4 md:px-6 py-4 font-medium text-primary text-xs md:text-sm min-w-[150px]">
                                         {t.description}
                                     </td>
-                                    <td className="px-6 py-4 text-right text-green-600 font-medium">
+                                    <td className="px-4 md:px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap text-xs md:text-sm">
                                         {t.type === "DEBIT" ? `Rp ${t.amount.toLocaleString("id-ID")}` : "-"}
                                     </td>
-                                    <td className="px-6 py-4 text-right text-red-600 font-medium">
+                                    <td className="px-4 md:px-6 py-4 text-right text-red-600 font-medium whitespace-nowrap text-xs md:text-sm">
                                         {t.type === "CREDIT" ? `Rp ${t.amount.toLocaleString("id-ID")}` : "-"}
                                     </td>
-                                    <td className="px-6 py-4 text-right font-bold text-primary">
+                                    <td className="px-4 md:px-6 py-4 text-right font-bold text-primary whitespace-nowrap text-xs md:text-sm">
                                         Rp {t.balance.toLocaleString("id-ID")}
                                     </td>
                                     {isSuperAdmin && (
-                                        <td className="px-6 py-4 text-right flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition">
+                                        <td className="px-4 md:px-6 py-4 text-right flex justify-end space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
                                             <Link href={`/dashboard/keuangan/${t.id}/edit`} className="text-blue-500 hover:text-blue-700 p-1">
                                                 <Edit className="w-4 h-4" />
                                             </Link>

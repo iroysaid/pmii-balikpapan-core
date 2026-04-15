@@ -45,11 +45,11 @@ export default function Sidebar() {
         <>
             {/* Mobile Header */}
             <div className="md:hidden fixed top-0 w-full h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-40">
-                <div className="flex items-center space-x-2">
+                <Link href="/" className="flex items-center space-x-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/PMII_BPP.png" alt="Logo PMII" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-primary text-sm leading-tight">PMII<br /><span className="text-secondary text-[10px] tracking-widest uppercase opacity-60">Balikpapan</span></span>
-                </div>
+                </Link>
                 <button onClick={() => setIsOpen(true)} className="p-2 text-secondary hover:bg-gray-50 rounded-lg">
                     <Menu className="w-6 h-6" />
                 </button>
@@ -65,13 +65,13 @@ export default function Sidebar() {
 
             <aside className={`w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col fixed h-full z-50 transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                    <Link href="/" className="flex items-center space-x-3">
                         <div className="relative w-10 h-10">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src="/PMII_BPP.png" alt="Logo PMII" className="w-full h-full object-contain" />
                         </div>
                         <span className="font-bold text-primary text-lg leading-tight">PMII<br /><span className="text-secondary text-xs tracking-widest uppercase opacity-60">Balikpapan</span></span>
-                    </div>
+                    </Link>
                     <button onClick={() => setIsOpen(false)} className="md:hidden p-2 text-secondary hover:bg-gray-50 rounded-lg">
                         <X className="w-6 h-6" />
                     </button>
