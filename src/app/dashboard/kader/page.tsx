@@ -123,7 +123,7 @@ export default async function KaderPage({
             />
 
             {/* Main Table (Active) */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="font-bold text-primary flex items-center">
                         <CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Data Kader (Terverifikasi)
@@ -206,7 +206,7 @@ export default async function KaderPage({
 
             {/* Pending Verification Table */}
             {pendingKaders.length > 0 && (
-                <div className="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden relative">
+                <div className="bg-white rounded-xl shadow-sm border border-orange-200 overflow-x-auto relative">
                     <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
                     <div className="p-4 border-b border-orange-100 flex justify-between items-center bg-orange-50">
                         <h2 className="font-bold text-orange-800 flex items-center">

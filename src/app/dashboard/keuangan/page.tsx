@@ -125,7 +125,7 @@ export default async function FinancePage({
             </div>
 
             {/* Ledger Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-secondary font-bold uppercase text-xs">
                         <tr>

@@ -35,7 +35,7 @@ export default async function LearningDashboard() {
                 )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold text-sm">
                         <tr>

@@ -66,7 +66,7 @@ export default async function ActivitiesPage({
                 exportFilename={`Data-Kegiatan-${new Date().toISOString().split('T')[0]}`}
             />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-secondary font-bold uppercase text-xs">
                         <tr>
