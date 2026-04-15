@@ -2,12 +2,20 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Calendar, ArrowRight, TrendingUp, Clock, Tag } from "lucide-react";
 
+
 export const dynamic = "force-dynamic";
+
+function stripHtml(html: string) {
+    return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
 
 export default async function NewsPage() {
     const posts = await prisma.post.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
+        include: {
+            tags: { include: { tag: true } },
+        },
     });
 
     if (posts.length === 0) {
@@ -70,7 +78,7 @@ export default async function NewsPage() {
                                         {featuredPost.title}
                                     </h2>
                                     <p className="text-white/70 text-sm md:text-base line-clamp-2 md:max-w-2xl">
-                                        {featuredPost.content.substring(0, 150)}...
+                                        {stripHtml(featuredPost.content).substring(0, 150)}...
                                     </p>
                                 </div>
                             </Link>
@@ -103,7 +111,7 @@ export default async function NewsPage() {
                                                 {post.title}
                                             </h3>
                                             <p className="text-gray-500 text-sm line-clamp-2">
-                                                {post.content.substring(0, 80)}...
+                                                {stripHtml(post.content).substring(0, 80)}...
                                             </p>
                                         </div>
                                     </Link>
@@ -137,7 +145,7 @@ export default async function NewsPage() {
                                                 {post.title}
                                             </h4>
                                             <p className="text-gray-500 text-sm line-clamp-2 mb-4">
-                                                {post.content.substring(0, 120)}...
+                                                {stripHtml(post.content).substring(0, 120)}...
                                             </p>
                                             <div className="flex items-center text-[10px] text-gray-400 font-medium">
                                                 <Calendar className="w-3 h-3 mr-1" /> {new Date(post.createdAt).toLocaleDateString("id-ID")}
