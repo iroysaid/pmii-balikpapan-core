@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Calendar, ArrowRight, TrendingUp, Clock, Tag } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function NewsPage() {
     const posts = await prisma.post.findMany({
         where: { published: true },

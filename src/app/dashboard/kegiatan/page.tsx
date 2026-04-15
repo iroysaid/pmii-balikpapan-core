@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Calendar } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar, Users, Heart } from "lucide-react";
 import { deleteActivity } from "@/app/actions/kegiatan";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -29,6 +29,11 @@ export default async function ActivitiesPage({
     const kegiatan = await prisma.activity.findMany({
         where: whereClause,
         orderBy: orderBy,
+        include: {
+            _count: {
+                select: { rsvps: true }
+            }
+        }
     });
 
     const kegiatanForExport = isSuperAdmin ? kegiatan.map(a => ({
@@ -93,7 +98,14 @@ export default async function ActivitiesPage({
                                               <img src={activity.image} alt="" className="w-10 h-10 rounded-md object-cover mr-3" />
                                             )}
                                             <div>
-                                                <div className="font-medium text-primary">{activity.title}</div>
+                                                <div className="font-medium text-primary flex items-center">
+                                                    {activity.title}
+                                                    {activity.isInvitation && (
+                                                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-pink-100 text-pink-600 uppercase">
+                                                            Undangan
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="text-xs text-secondary line-clamp-1">{activity.description}</div>
                                             </div>
                                         </div>
@@ -116,15 +128,29 @@ export default async function ActivitiesPage({
                                         )}
                                     </td>
                                     {isSuperAdmin && (
-                                        <td className="px-6 py-4 text-right flex justify-end space-x-2">
-                                            <Link href={`/dashboard/kegiatan/${activity.id}/edit`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                                                <Edit className="w-4 h-4" />
-                                            </Link>
-                                            <form action={deleteActivity.bind(null, activity.id)}>
-                                                <button type="submit" className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </form>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end space-x-2">
+                                                {activity.isInvitation && (
+                                                    <Link 
+                                                        href={`/dashboard/kegiatan/${activity.id}/rsvp`} 
+                                                        className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg flex items-center group relative"
+                                                        title="Lihat Konfirmasi Kehadiran"
+                                                    >
+                                                        <Users className="w-4 h-4" />
+                                                        <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-[8px] font-bold px-1 rounded-full">
+                                                            {activity._count.rsvps}
+                                                        </span>
+                                                    </Link>
+                                                )}
+                                                <Link href={`/dashboard/kegiatan/${activity.id}/edit`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                                                    <Edit className="w-4 h-4" />
+                                                </Link>
+                                                <form action={deleteActivity.bind(null, activity.id)}>
+                                                    <button type="submit" className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     )}
                                 </tr>

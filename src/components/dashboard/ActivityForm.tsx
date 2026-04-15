@@ -12,6 +12,11 @@ interface ActivityFormProps {
     description: string;
     eventDate: Date | string;
     image: string | null;
+    isInvitation?: boolean;
+    theme?: string;
+    musicUrl?: string | null;
+    locationUrl?: string | null;
+    locationName?: string | null;
     photos?: { id: string; url: string }[];
   };
 }
@@ -20,6 +25,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
   const isEditing = !!initialData;
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isInvitation, setIsInvitation] = useState(initialData?.isInvitation || false);
   const [banner, setBanner] = useState(initialData?.image || "");
   const [photos, setPhotos] = useState<string[]>(initialData?.photos?.map(p => p.url) || []);
   
@@ -155,6 +161,74 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
                 </button>
             </div>
           </div>
+        </div>
+
+        {/* Digital Invitation Mode */}
+        <div className="pt-6 border-t border-gray-100 space-y-6">
+            <div className="flex items-center justify-between bg-blue-50 p-6 rounded-3xl">
+                <div>
+                    <h3 className="text-xl font-black text-primary flex items-center">
+                        <span className="w-2 h-6 bg-blue-600 mr-3 inline-block"></span>
+                        Mode Undangan Digital
+                    </h3>
+                    <p className="text-sm text-secondary">Aktifkan untuk membuat halaman khusus undangan yang bisa di-share.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        name="isInvitation"
+                        checked={isInvitation}
+                        onChange={(e) => setIsInvitation(e.target.checked)}
+                        className="sr-only peer" 
+                    />
+                    <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+
+            {isInvitation && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-top-4">
+                    <div className="space-y-4">
+                        <label className="block text-sm font-bold text-primary">Tema Undangan</label>
+                        <select 
+                            name="theme"
+                            defaultValue={initialData?.theme || "modern-blue"}
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+                        >
+                            <option value="modern-blue">Modern Blue (Elegan)</option>
+                            <option value="classic-gold">Classic Gold (Formal)</option>
+                            <option value="midnight-dark">Midnight Dark (Mewah)</option>
+                        </select>
+
+                        <label className="block text-sm font-bold text-primary">Musik Latar (URL .mp3)</label>
+                        <input 
+                            type="text"
+                            name="musicUrl"
+                            defaultValue={initialData?.musicUrl || ""}
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+                            placeholder="Link file audio (.mp3)"
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <label className="block text-sm font-bold text-primary">Nama Lokasi (Gedung/Tempat)</label>
+                        <input 
+                            type="text"
+                            name="locationName"
+                            defaultValue={initialData?.locationName || ""}
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+                            placeholder="Contoh: Gedung Serbaguna IAI"
+                        />
+                        
+                        <label className="block text-sm font-bold text-primary">Google Maps URL</label>
+                        <input 
+                            type="text"
+                            name="locationUrl"
+                            defaultValue={initialData?.locationUrl || ""}
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+                            placeholder="Link dari Google Maps"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* Documentation Gallery */}
