@@ -90,7 +90,7 @@ export default function ProfilPage() {
                     
                     <div className="bg-white p-4 rounded-[3rem] shadow-2xl border border-gray-100 overflow-hidden h-[550px] group relative focus-within:ring-4 focus-within:ring-primary/5 transition-all outline-none">
                         <iframe
-                            src="https://maps.google.com/maps?q=Sekretariat+Cabang+PMII+Balikpapan&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                            src="https://maps.google.com/maps?q=-1.250806,116.888083&t=&z=17&ie=UTF8&iwloc=&output=embed"
                             width="100%"
                             height="100%"
                             style={{ border: 0, borderRadius: '2rem' }}

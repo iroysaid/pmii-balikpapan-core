@@ -68,7 +68,7 @@ export default function ContactPage() {
                     {/* Maps Embed */}
                     <div className="bg-white p-4 rounded-2xl shadow-lg h-[400px] overflow-hidden">
                         <iframe
-                            src="https://maps.google.com/maps?q=Sekretariat+Cabang+PMII+Balikpapan&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            src="https://maps.google.com/maps?q=-1.250806,116.888083&t=&z=17&ie=UTF8&iwloc=&output=embed"
                             width="100%"
                             height="100%"
                             style={{ border: 0, borderRadius: '1rem' }}
