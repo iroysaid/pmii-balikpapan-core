@@ -11,9 +11,23 @@ services:
       - DATABASE_URL=file:/app/dev.db
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-super-secret-key-123}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://pmii.local:1960}
+      - NODE_OPTIONS=--max-old-space-size=512
     volumes:
       - ./dev.db:/app/dev.db
       - ./uploads:/app/public/uploads
+    # ——— Hybrid CPU + GPU resource management ———
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"       # Maksimum 4 core CPU untuk proses berat
+          memory: 1G        # Batas RAM 1GB untuk app runtime
+        reservations:
+          cpus: "0.5"       # Minimal 0.5 core selalu terjamin
+          memory: 256M
+          devices:
+            - driver: nvidia
+              count: 1      # Gunakan 1 GPU jika tersedia
+              capabilities: [gpu, utility]
 
   studio:
     image: node:20-bookworm-slim
@@ -28,3 +42,12 @@ services:
     volumes:
       - ./dev.db:/app/dev.db
       - .:/app
+    # Studio ringan — CPU only
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
