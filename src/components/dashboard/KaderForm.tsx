@@ -163,7 +163,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             required
                             defaultValue={initialData?.name}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            placeholder="Nama sesuai KTP"
+                            placeholder="Contoh: Budi Widodo"
                         />
                     </div>
                     <div>
@@ -174,7 +174,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             required
                             defaultValue={initialData?.username}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            placeholder="kader_123"
+                            placeholder="Contoh: wongsolo24"
                         />
                     </div>
                     <div>
@@ -306,7 +306,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             name="campusAddress"
                             defaultValue={initialData?.kaderProfile?.campusAddress}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            placeholder="Jl. Raya..."
+                            placeholder="Contoh: Jl. Soekarno Hatta KM 15, Karang Joang (Gunakan alamat resmi kampus)"
                         />
                     </div>
 
@@ -341,7 +341,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             name="phone"
                             defaultValue={initialData?.kaderProfile?.phone}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            placeholder="08..."
+                            placeholder="Contoh: 081234567890"
                         />
                     </div>
                     <div>
@@ -351,6 +351,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             name="placeOfBirth"
                             defaultValue={initialData?.kaderProfile?.birthPlace}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: Balikpapan"
                         />
                     </div>
                     <div>
@@ -370,6 +371,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         rows={3}
                         defaultValue={initialData?.kaderProfile?.address}
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                        placeholder="Contoh: Jl. Marsma R. Iswahyudi No. 123, RT 05, Kelurahan Sepinggan, Kecamatan Balikpapan Selatan"
                     ></textarea>
                 </div>
             </div>
