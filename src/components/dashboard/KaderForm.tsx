@@ -28,6 +28,28 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
     const action = customAction || defaultAction;
 
     const [selectedKomisariat, setSelectedKomisariat] = useState<string>(initialData?.kaderProfile?.komisariat || "");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [otherTrainings, setOtherTrainings] = useState<any[]>(() => {
+        if (initialData?.kaderProfile?.otherTraining) {
+            try {
+                return JSON.parse(initialData.kaderProfile.otherTraining);
+            } catch (e) { return []; }
+        }
+        return [];
+    });
+
+    const addTraining = () => {
+        setOtherTrainings([...otherTrainings, { name: "", year: "", location: "", organizer: "" }]);
+    };
+    const updateTraining = (index: number, field: string, value: string) => {
+        const newT = [...otherTrainings];
+        newT[index][field] = value;
+        setOtherTrainings(newT);
+    };
+    const removeTraining = (index: number) => {
+        setOtherTrainings(otherTrainings.filter((_, i) => i !== index));
+    };
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [resultData, setResultData] = useState<{username: string, password: string, noInduk: string} | null>(null);
 
@@ -299,6 +321,170 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         defaultValue={initialData?.kaderProfile?.address}
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                     ></textarea>
+                </div>
+            </div>
+
+            {/* Riwayat Pengkaderan Formal */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-lg font-bold text-primary mb-4 border-b pb-2">Riwayat Pelatihan Kader (Opsional)</h2>
+                
+                {/* PKD */}
+                <h3 className="font-semibold text-secondary mb-3 mt-4">Pelatihan Kader Dasar (PKD)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Tahun PKD</label>
+                        <select
+                            name="pkdYear"
+                            defaultValue={initialData?.kaderProfile?.pkdYear || ""}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                        >
+                            <option value="">-- Pilih Tahun --</option>
+                            {Array.from({ length: 2045 - 1990 + 1 }, (_, i) => 2045 - i).map(year => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Lokasi PKD</label>
+                        <input
+                            type="text"
+                            name="pkdLocation"
+                            defaultValue={initialData?.kaderProfile?.pkdLocation}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: Balikpapan"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Penyelenggara PKD</label>
+                        <input
+                            type="text"
+                            name="pkdOrganizer"
+                            defaultValue={initialData?.kaderProfile?.pkdOrganizer}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: PC PMII Balikpapan"
+                        />
+                    </div>
+                </div>
+
+                {/* PKL */}
+                <h3 className="font-semibold text-secondary mb-3 mt-6">Pelatihan Kader Lanjut (PKL)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Tahun PKL</label>
+                        <select
+                            name="pklYear"
+                            defaultValue={initialData?.kaderProfile?.pklYear || ""}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                        >
+                            <option value="">-- Pilih Tahun --</option>
+                            {Array.from({ length: 2045 - 1990 + 1 }, (_, i) => 2045 - i).map(year => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Lokasi PKL</label>
+                        <input
+                            type="text"
+                            name="pklLocation"
+                            defaultValue={initialData?.kaderProfile?.pklLocation}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: Samarinda"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Penyelenggara PKL</label>
+                        <input
+                            type="text"
+                            name="pklOrganizer"
+                            defaultValue={initialData?.kaderProfile?.pklOrganizer}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: PKC PMII Kaltim"
+                        />
+                    </div>
+                </div>
+                </div>
+
+                {/* PKN */}
+                <h3 className="font-semibold text-secondary mb-3 mt-6">Pelatihan Kader Nasional (PKN)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Tahun PKN</label>
+                        <select
+                            name="pknYear"
+                            defaultValue={initialData?.kaderProfile?.pknYear || ""}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                        >
+                            <option value="">-- Pilih Tahun --</option>
+                            {Array.from({ length: 2045 - 1990 + 1 }, (_, i) => 2045 - i).map(year => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Lokasi PKN</label>
+                        <input
+                            type="text"
+                            name="pknLocation"
+                            defaultValue={initialData?.kaderProfile?.pknLocation}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: Jakarta"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Penyelenggara PKN</label>
+                        <input
+                            type="text"
+                            name="pknOrganizer"
+                            defaultValue={initialData?.kaderProfile?.pknOrganizer}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: PB PMII"
+                        />
+                    </div>
+                </div>
+
+                {/* Other Trainings (Dynamic) */}
+                <div className="mt-8 border-t pt-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-semibold text-secondary">Pelatihan / Kaderisasi Lainnya</h3>
+                        <button type="button" onClick={addTraining} className="text-sm bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-bold hover:bg-blue-100 flex items-center">
+                            <span className="mr-1">+</span> Tambah Pelatihan
+                        </button>
+                    </div>
+                    <input type="hidden" name="otherTraining" value={JSON.stringify(otherTrainings)} />
+                    
+                    <div className="space-y-4">
+                        {otherTrainings.map((t, index) => (
+                            <div key={index} className="bg-gray-50 p-4 rounded-xl border border-gray-200 relative">
+                                <button type="button" onClick={() => removeTraining(index)} className="absolute top-2 right-2 text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded-md">
+                                    Hapus
+                                </button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                                    <div>
+                                        <label className="block text-xs font-bold text-primary mb-1">Nama Pelatihan</label>
+                                        <input type="text" value={t.name} onChange={(e) => updateTraining(index, 'name', e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm" placeholder="Contoh: PKPN" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-primary mb-1">Tahun</label>
+                                        <input type="text" value={t.year} onChange={(e) => updateTraining(index, 'year', e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm" placeholder="Contoh: 2024" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-primary mb-1">Lokasi</label>
+                                        <input type="text" value={t.location} onChange={(e) => updateTraining(index, 'location', e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm" placeholder="Contoh: Surabaya" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-primary mb-1">Penyelenggara</label>
+                                        <input type="text" value={t.organizer} onChange={(e) => updateTraining(index, 'organizer', e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm" placeholder="Contoh: PB PMII" />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {otherTrainings.length === 0 && (
+                            <div className="text-center text-sm text-gray-400 py-4 border-2 border-dashed border-gray-200 rounded-xl">
+                                Belum ada pelatihan tambahan. Klik &quot;Tambah Pelatihan&quot; jika ada.
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

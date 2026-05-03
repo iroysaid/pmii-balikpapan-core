@@ -51,7 +51,15 @@ model KaderProfile {
   komisariat  String?
   mapabaYear  String?
   pkdYear     String?
+  pkdLocation String?
+  pkdOrganizer String?
   pklYear     String?
+  pklLocation String?
+  pklOrganizer String?
+  pknYear     String?
+  pknLocation String?
+  pknOrganizer String?
+  otherTraining String? // Stores JSON stringified array of other trainings
   
   // New Fields
   campus         String?

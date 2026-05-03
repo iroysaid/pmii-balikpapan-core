@@ -47,13 +47,22 @@ export async function createKader(formData: FormData) {
     const mapabaYear = formData.get("mapabaYear") as string;
     const role = (formData.get("role") as string) || "KADER";
 
-    // New Fields
     const address = formData.get("address") as string;
     const phone = formData.get("phone") as string;
     const placeOfBirth = formData.get("placeOfBirth") as string;
     const dateOfBirth = formData.get("dateOfBirth") as string;
     const campusAddress = formData.get("campusAddress") as string;
     const faculty = formData.get("faculty") as string;
+    const pkdYear = formData.get("pkdYear") as string;
+    const pkdLocation = formData.get("pkdLocation") as string;
+    const pkdOrganizer = formData.get("pkdOrganizer") as string;
+    const pklYear = formData.get("pklYear") as string;
+    const pklLocation = formData.get("pklLocation") as string;
+    const pklOrganizer = formData.get("pklOrganizer") as string;
+    const pknYear = formData.get("pknYear") as string;
+    const pknLocation = formData.get("pknLocation") as string;
+    const pknOrganizer = formData.get("pknOrganizer") as string;
+    const otherTraining = formData.get("otherTraining") as string;
 
     // Find organization
     const org = await prisma.organization.findFirst({ where: { name: komisariat } });
@@ -109,6 +118,16 @@ export async function createKader(formData: FormData) {
                         faculty,
                         major,
                         mapabaYear,
+                        pkdYear,
+                        pkdLocation,
+                        pkdOrganizer,
+                        pklYear,
+                        pklLocation,
+                        pklOrganizer,
+                        pknYear,
+                        pknLocation,
+                        pknOrganizer,
+                        otherTraining,
                         address,
                         noInduk: newNoInduk,
                         phone,
@@ -163,6 +182,16 @@ export async function updateKader(userId: string, formData: FormData) {
     const dateOfBirth = formData.get("dateOfBirth") as string;
     const campusAddress = formData.get("campusAddress") as string;
     const faculty = formData.get("faculty") as string;
+    const pkdYear = formData.get("pkdYear") as string;
+    const pkdLocation = formData.get("pkdLocation") as string;
+    const pkdOrganizer = formData.get("pkdOrganizer") as string;
+    const pklYear = formData.get("pklYear") as string;
+    const pklLocation = formData.get("pklLocation") as string;
+    const pklOrganizer = formData.get("pklOrganizer") as string;
+    const pknYear = formData.get("pknYear") as string;
+    const pknLocation = formData.get("pknLocation") as string;
+    const pknOrganizer = formData.get("pknOrganizer") as string;
+    const otherTraining = formData.get("otherTraining") as string;
 
     const org = await prisma.organization.findFirst({ where: { name: komisariat } });
     const organizationId = org?.id;
@@ -201,6 +230,16 @@ export async function updateKader(userId: string, formData: FormData) {
                 phone,
                 birthPlace: placeOfBirth,
                 birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                pkdYear,
+                pkdLocation,
+                pkdOrganizer,
+                pklYear,
+                pklLocation,
+                pklOrganizer,
+                pknYear,
+                pknLocation,
+                pknOrganizer,
+                otherTraining,
             },
             create: {
                 userId,
@@ -215,6 +254,16 @@ export async function updateKader(userId: string, formData: FormData) {
                 phone,
                 birthPlace: placeOfBirth,
                 birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                pkdYear,
+                pkdLocation,
+                pkdOrganizer,
+                pklYear,
+                pklLocation,
+                pklOrganizer,
+                pknYear,
+                pknLocation,
+                pknOrganizer,
+                otherTraining,
                 status: "VERIFIED"
             }
         });
