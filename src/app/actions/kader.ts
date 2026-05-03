@@ -24,6 +24,17 @@ function generatePassword() {
     return password;
 }
 
+function getKomisariatCode(komisariat: string) {
+    const codes: Record<string, string> = {
+        "Komisariat Nusantara": "1",
+        "Komisariat Uniba": "2",
+        "Komisariat Mulia": "3",
+        "Komisariat Staiba": "4",
+        "Komisariat Stitba": "5"
+    };
+    return codes[komisariat] || "0";
+}
+
 export async function createKader(formData: FormData) {
     await checkSuperAdmin();
 
@@ -41,27 +52,33 @@ export async function createKader(formData: FormData) {
     const phone = formData.get("phone") as string;
     const placeOfBirth = formData.get("placeOfBirth") as string;
     const dateOfBirth = formData.get("dateOfBirth") as string;
+    const campusAddress = formData.get("campusAddress") as string;
+    const faculty = formData.get("faculty") as string;
 
     // Find organization
     const org = await prisma.organization.findFirst({ where: { name: komisariat } });
     const organizationId = org?.id;
 
-    // Auto Generate No Induk (using previous logic)
-    const lastKader = await prisma.kaderProfile.findFirst({
-        where: { noInduk: { not: null } },
-        orderBy: { noInduk: "desc" },
-    });
+    // Auto Generate NIA (1110 + KODE_KOMISARIAT + YY + NOMOR_URUT)
+    const currentYear = mapabaYear ? mapabaYear.slice(-2) : new Date().getFullYear().toString().slice(-2);
+    const kodeKomisariat = getKomisariatCode(komisariat);
+    const prefix = `1110${kodeKomisariat}${currentYear}`;
 
-    let newNoInduk = "001";
-    if (lastKader && lastKader.noInduk) {
-        const currentId = parseInt(lastKader.noInduk);
-        if (!isNaN(currentId)) {
-            newNoInduk = (currentId + 1).toString().padStart(3, "0");
-        } else {
-            newNoInduk = (parseInt(lastKader.noInduk.replace(/\D/g, '')) + 1).toString().padStart(3, "0");
-            if (newNoInduk === "NaN") newNoInduk = "001";
+    const allKaders = await prisma.kaderProfile.findMany({
+        where: { noInduk: { not: null } },
+        select: { noInduk: true }
+    });
+    
+    let maxSequence = 0;
+    for (const k of allKaders) {
+        if (k.noInduk && k.noInduk.length === 11) {
+            const seq = parseInt(k.noInduk.slice(-4), 10);
+            if (!isNaN(seq) && seq > maxSequence) {
+                maxSequence = seq;
+            }
         }
     }
+    const newNoInduk = `${prefix}${(maxSequence + 1).toString().padStart(4, "0")}`;
 
     const imageFile = formData.get("image") as File;
     let imageUrl = null;
@@ -88,6 +105,8 @@ export async function createKader(formData: FormData) {
                     create: {
                         komisariat,
                         campus,
+                        campusAddress,
+                        faculty,
                         major,
                         mapabaYear,
                         address,
@@ -142,6 +161,8 @@ export async function updateKader(userId: string, formData: FormData) {
     const phone = formData.get("phone") as string;
     const placeOfBirth = formData.get("placeOfBirth") as string;
     const dateOfBirth = formData.get("dateOfBirth") as string;
+    const campusAddress = formData.get("campusAddress") as string;
+    const faculty = formData.get("faculty") as string;
 
     const org = await prisma.organization.findFirst({ where: { name: komisariat } });
     const organizationId = org?.id;
@@ -171,6 +192,8 @@ export async function updateKader(userId: string, formData: FormData) {
             update: {
                 komisariat,
                 campus,
+                campusAddress,
+                faculty,
                 major,
                 mapabaYear,
                 address,
@@ -183,6 +206,8 @@ export async function updateKader(userId: string, formData: FormData) {
                 userId,
                 komisariat,
                 campus,
+                campusAddress,
+                faculty,
                 major,
                 mapabaYear,
                 address,

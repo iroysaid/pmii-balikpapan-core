@@ -202,16 +202,39 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         </select>
                     </div>
 
-                    {/* Prodi / Fakultas */}
+                    {/* Fakultas */}
                     <div>
-                        <label className="block text-sm font-bold text-primary mb-2">Prodi / Fakultas</label>
+                        <label className="block text-sm font-bold text-primary mb-2">Fakultas</label>
+                        <input
+                            type="text"
+                            name="faculty"
+                            defaultValue={initialData?.kaderProfile?.faculty}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Contoh: Fakultas Hukum"
+                        />
+                    </div>
+
+                    {/* Prodi / Jurusan */}
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Prodi / Jurusan</label>
                         <input
                             type="text"
                             name="major"
-                            required
                             defaultValue={initialData?.kaderProfile?.major}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            placeholder="Contoh: Hukum / Teknik Sipil"
+                            placeholder="Contoh: Ilmu Hukum"
+                        />
+                    </div>
+
+                    {/* Alamat Kampus */}
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Alamat Kampus</label>
+                        <input
+                            type="text"
+                            name="campusAddress"
+                            defaultValue={initialData?.kaderProfile?.campusAddress}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="Jl. Raya..."
                         />
                     </div>
 

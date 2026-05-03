@@ -11,29 +11,21 @@ export default function Navbar() {
     const { data: session } = useSession();
     const role = session?.user?.role;
 
-    // Base links for Everyone
+    // Base links for Everyone (Public)
     const links = [
-        { name: "Home", href: "/" },
+        { name: "Beranda", href: "/" },
         { name: "Profil", href: "/profil" },
+        { name: "Agenda", href: "/kegiatan" },
         { name: "Berita", href: "/berita" },
         { name: "Galeri", href: "/galeri" },
-        { name: "Kontak", href: "/kontak" },
     ];
+
+    const isPengurus = ["PENGURUS_KOMISARIAT", "PENGURUS_CABANG", "ADMIN_CABANG", "SUPER_ADMIN"].includes(role as string);
 
     // Role-Based Additions
     if (session) {
-        // Kader, Pengurus, Admin: Add E-Learning
+        // Semua user yang login bisa akses modul E-Learning
         links.push({ name: "E-Learning", href: "/materi" });
-
-        // Pengurus & Super Admin: Add Keuangan (Report Page)
-        if (role === "PENGURUS" || role === "SUPER_ADMIN") {
-            links.push({ name: "Keuangan", href: "/keuangan" });
-        }
-
-        // Super Admin Only: Add Dashboard (Editor)
-        if (role === "SUPER_ADMIN") {
-            links.push({ name: "Dashboard", href: "/dashboard" });
-        }
     }
 
     return (
@@ -81,7 +73,7 @@ export default function Navbar() {
                         ))}
                         {session ? (
                             <Link
-                                href={role === "KADER" ? "/dashboard/anggota" : "/dashboard"}
+                                href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
                                 className="bg-accent text-primary px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition"
                             >
                                 {session.user?.name?.split(' ')[0] || "Akun"}
@@ -124,7 +116,7 @@ export default function Navbar() {
                         ))}
                         {session ? (
                             <Link
-                                href={role === "KADER" ? "/dashboard/anggota" : "/dashboard"}
+                                href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
                                 onClick={() => setIsOpen(false)}
                                 className="block py-2 text-accent font-bold"
                             >

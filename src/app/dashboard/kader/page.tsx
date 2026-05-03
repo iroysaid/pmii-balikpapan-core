@@ -174,7 +174,7 @@ export default async function KaderPage({
                                     <td className="px-6 py-4">
                                         <div className="text-sm font-semibold text-primary">{kader.kaderProfile?.komisariat || "-"}</div>
                                         <div className="text-xs text-secondary mt-1">{kader.kaderProfile?.campus || "-"}</div>
-                                        <div className="text-xs text-gray-400 mt-0.5">{kader.kaderProfile?.major || "-"}</div>
+                                        <div className="text-xs text-gray-500 mt-0.5">{kader.kaderProfile?.faculty || "-"} - {kader.kaderProfile?.major || "-"}</div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="text-xs text-gray-500">Angkatan</div>

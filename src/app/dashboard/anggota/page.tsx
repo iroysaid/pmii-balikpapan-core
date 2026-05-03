@@ -70,12 +70,24 @@ export default async function MemberDashboard() {
                             <span className="font-bold text-primary">{user?.name}</span>
                         </div>
                         <div className="flex justify-between border-b border-gray-50 pb-2">
-                            <span className="text-secondary text-sm">Rayon</span>
-                            <span className="font-bold text-primary">{user?.kaderProfile?.rayon || '-'}</span>
+                            <span className="text-secondary text-sm">NIA</span>
+                            <span className="font-bold text-primary">{user?.kaderProfile?.noInduk || '-'}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-50 pb-2">
+                            <span className="text-secondary text-sm">Komisariat</span>
+                            <span className="font-bold text-primary">{user?.kaderProfile?.komisariat || '-'}</span>
                         </div>
                         <div className="flex justify-between border-b border-gray-50 pb-2">
                             <span className="text-secondary text-sm">Kampus</span>
                             <span className="font-bold text-primary">{user?.kaderProfile?.campus || '-'}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-50 pb-2">
+                            <span className="text-secondary text-sm">Fakultas</span>
+                            <span className="font-bold text-primary">{user?.kaderProfile?.faculty || '-'}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-gray-50 pb-2">
+                            <span className="text-secondary text-sm">Jurusan</span>
+                            <span className="font-bold text-primary">{user?.kaderProfile?.major || '-'}</span>
                         </div>
                     </div>
                 </div>

@@ -54,9 +54,11 @@ model KaderProfile {
   pklYear     String?
   
   // New Fields
-  campus      String?
-  major       String? // Prodi / Fakultas
-  address     String?
+  campus         String?
+  campusAddress  String?
+  faculty        String?
+  major          String? // Prodi / Jurusan
+  address        String?
   noInduk     String?  @unique
   birthPlace  String?
   birthDate   DateTime?
