@@ -1,16 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react";
+import Link from "next/link";
 
 interface Activity {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  eventDate: Date | string;
+  startDate: Date | string;
+  endDate?: Date | string | null;
+  location?: string | null;
   image: string | null;
 }
-
 
 export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
   const [current, setCurrent] = useState(0);
@@ -36,6 +39,31 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
 
   const active = kegiatan[current];
 
+  // Automated Logic for Status
+  const getStatusInfo = (start: Date | string, end?: Date | string | null) => {
+    // Determine the current time in local timezone (WITA implied by server/client locale or just using Date object normally)
+    const now = new Date();
+    const startDate = new Date(start);
+    const endDate = end ? new Date(end) : new Date(startDate);
+    
+    // Normalize to end of day for end date to cover the whole day
+    endDate.setHours(23, 59, 59, 999);
+
+    if (now < startDate) {
+      // Check if it's today
+      if (now.toDateString() === startDate.toDateString()) {
+          return { label: "HARI INI", color: "bg-red-500 text-white" };
+      }
+      return { label: "AKAN DATANG", color: "bg-blue-500 text-white" };
+    } else if (now >= startDate && now <= endDate) {
+      return { label: "SEDANG BERLANGSUNG", color: "bg-red-500 text-white animate-pulse" };
+    } else {
+      return { label: "DOKUMENTASI", color: "bg-gray-600 text-white" };
+    }
+  };
+
+  const status = getStatusInfo(active.startDate, active.endDate);
+
   return (
     <div className="relative bg-white rounded-3xl shadow-xl overflow-hidden group">
       <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -55,40 +83,43 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
             </div>
           )}
           
-          {/* Status Badge - Automated Logic */}
           <div className="absolute top-6 left-6">
-            {new Date(active.eventDate) > new Date() ? (
-              <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg bg-accent text-primary">
-                Coming Soon
-              </span>
-            ) : (
-              <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg bg-gray-600 text-white">
-                Past Event
-              </span>
-            )}
+            <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg ${status.color}`}>
+              {status.label}
+            </span>
           </div>
         </div>
 
         {/* Content Section */}
         <div className="p-8 lg:p-12 flex flex-col justify-center bg-white relative">
           <div className="animate-in fade-in slide-in-from-right-4 duration-500" key={active.id}>
-            <div className="flex items-center text-primary/60 mb-4 font-medium">
-                <Calendar className="w-5 h-5 mr-3 text-accent" />
-                <span>{new Date(active.eventDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <div className="flex flex-wrap items-center text-primary/60 mb-4 font-medium gap-4">
+                <div className="flex items-center">
+                    <Calendar className="w-5 h-5 mr-2 text-accent" />
+                    <span>{new Date(active.startDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                </div>
+                {active.location && (
+                    <div className="flex items-center">
+                        <MapPin className="w-5 h-5 mr-2 text-red-400" />
+                        <span className="line-clamp-1 max-w-[200px]">{active.location}</span>
+                    </div>
+                )}
             </div>
             
-            <h3 className="text-3xl lg:text-4xl font-black text-primary mb-6 leading-tight">
-              {active.title}
+            <h3 className="text-3xl lg:text-4xl font-black text-primary mb-6 leading-tight line-clamp-2">
+              <Link href={`/kegiatan/${active.slug}`} className="hover:text-accent transition">
+                {active.title}
+              </Link>
             </h3>
             
-            <p className="text-lg text-secondary leading-relaxed mb-8">
+            <p className="text-lg text-secondary leading-relaxed mb-8 line-clamp-3">
               {active.description}
             </p>
             
-            <button className="inline-flex items-center text-primary font-bold hover:text-accent transition group/btn">
+            <Link href={`/kegiatan/${active.slug}`} className="inline-flex items-center text-primary font-bold hover:text-accent transition group/btn">
               Lihat Detail Kegiatan
               <ChevronRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition" />
-            </button>
+            </Link>
           </div>
 
           {/* Navigation Controls */}

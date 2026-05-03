@@ -9,15 +9,21 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 type LetterType = "MASUK" | "KELUAR";
 
-async function checkSuperAdmin() {
+async function getAuthorizedSession() {
     const session = await getServerSession(authOptions);
-    if (session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized: Only Super Admin can perform this action.");
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
     }
+    const role = session.user.role as string;
+    if (role === "KADER" || role === "PUBLIC") {
+        throw new Error("Unauthorized: Insufficient permissions.");
+    }
+    return session;
 }
 
 export async function createLetter(formData: FormData) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+    const organizationId = session.user.organizationId as string | null;
 
     const number = formData.get("number") as string;
     const subject = formData.get("subject") as string;
@@ -42,6 +48,7 @@ export async function createLetter(formData: FormData) {
             receiver: type === "KELUAR" ? receiver : null,
             date: new Date(dateStr),
             fileUrl,
+            organizationId
         },
     });
 
@@ -50,14 +57,28 @@ export async function createLetter(formData: FormData) {
 }
 
 export async function deleteLetter(id: string) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+
+    // Authorization check
+    const letter = await prisma.letter.findUnique({ where: { id } });
+    if (!letter) throw new Error("Not found");
+    if (session.user.role === "PENGURUS_KOMISARIAT" && letter.organizationId !== session.user.organizationId) {
+        throw new Error("Unauthorized");
+    }
 
     await prisma.letter.delete({ where: { id } });
     revalidatePath("/dashboard/surat");
 }
 
 export async function updateLetter(id: string, formData: FormData) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+
+    // Authorization check
+    const letter = await prisma.letter.findUnique({ where: { id } });
+    if (!letter) throw new Error("Not found");
+    if (session.user.role === "PENGURUS_KOMISARIAT" && letter.organizationId !== session.user.organizationId) {
+        throw new Error("Unauthorized");
+    }
 
     const number = formData.get("number") as string;
     const subject = formData.get("subject") as string;

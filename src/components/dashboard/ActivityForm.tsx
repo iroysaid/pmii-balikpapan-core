@@ -3,14 +3,19 @@
 import { createActivity, updateActivity } from "@/app/actions/kegiatan";
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Calendar, Image as ImageIcon, Plus, X, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Calendar, Image as ImageIcon, Plus, X, Upload, Loader2, MapPin, Users } from "lucide-react";
 
 interface ActivityFormProps {
   initialData?: {
     id: string;
     title: string;
     description: string;
-    eventDate: Date | string;
+    startDate: Date | string;
+    endDate?: Date | string | null;
+    location?: string | null;
+    organizer?: string | null;
+    scope?: string;
+    published?: boolean;
     image: string | null;
     isInvitation?: boolean;
     theme?: string;
@@ -28,6 +33,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
   const [isInvitation, setIsInvitation] = useState(initialData?.isInvitation || false);
   const [banner, setBanner] = useState(initialData?.image || "");
   const [photos, setPhotos] = useState<string[]>(initialData?.photos?.map(p => p.url) || []);
+  const [published, setPublished] = useState(initialData?.published ?? true);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +76,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
     // Add photos JSON to formData
     formData.append("photosJson", JSON.stringify(photos));
     formData.set("image", banner);
+    formData.set("published", published.toString());
     
     if (isEditing) {
       await updateActivity(initialData.id, formData);
@@ -89,51 +96,120 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
         {/* Basic Info */}
         <div className="grid grid-cols-1 gap-6">
             <div>
-            <label className="block text-sm font-bold text-primary mb-2">
-                Judul Kegiatan
-            </label>
-            <input
-                type="text"
-                name="title"
-                defaultValue={initialData?.title}
-                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200 text-lg font-medium"
-                placeholder="Contoh: MAPABA Raya 2024"
-                required
-            />
+                <label className="block text-sm font-bold text-primary mb-2">
+                    Judul Kegiatan
+                </label>
+                <input
+                    type="text"
+                    name="title"
+                    defaultValue={initialData?.title}
+                    className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200 text-lg font-medium"
+                    placeholder="Contoh: MAPABA Raya 2026"
+                    required
+                />
             </div>
 
             <div>
-            <label className="block text-sm font-bold text-primary mb-2">
-                Deskripsi Singkat / Ringkasan
-            </label>
-            <textarea
-                name="description"
-                defaultValue={initialData?.description}
-                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200 min-h-[120px]"
-                placeholder="Tulis ringkasan kegiatan untuk slider..."
-                required
-            />
+                <label className="block text-sm font-bold text-primary mb-2">
+                    Deskripsi Singkat / Ringkasan
+                </label>
+                <textarea
+                    name="description"
+                    defaultValue={initialData?.description}
+                    className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200 min-h-[120px]"
+                    placeholder="Tulis ringkasan kegiatan untuk detail page..."
+                    required
+                />
             </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <label className="block text-sm font-bold text-primary mb-2">
-                <span className="flex items-center"><Calendar className="w-4 h-4 mr-2 text-accent" /> Tanggal Event</span>
+                <span className="flex items-center"><Calendar className="w-4 h-4 mr-2 text-accent" /> Tanggal Mulai</span>
             </label>
             <input
-              type="date"
-              name="eventDate"
-              defaultValue={initialData?.eventDate ? new Date(initialData.eventDate).toISOString().split('T')[0] : ""}
+              type="datetime-local"
+              name="startDate"
+              defaultValue={initialData?.startDate ? new Date(initialData.startDate).toISOString().slice(0,16) : ""}
               className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
               required
             />
-            <p className="mt-2 text-xs text-secondary italic">* Status (Coming Soon/Past) ditentukan otomatis berdasarkan tanggal ini.</p>
           </div>
 
           <div>
             <label className="block text-sm font-bold text-primary mb-2">
-              <span className="flex items-center"><ImageIcon className="w-4 h-4 mr-2 text-blue-500" /> Foto Utama (Banner)</span>
+                <span className="flex items-center"><Calendar className="w-4 h-4 mr-2 text-accent" /> Tanggal Selesai (Opsional)</span>
+            </label>
+            <input
+              type="datetime-local"
+              name="endDate"
+              defaultValue={initialData?.endDate ? new Date(initialData.endDate).toISOString().slice(0,16) : ""}
+              className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-bold text-primary mb-2">
+                <span className="flex items-center"><MapPin className="w-4 h-4 mr-2 text-red-500" /> Lokasi Kegiatan</span>
+            </label>
+            <input
+              type="text"
+              name="location"
+              defaultValue={initialData?.location || ""}
+              placeholder="Contoh: Gedung KNPI Balikpapan"
+              className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-primary mb-2">
+                <span className="flex items-center"><Users className="w-4 h-4 mr-2 text-green-500" /> Penyelenggara</span>
+            </label>
+            <input
+              type="text"
+              name="organizer"
+              defaultValue={initialData?.organizer || ""}
+              placeholder="Contoh: PC PMII Balikpapan"
+              className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-bold text-primary mb-2">
+              Scope (Jangkauan Publikasi)
+            </label>
+            <select
+              name="scope"
+              defaultValue={initialData?.scope || "PUBLIC"}
+              className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
+            >
+                <option value="PUBLIC">Public (Umum)</option>
+                <option value="KADER">Kader PMII</option>
+                <option value="CABANG">Pengurus Cabang</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-primary mb-2">
+              Status Tampilan
+            </label>
+            <div className="flex items-center h-full pb-4">
+                <label className="flex items-center cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        checked={published} 
+                        onChange={(e) => setPublished(e.target.checked)}
+                        className="w-5 h-5 text-accent rounded border-gray-300 focus:ring-accent" 
+                    />
+                    <span className="ml-3 font-medium text-secondary">Tampilkan di halaman publik (Published)</span>
+                </label>
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-bold text-primary mb-2">
+              <span className="flex items-center"><ImageIcon className="w-4 h-4 mr-2 text-blue-500" /> Poster / Cover Kegiatan</span>
             </label>
             <div className="flex gap-4">
                 <input
@@ -142,7 +218,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
                     value={banner}
                     onChange={(e) => setBanner(e.target.value)}
                     className="flex-1 px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition duration-200"
-                    placeholder="URL atau Upload ->"
+                    placeholder="URL Poster atau Upload ->"
                 />
                 <input 
                     type="file" 
@@ -235,8 +311,8 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
         <div className="pt-6 border-t border-gray-100">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h3 className="text-xl font-black text-primary">Dokumentasi Kegiatan</h3>
-                    <p className="text-sm text-secondary">Foto-foto ini akan otomatis masuk ke Galeri Album.</p>
+                    <h3 className="text-xl font-black text-primary">Dokumentasi Album Foto</h3>
+                    <p className="text-sm text-secondary">Foto-foto keseruan yang otomatis masuk ke halaman galeri/detail kegiatan.</p>
                 </div>
                 <button 
                     type="button"
@@ -250,7 +326,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
                         </>
                     ) : (
                         <>
-                            <Plus className="w-4 h-4 mr-2" /> Tambah Foto Galeri
+                            <Plus className="w-4 h-4 mr-2" /> Tambah Foto Album
                         </>
                     )}
                 </button>
@@ -280,7 +356,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
                 ))}
                 {photos.length === 0 && !uploading && (
                     <div className="col-span-full py-12 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-gray-400">
-                        Belum ada dokumentasi. Upload foto untuk membuat album di Halaman Galeri.
+                        Belum ada dokumentasi. Tambahkan foto jika kegiatan ini sudah selesai dilaksanakan.
                     </div>
                 )}
             </div>
@@ -305,7 +381,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
              </>
           ) : (
             <>
-              <Save className="w-6 h-6 mr-3" /> {isEditing ? "Perbarui Kegiatan & Galeri" : "Publikasikan Kegiatan"}
+              <Save className="w-6 h-6 mr-3" /> {isEditing ? "Perbarui Kegiatan" : "Publikasikan Kegiatan"}
             </>
           )}
         </button>

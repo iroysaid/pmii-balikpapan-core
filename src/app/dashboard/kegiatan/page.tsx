@@ -12,10 +12,16 @@ export default async function ActivitiesPage({
     searchParams: Promise<{ q?: string; sort?: string }>;
 }) {
     const session = await getServerSession(authOptions);
-    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+    const role = session?.user?.role;
+    const isSuperAdmin = role === "SUPER_ADMIN" || role === "ADMIN_CABANG" || role === "PENGURUS_CABANG";
+    const organizationId = session?.user?.organizationId;
     const params = await searchParams;
 
     const whereClause: any = {};
+    if (!isSuperAdmin && organizationId) {
+        whereClause.organizationId = organizationId;
+    }
+
     if (params.q) {
         whereClause.OR = [
             { title: { contains: params.q } },
@@ -23,8 +29,8 @@ export default async function ActivitiesPage({
         ];
     }
 
-    let orderBy: any = { eventDate: "desc" };
-    if (params.sort === "date-asc") orderBy = { eventDate: "asc" };
+    let orderBy: any = { startDate: "desc" };
+    if (params.sort === "date-asc") orderBy = { startDate: "asc" };
 
     const kegiatan = await prisma.activity.findMany({
         where: whereClause,
@@ -38,8 +44,9 @@ export default async function ActivitiesPage({
 
     const kegiatanForExport = isSuperAdmin ? kegiatan.map(a => ({
         Judul: a.title,
-        Tanggal: new Date(a.eventDate).toLocaleDateString("id-ID"),
-        Status: new Date(a.eventDate) > new Date() ? "Coming Soon" : "Past Event"
+        Tanggal: new Date(a.startDate).toLocaleDateString("id-ID"),
+        Status: new Date(a.startDate) > new Date() ? "Coming Soon" : "Past Event",
+        Published: a.published ? "Yes" : "No"
     })) : [];
 
 
@@ -113,17 +120,22 @@ export default async function ActivitiesPage({
                                     <td className="px-6 py-4 text-secondary">
                                         <div className="flex items-center">
                                             <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                                            {new Date(activity.eventDate).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            {new Date(activity.startDate).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {new Date(activity.eventDate) > new Date() ? (
+                                        {new Date(activity.startDate) > new Date() ? (
                                             <span className="px-2 py-1 rounded text-xs font-bold bg-accent/20 text-primary">
                                                 Coming Soon
                                             </span>
                                         ) : (
                                             <span className="px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-600">
                                                 Past Event
+                                            </span>
+                                        )}
+                                        {!activity.published && (
+                                            <span className="ml-2 px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-600">
+                                                Draft
                                             </span>
                                         )}
                                     </td>

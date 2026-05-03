@@ -14,10 +14,19 @@ export default async function Home() {
     take: 3,
   });
 
-  const latestActivities = await prisma.activity.findMany({
-    orderBy: { eventDate: "desc" },
+  const upcomingActivities = await prisma.activity.findMany({
+    where: { published: true, scope: "PUBLIC", startDate: { gte: new Date() } },
+    orderBy: { startDate: "asc" },
     take: 5,
   });
+
+  const pastActivities = await prisma.activity.findMany({
+    where: { published: true, scope: "PUBLIC", startDate: { lt: new Date() } },
+    orderBy: { startDate: "desc" },
+    take: 5,
+  });
+
+  const latestActivities = [...upcomingActivities, ...pastActivities].slice(0, 5);
 
   return (
     <div className="flex flex-col gap-16 pb-16">

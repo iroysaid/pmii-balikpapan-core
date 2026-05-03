@@ -9,49 +9,66 @@ async function main() {
 
     console.log('Seeding data...');
 
-    // 1. CLEAR EXISTING DATA (Optional but cleaner for dummy)
-    // await prisma.transaction.deleteMany();
-    // await prisma.materialChapter.deleteMany();
-    // await prisma.material.deleteMany();
-    // await prisma.post.deleteMany();
-    // await prisma.kaderProfile.deleteMany();
-    // await prisma.user.deleteMany();
+    // 1. CREATE ORGANIZATIONS
+    const orgNames = [
+        "Komisariat Nusantara",
+        "Komisariat Uniba",
+        "Komisariat Mulia",
+        "Komisariat Staiba",
+        "Komisariat Stitba"
+    ];
+    
+    const organizations = {};
+    for (const name of orgNames) {
+        // Since we don't have unique constraint on name, we use findFirst
+        let org = await prisma.organization.findFirst({ where: { name } });
+        if (!org) {
+            org = await prisma.organization.create({
+                data: { name, type: "KOMISARIAT" }
+            });
+        }
+        organizations[name] = org;
+    }
 
     // 2. CREATE ADMIN
     const admin = await prisma.user.upsert({
-        where: { email: 'admin@pmii.org' },
+        where: { username: 'admin' },
         update: {},
         create: {
+            username: 'admin',
             email: 'admin@pmii.org',
             name: 'Super Admin',
             password,
+            mustChangePassword: false,
             role: 'SUPER_ADMIN',
         },
     });
 
     // 3. CREATE DUMMY KADERS
     const kaders = [
-        { name: 'Ahmad Fauzi', email: 'ahmad@example.com', rayon: 'Rayon Teknik', komisariat: 'Kampus Merdeka' },
-        { name: 'Siti Aminah', email: 'siti@example.com', rayon: 'Rayon Ekonomi', komisariat: 'Kampus Sejahtera' },
-        { name: 'Budi Santoso', email: 'budi@example.com', rayon: 'Rayon Hukum', komisariat: 'Kampus Merdeka' },
+        { name: 'Ahmad Fauzi', username: 'ahmadf', noInduk: '001', org: 'Komisariat Uniba' },
+        { name: 'Siti Aminah', username: 'sitia', noInduk: '002', org: 'Komisariat Nusantara' },
+        { name: 'Budi Santoso', username: 'budis', noInduk: '003', org: 'Komisariat Mulia' },
     ];
 
     for (const k of kaders) {
+        const orgId = organizations[k.org].id;
         await prisma.user.upsert({
-            where: { email: k.email },
+            where: { username: k.username },
             update: {},
             create: {
-                email: k.email,
+                username: k.username,
                 name: k.name,
                 password,
+                mustChangePassword: false,
                 role: 'KADER',
+                organizationId: orgId,
                 kaderProfile: {
                     create: {
-                        rayon: k.rayon,
-                        komisariat: k.komisariat,
+                        noInduk: k.noInduk,
                         status: 'VERIFIED',
-                        campus: 'Universitas Balikpapan',
-                        major: 'Informatika',
+                        campus: k.org,
+                        komisariat: k.org
                     }
                 }
             }
@@ -117,24 +134,39 @@ async function main() {
     // 7. CREATE DUMMY ACTIVITIES (KEGIATAN)
     const activities = [
         {
-            title: 'MAPABA Raya 2024',
-            slug: 'mapaba-raya-2024',
-            description: 'Masa Penerimaan Anggota Baru untuk seluruh mahasiswa islam se-Balikpapan.',
-            eventDate: new Date('2024-05-20'),
+            title: 'MAPABA Raya 2026',
+            slug: 'mapaba-raya-2026',
+            description: 'Masa Penerimaan Anggota Baru untuk seluruh mahasiswa islam se-Balikpapan. Agenda rutin yang selalu dinanti.',
+            startDate: new Date('2026-06-20'), // Akan Datang
+            endDate: new Date('2026-06-22'),
+            location: 'Asrama Haji Balikpapan',
+            organizer: 'PC PMII Balikpapan',
+            scope: 'PUBLIC',
+            published: true,
             image: 'https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?q=80&w=1200',
         },
         {
-            title: 'Kajian Pergerakan: Sejarah NU',
-            slug: 'kajian-pergerakan-sejarah-nu',
-            description: 'Kajian rutin mingguan membahas sejarah dan peranan NU dalam kemerdekaan.',
-            eventDate: new Date('2024-04-15'),
+            title: 'Kajian Pergerakan: Sejarah NU & PMII',
+            slug: 'kajian-pergerakan-sejarah-nu-2026',
+            description: 'Kajian rutin mingguan membahas sejarah dan peranan NU dalam kemerdekaan. Diikuti oleh kader aktif.',
+            startDate: new Date('2026-05-03T07:00:00Z'), // Sedang Berlangsung (Hari Ini)
+            endDate: new Date('2026-05-03T12:00:00Z'),
+            location: 'Sekretariat PC PMII Balikpapan',
+            organizer: 'Biro Kaderisasi',
+            scope: 'KADER',
+            published: true,
             image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200',
         },
         {
-            title: 'Bakti Sosial Panti Asuhan',
-            slug: 'bakti-sosial-panti-asuhan',
-            description: 'Kegiatan berbagi kebahagiaan dengan adik-adik di panti asuhan.',
-            eventDate: new Date('2024-02-10'),
+            title: 'Bakti Sosial Panti Asuhan Ramadhan',
+            slug: 'bakti-sosial-panti-asuhan-2025',
+            description: 'Kegiatan berbagi kebahagiaan dengan adik-adik di panti asuhan pada bulan suci Ramadhan tahun lalu.',
+            startDate: new Date('2025-03-10'), // Dokumentasi / Past
+            endDate: new Date('2025-03-10'),
+            location: 'Panti Asuhan Al-Mukmin',
+            organizer: 'PC PMII Balikpapan',
+            scope: 'PUBLIC',
+            published: true,
             image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200',
         }
     ];

@@ -15,9 +15,14 @@ export default async function SuratPage({
     const params = await searchParams;
     const currentType = params.type === "KELUAR" ? "KELUAR" : "MASUK";
     const session = await getServerSession(authOptions);
-    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+    const role = session?.user?.role;
+    const isSuperAdmin = role === "SUPER_ADMIN" || role === "ADMIN_CABANG" || role === "PENGURUS_CABANG";
+    const organizationId = session?.user?.organizationId;
 
     const whereClause: any = { type: currentType };
+    if (!isSuperAdmin && organizationId) {
+        whereClause.organizationId = organizationId;
+    }
     if (params.q) {
         whereClause.OR = [
             { number: { contains: params.q } },

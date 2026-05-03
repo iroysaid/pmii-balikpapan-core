@@ -10,31 +10,43 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function checkSuperAdmin() {
     const session = await getServerSession(authOptions);
-    if (session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized: Only Super Admin can perform this action.");
+    if (!session || !["SUPER_ADMIN", "ADMIN_CABANG"].includes(session.user?.role as string)) {
+        throw new Error("Unauthorized: Insufficient permissions.");
     }
+}
+
+function generatePassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let password = "";
+    for (let i = 0; i < 4; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
 }
 
 export async function createKader(formData: FormData) {
     await checkSuperAdmin();
 
     const name = formData.get("name") as string;
+    const username = formData.get("username") as string;
     const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
     const komisariat = formData.get("komisariat") as string;
     const campus = formData.get("campus") as string;
     const major = formData.get("major") as string;
     const mapabaYear = formData.get("mapabaYear") as string;
-    const role = (formData.get("role") as string) || "KADER"; // Allow role assignment
+    const role = (formData.get("role") as string) || "KADER";
 
     // New Fields
     const address = formData.get("address") as string;
-    // const noInduk = formData.get("noInduk") as string; // Auto Generated
     const phone = formData.get("phone") as string;
     const placeOfBirth = formData.get("placeOfBirth") as string;
-    const dateOfBirth = formData.get("dateOfBirth") as string; // String from date input
+    const dateOfBirth = formData.get("dateOfBirth") as string;
 
-    // Auto Generate No Induk
+    // Find organization
+    const org = await prisma.organization.findFirst({ where: { name: komisariat } });
+    const organizationId = org?.id;
+
+    // Auto Generate No Induk (using previous logic)
     const lastKader = await prisma.kaderProfile.findFirst({
         where: { noInduk: { not: null } },
         orderBy: { noInduk: "desc" },
@@ -58,34 +70,42 @@ export async function createKader(formData: FormData) {
         imageUrl = await uploadFile(imageFile, "kader");
     }
 
-    const hashedPassword = await hash(password, 12);
+    const generatedPassword = generatePassword();
+    const hashedPassword = await hash(generatedPassword, 12);
 
-    await prisma.user.create({
-        data: {
-            name,
-            email,
-            password: hashedPassword,
-            role: role,
-            image: imageUrl,
-            kaderProfile: {
-                create: {
-                    komisariat,
-                    campus,
-                    major,
-                    mapabaYear,
-                    address,
-                    noInduk: newNoInduk,
-                    phone,
-                    birthPlace: placeOfBirth,
-                    birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
-                    status: "PENDING", // Default to Pending for manual verification
+    try {
+        await prisma.user.create({
+            data: {
+                name,
+                username,
+                email: email || undefined,
+                password: hashedPassword,
+                role: role,
+                image: imageUrl,
+                organizationId,
+                mustChangePassword: true,
+                kaderProfile: {
+                    create: {
+                        komisariat,
+                        campus,
+                        major,
+                        mapabaYear,
+                        address,
+                        noInduk: newNoInduk,
+                        phone,
+                        birthPlace: placeOfBirth,
+                        birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                        status: "PENDING", 
+                    },
                 },
             },
-        },
-    });
+        });
 
-    revalidatePath("/dashboard/kader");
-    redirect("/dashboard/kader");
+        revalidatePath("/dashboard/kader");
+        return { success: true, generatedPassword, username, noInduk: newNoInduk };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 }
 
 export async function verifyKader(userId: string) {
@@ -109,10 +129,10 @@ export async function updateKader(userId: string, formData: FormData) {
     await checkSuperAdmin();
 
     const name = formData.get("name") as string;
+    const username = formData.get("username") as string;
     const email = formData.get("email") as string;
-    const role = formData.get("role") as string; // Allow role update
+    const role = formData.get("role") as string;
 
-    // Check if we are updating profile specific fields
     const komisariat = formData.get("komisariat") as string;
     const campus = formData.get("campus") as string;
     const major = formData.get("major") as string;
@@ -123,6 +143,9 @@ export async function updateKader(userId: string, formData: FormData) {
     const placeOfBirth = formData.get("placeOfBirth") as string;
     const dateOfBirth = formData.get("dateOfBirth") as string;
 
+    const org = await prisma.organization.findFirst({ where: { name: komisariat } });
+    const organizationId = org?.id;
+
     const imageFile = formData.get("image") as File;
     let imageUrl;
 
@@ -130,46 +153,50 @@ export async function updateKader(userId: string, formData: FormData) {
         imageUrl = await uploadFile(imageFile, "kader");
     }
 
-    // Update User
-    await prisma.user.update({
-        where: { id: userId },
-        data: {
-            name,
-            email,
-            ...(role ? { role } : {}), // Update role if provided
-            ...(imageUrl ? { image: imageUrl } : {}),
-        },
-    });
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                name,
+                username,
+                email: email || undefined,
+                ...(role ? { role } : {}),
+                ...(imageUrl ? { image: imageUrl } : {}),
+                ...(organizationId ? { organizationId } : {})
+            },
+        });
 
-    // Upsert Profile
-    await prisma.kaderProfile.upsert({
-        where: { userId },
-        update: {
-            komisariat,
-            campus,
-            major,
-            mapabaYear,
-            address,
-            noInduk,
-            phone,
-            birthPlace: placeOfBirth,
-            birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
-        },
-        create: {
-            userId,
-            komisariat,
-            campus,
-            major,
-            mapabaYear,
-            address,
-            noInduk,
-            phone,
-            birthPlace: placeOfBirth,
-            birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
-            status: "VERIFIED"
-        }
-    });
+        await prisma.kaderProfile.upsert({
+            where: { userId },
+            update: {
+                komisariat,
+                campus,
+                major,
+                mapabaYear,
+                address,
+                noInduk,
+                phone,
+                birthPlace: placeOfBirth,
+                birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+            },
+            create: {
+                userId,
+                komisariat,
+                campus,
+                major,
+                mapabaYear,
+                address,
+                noInduk,
+                phone,
+                birthPlace: placeOfBirth,
+                birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                status: "VERIFIED"
+            }
+        });
 
-    revalidatePath("/dashboard/kader");
-    redirect("/dashboard/kader");
+        revalidatePath("/dashboard/kader");
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 }

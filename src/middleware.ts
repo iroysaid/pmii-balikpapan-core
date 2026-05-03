@@ -5,15 +5,23 @@ export default withAuth(
     function middleware(req) {
         const token = req.nextauth.token;
         const path = req.nextUrl.pathname;
-        const role = token?.role;
+        const role = token?.role as string;
+        const mustChangePassword = token?.mustChangePassword;
+
+        // Force password change on first login
+        if (mustChangePassword && path !== "/ganti-password") {
+            return NextResponse.redirect(new URL("/ganti-password", req.url));
+        }
+
+        // Allow passing /ganti-password if they don't need to change it?
+        if (!mustChangePassword && path === "/ganti-password") {
+            return NextResponse.redirect(new URL("/dashboard", req.url));
+        }
 
         // Kader Access Control
         if (role === "KADER") {
-            // Preventing access to admin routes
-            // Allowed: /dashboard/anggota, /dashboard/materi, /dashboard/keuangan (User request)
-            // Blocked: /dashboard (root), /dashboard/kader (list from sidebar logic, though arguably they might see it?)
-            // Actually, keep blocking 'kader' user management and 'surat' (Administrasi) for Kader.
-            const blockedPrefixes = ["/dashboard/kader", "/dashboard/surat", "/admin"];
+            // Block admin routes
+            const blockedPrefixes = ["/dashboard/kader", "/dashboard/surat", "/dashboard/keuangan/manage", "/admin"];
             const isBlocked = blockedPrefixes.some(prefix => path.startsWith(prefix)) || path === "/dashboard";
 
             if (isBlocked) {
@@ -21,9 +29,10 @@ export default withAuth(
             }
         }
 
-        // Pengurus Access Control
-        // Pengurus can access everything but read-only (handled by page logic), so no redirect needed except maybe preventing Access to Member dashboard if strictly separate?
-        // For now, let Pengurus access everything.
+        // PUBLIC Access Control
+        if (role === "PUBLIC" && path.startsWith("/dashboard")) {
+            return NextResponse.redirect(new URL("/", req.url));
+        }
     },
     {
         callbacks: {
@@ -33,5 +42,5 @@ export default withAuth(
 );
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/admin/:path*"],
+    matcher: ["/dashboard/:path*", "/admin/:path*", "/ganti-password"],
 };

@@ -12,10 +12,16 @@ export default async function FinancePage({
     searchParams: Promise<{ q?: string; type?: string; sort?: string }>;
 }) {
     const session = await getServerSession(authOptions);
-    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+    const role = session?.user?.role;
+    const isSuperAdmin = role === "SUPER_ADMIN" || role === "ADMIN_CABANG" || role === "PENGURUS_CABANG";
+    const organizationId = session?.user?.organizationId;
     const params = await searchParams;
 
     const whereClause: any = {};
+    if (!isSuperAdmin && organizationId) {
+        whereClause.organizationId = organizationId;
+    }
+    
     if (params.q) {
         whereClause.description = { contains: params.q };
     }
@@ -39,6 +45,7 @@ export default async function FinancePage({
     // So for "Saldo Akhir", we should get the very last transaction in time (regardless of filters).
 
     const lastTransaction = await prisma.transaction.findFirst({
+        where: !isSuperAdmin && organizationId ? { organizationId } : {},
         orderBy: { date: 'desc' }
     });
     const currentBalance = lastTransaction ? lastTransaction.balance : 0;

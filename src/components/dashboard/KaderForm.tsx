@@ -1,45 +1,103 @@
 "use client";
 
 import { createKader, updateKader } from "@/app/actions/kader";
-import { ArrowLeft, Edit, Save } from "lucide-react";
+import { ArrowLeft, Edit, Save, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 const KOMISARIAT_DATA: Record<string, string[]> = {
-    "Komisariat UNIBA": ["Universitas Balikpapan"],
-    "Komisariat NUsantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I", "STIMIK", "Universitas Terbuka"],
-    "Komisariat STITBA": ["Sekolah Tinggi Ilmu Tarbiyah Balikpapan"],
+    "Komisariat Uniba": ["Universitas Balikpapan"],
+    "Komisariat Nusantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I", "STIMIK", "Universitas Terbuka"],
+    "Komisariat Stitba": ["Sekolah Tinggi Ilmu Tarbiyah Balikpapan"],
     "Komisariat Mulia": ["Universitas Mulia"],
-    "Komisariat STAIBA": ["STAI Balikpapan"]
+    "Komisariat Staiba": ["STAI Balikpapan"]
 };
 
 interface KaderFormProps {
-    initialData?: any; // Using any for simplicity in rapid dev, ideally proper type
+    initialData?: any; 
     isEdit?: boolean;
     isSuperAdmin?: boolean;
-    customAction?: (formData: FormData) => Promise<void>;
+    customAction?: (formData: FormData) => Promise<any>;
     submitLabel?: string;
 }
 
 export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = false, customAction, submitLabel }: KaderFormProps) {
+    const router = useRouter();
     const defaultAction = isEdit ? updateKader.bind(null, initialData?.id) : createKader;
     const action = customAction || defaultAction;
 
     const [selectedKomisariat, setSelectedKomisariat] = useState<string>(initialData?.kaderProfile?.komisariat || "");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [resultData, setResultData] = useState<{username: string, password: string, noInduk: string} | null>(null);
 
     const availableCampuses = useMemo(() => {
         return selectedKomisariat ? KOMISARIAT_DATA[selectedKomisariat] || [] : [];
     }, [selectedKomisariat]);
 
-    // Helper to format date for input
     const formatDate = (dateString?: string | Date) => {
         if (!dateString) return "";
         return new Date(dateString).toISOString().split('T')[0];
     };
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        const formData = new FormData(e.currentTarget);
+        
+        try {
+            const res = await action(formData);
+            if (res && res.success) {
+                if (!isEdit && !customAction) {
+                    setResultData({
+                        username: res.username,
+                        password: res.generatedPassword,
+                        noInduk: res.noInduk
+                    });
+                } else {
+                    router.push('/dashboard/kader');
+                }
+            } else if (res && !res.success) {
+                alert("Error: " + res.error);
+            }
+        } catch (error: any) {
+            alert("Unexpected error: " + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    if (resultData) {
+        return (
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-green-200 text-center max-w-2xl mx-auto">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-green-700 mb-2">Kader Berhasil Ditambahkan!</h2>
+                <p className="text-gray-600 mb-6">Berikut adalah detail login untuk kader baru. <strong>Harap simpan atau salin password ini sekarang</strong>, karena tidak akan ditampilkan lagi.</p>
+                
+                <div className="bg-gray-50 rounded-lg p-6 text-left border border-gray-200 mb-6 space-y-3">
+                    <div>
+                        <span className="block text-sm text-gray-500">Nomor Induk / NIA</span>
+                        <span className="font-mono text-lg font-bold">{resultData.noInduk}</span>
+                    </div>
+                    <div>
+                        <span className="block text-sm text-gray-500">Username</span>
+                        <span className="font-mono text-lg font-bold">{resultData.username}</span>
+                    </div>
+                    <div>
+                        <span className="block text-sm text-gray-500">Password Awal</span>
+                        <span className="font-mono text-xl font-bold text-blue-600">{resultData.password}</span>
+                    </div>
+                </div>
+
+                <Link href="/dashboard/kader" className="inline-block bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-900 transition">
+                    Kembali ke Daftar Kader
+                </Link>
+            </div>
+        );
+    }
+
     return (
-        <form action={action} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
             {/* Account Info */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-lg font-bold text-primary mb-4 border-b pb-2">Informasi Akun</h2>
@@ -56,11 +114,21 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-primary mb-2">Email</label>
+                        <label className="block text-sm font-bold text-primary mb-2">Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            required
+                            defaultValue={initialData?.username}
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            placeholder="kader_123"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Email (Opsional)</label>
                         <input
                             type="email"
                             name="email"
-                            required
                             defaultValue={initialData?.email}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                             placeholder="email@contoh.com"
@@ -75,22 +143,11 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                             >
                                 <option value="KADER">KADER</option>
-                                <option value="PENGURUS">PENGURUS</option>
+                                <option value="PENGURUS_KOMISARIAT">PENGURUS KOMISARIAT</option>
+                                <option value="PENGURUS_CABANG">PENGURUS CABANG</option>
+                                <option value="ADMIN_CABANG">ADMIN CABANG</option>
                                 <option value="SUPER_ADMIN">SUPER ADMIN</option>
                             </select>
-                        </div>
-                    )}
-                    {!isEdit && (
-                        <div>
-                            <label className="block text-sm font-bold text-primary mb-2">Password Default</label>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                defaultValue="12345678"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                            />
-                            <p className="text-xs text-gray-400 mt-1">Default: 12345678</p>
                         </div>
                     )}
                     <div>
@@ -225,10 +282,11 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
             <div className="flex justify-end pt-4">
                 <button
                     type="submit"
-                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center shadow-lg"
+                    disabled={isSubmitting}
+                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center shadow-lg disabled:opacity-50"
                 >
                     {isEdit ? <Edit className="w-4 h-4 mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                    {submitLabel || (isEdit ? "Update Data Kader" : "Simpan Data Kader")}
+                    {isSubmitting ? "Menyimpan..." : (submitLabel || (isEdit ? "Update Data Kader" : "Simpan Data Kader"))}
                 </button>
             </div>
         </form>

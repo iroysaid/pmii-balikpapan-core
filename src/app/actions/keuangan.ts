@@ -8,23 +8,29 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 type TransactionType = "DEBIT" | "CREDIT";
 
-async function checkSuperAdmin() {
+async function getAuthorizedSession() {
     const session = await getServerSession(authOptions);
-    if (session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized: Only Super Admin can perform this action.");
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
     }
+    const role = session.user.role as string;
+    if (role === "KADER" || role === "PUBLIC") {
+        throw new Error("Unauthorized: Insufficient permissions.");
+    }
+    return session;
 }
 
 export async function createTransaction(formData: FormData) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+    const organizationId = session.user.organizationId as string | null;
 
     const dateStr = formData.get("date") as string;
     const description = formData.get("description") as string;
-    const type = formData.get("type") as TransactionType; // DEBIT or CREDIT
+    const type = formData.get("type") as TransactionType; 
     const amount = parseFloat(formData.get("amount") as string);
 
-    // Get last transaction to calculate balance
     const lastTransaction = await prisma.transaction.findFirst({
+        where: organizationId ? { organizationId } : {},
         orderBy: { createdAt: "desc" },
     });
 
@@ -44,6 +50,7 @@ export async function createTransaction(formData: FormData) {
             type,
             amount,
             balance: newBalance,
+            organizationId,
         },
     });
 
@@ -52,32 +59,34 @@ export async function createTransaction(formData: FormData) {
 }
 
 export async function deleteTransaction(id: string) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+    
+    // Authorization check
+    const transaction = await prisma.transaction.findUnique({ where: { id } });
+    if (!transaction) throw new Error("Not found");
+    if (session.user.role === "PENGURUS_KOMISARIAT" && transaction.organizationId !== session.user.organizationId) {
+        throw new Error("Unauthorized");
+    }
 
     await prisma.transaction.delete({ where: { id } });
     revalidatePath("/dashboard/keuangan");
 }
 
 export async function updateTransaction(id: string, formData: FormData) {
-    await checkSuperAdmin();
+    const session = await getAuthorizedSession();
+
+    // Authorization check
+    const transaction = await prisma.transaction.findUnique({ where: { id } });
+    if (!transaction) throw new Error("Not found");
+    if (session.user.role === "PENGURUS_KOMISARIAT" && transaction.organizationId !== session.user.organizationId) {
+        throw new Error("Unauthorized");
+    }
 
     const dateStr = formData.get("date") as string;
     const description = formData.get("description") as string;
-    const type = formData.get("type") as TransactionType; // DEBIT or CREDIT
+    const type = formData.get("type") as TransactionType;
     const amount = parseFloat(formData.get("amount") as string);
 
-    // Note: This simple update does NOT recalculate historical balances of subsequent transactions.
-    // It only updates the current field. This is a tradeoff for simplicity.
-    // Ideally, we would recalculate all future balances, but that is complex.
-    // We strive to update the balance of THIS transaction at least if it was the last one,
-    // but since we don't know if it's the last one easily without query, we just update the specific fields.
-    // If the user changes Amount, the "Balance" column for this row and future rows might be inconsistent.
-    // We will just update the visual fields for now. 
-    // To fix balance for THIS row, we might need to fetch the previous row's balance and re-add/sub.
-    // But let's assume for this "Edit" feature, mainly Description/Date/Type errors are fixed.
-    // If Amount is changed, we should probably warn or try to calc.
-
-    // For now, allow simple update.
     await prisma.transaction.update({
         where: { id },
         data: {
@@ -85,8 +94,6 @@ export async function updateTransaction(id: string, formData: FormData) {
             description,
             type,
             amount,
-            // We do NOT update Balance here to avoid breaking the chain completely.
-            // If the user wants to fix balance, they usually have to delete and re-entry or we need a specific "Recalculate Ledger" button/function.
         }
     });
 
