@@ -99,6 +99,9 @@ export async function createKader(formData: FormData) {
     const generatedPassword = generatePassword();
     const hashedPassword = await hash(generatedPassword, 12);
 
+    const parsedBirthDate = dateOfBirth ? new Date(dateOfBirth) : null;
+    const finalBirthDate = parsedBirthDate && !isNaN(parsedBirthDate.getTime()) ? parsedBirthDate : null;
+
     try {
         await prisma.user.create({
             data: {
@@ -132,7 +135,7 @@ export async function createKader(formData: FormData) {
                         noInduk: newNoInduk,
                         phone,
                         birthPlace: placeOfBirth,
-                        birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                        birthDate: finalBirthDate,
                         status: "PENDING", 
                     },
                 },
@@ -203,13 +206,18 @@ export async function updateKader(userId: string, formData: FormData) {
         imageUrl = await uploadFile(imageFile, "kader");
     }
 
+    let dbError: string | null = null;
+
+    const parsedBirthDate = dateOfBirth ? new Date(dateOfBirth) : null;
+    const finalBirthDate = parsedBirthDate && !isNaN(parsedBirthDate.getTime()) ? parsedBirthDate : null;
+
     try {
         await prisma.user.update({
             where: { id: userId },
             data: {
                 name,
                 username,
-                email: email || undefined,
+                ...(email ? { email } : {}),
                 ...(role ? { role } : {}),
                 ...(imageUrl ? { image: imageUrl } : {}),
                 ...(organizationId ? { organizationId } : {})
@@ -229,7 +237,7 @@ export async function updateKader(userId: string, formData: FormData) {
                 noInduk,
                 phone,
                 birthPlace: placeOfBirth,
-                birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                birthDate: finalBirthDate,
                 pkdYear,
                 pkdLocation,
                 pkdOrganizer,
@@ -253,7 +261,7 @@ export async function updateKader(userId: string, formData: FormData) {
                 noInduk,
                 phone,
                 birthPlace: placeOfBirth,
-                birthDate: dateOfBirth ? new Date(dateOfBirth) : null,
+                birthDate: finalBirthDate,
                 pkdYear,
                 pkdLocation,
                 pkdOrganizer,
@@ -267,10 +275,15 @@ export async function updateKader(userId: string, formData: FormData) {
                 status: "VERIFIED"
             }
         });
-
-        revalidatePath("/dashboard/kader");
-        return { success: true };
     } catch (error: any) {
-        return { success: false, error: error.message };
+        console.error("[updateKader ERROR]", error.message, error?.code, JSON.stringify(error?.meta));
+        dbError = error.message;
     }
+
+    if (dbError) {
+        return { success: false, error: dbError };
+    }
+
+    revalidatePath("/dashboard/kader");
+    redirect("/dashboard/kader");
 }

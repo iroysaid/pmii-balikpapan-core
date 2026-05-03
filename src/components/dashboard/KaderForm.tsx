@@ -3,15 +3,15 @@
 import { createKader, updateKader } from "@/app/actions/kader";
 import { ArrowLeft, Edit, Save, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const KOMISARIAT_DATA: Record<string, string[]> = {
-    "Komisariat Uniba": ["Universitas Balikpapan"],
-    "Komisariat Nusantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I", "STIMIK", "Universitas Terbuka"],
-    "Komisariat Stitba": ["Sekolah Tinggi Ilmu Tarbiyah Balikpapan"],
-    "Komisariat Mulia": ["Universitas Mulia"],
-    "Komisariat Staiba": ["STAI Balikpapan"]
+const KOMISARIAT_DATA: Record<string, string[] | string> = {
+    "Komisariat Uniba":      "Universitas Balikpapan",
+    "Komisariat Nusantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I College Balikpapan", "STMIK Bornep", "Universitas Terbuka"],
+    "Komisariat Stitba":     "Sekolah Tinggi Ilmu Tarbiyah Balikpapan",
+    "Komisariat Mulia":      "Universitas Mulia",
+    "Komisariat Staiba":     "Sekolah Tinggi Agama Islam Balikpapan"
 };
 
 interface KaderFormProps {
@@ -27,7 +27,19 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
     const defaultAction = isEdit ? updateKader.bind(null, initialData?.id) : createKader;
     const action = customAction || defaultAction;
 
-    const [selectedKomisariat, setSelectedKomisariat] = useState<string>(initialData?.kaderProfile?.komisariat || "");
+    const AUTO_CAMPUS: Record<string, string> = {
+        "Komisariat Uniba":  "Universitas Balikpapan",
+        "Komisariat Stitba": "Sekolah Tinggi Ilmu Tarbiyah Balikpapan",
+        "Komisariat Mulia":  "Universitas Mulia",
+        "Komisariat Staiba": "Sekolah Tinggi Agama Islam Balikpapan"
+    };
+
+    const initKomisariat = initialData?.kaderProfile?.komisariat || "";
+    const initCampus = initialData?.kaderProfile?.campus ||
+        (initKomisariat && initKomisariat !== "Komisariat Nusantara" ? AUTO_CAMPUS[initKomisariat] || "" : "");
+
+    const [selectedKomisariat, setSelectedKomisariat] = useState<string>(initKomisariat);
+    const [selectedCampus, setSelectedCampus] = useState<string>(initCampus);
     const [isLoading, setIsLoading] = useState(false);
 
     const [otherTrainings, setOtherTrainings] = useState<any[]>(() => {
@@ -53,9 +65,24 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [resultData, setResultData] = useState<{username: string, password: string, noInduk: string} | null>(null);
 
-    const availableCampuses = useMemo(() => {
-        return selectedKomisariat ? KOMISARIAT_DATA[selectedKomisariat] || [] : [];
-    }, [selectedKomisariat]);
+    const isNusantara = selectedKomisariat === "Komisariat Nusantara";
+    const nusantaraCampuses = [
+        "Institut Teknologi Kalimantan",
+        "Politeknik Balikpapan",
+        "LP3I College Balikpapan",
+        "STMIK Bornep",
+        "Universitas Terbuka"
+    ];
+
+    const handleKomisariatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const k = e.target.value;
+        setSelectedKomisariat(k);
+        if (k !== "Komisariat Nusantara" && AUTO_CAMPUS[k]) {
+            setSelectedCampus(AUTO_CAMPUS[k]);
+        } else {
+            setSelectedCampus("");
+        }
+    };
 
     const formatDate = (dateString?: string | Date) => {
         if (!dateString) return "";
@@ -69,22 +96,26 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
         
         try {
             const res = await action(formData);
-            if (res && res.success) {
-                if (!isEdit && !customAction) {
-                    setResultData({
-                        username: res.username,
-                        password: res.generatedPassword,
-                        noInduk: res.noInduk
-                    });
-                } else {
-                    router.push('/dashboard/kader');
-                }
-            } else if (res && !res.success) {
-                alert("Error: " + res.error);
+            // For edit mode, server redirects directly — res may be undefined or error
+            if (res && !res.success) {
+                alert("Gagal menyimpan: " + res.error);
+                setIsSubmitting(false);
+            } else if (res && res.success && !isEdit && !customAction) {
+                // Create mode: show credentials
+                setResultData({
+                    username: res.username,
+                    password: res.generatedPassword,
+                    noInduk: res.noInduk
+                });
+                setIsSubmitting(false);
             }
+            // Edit mode success: server redirect handles navigation
         } catch (error: any) {
-            alert("Unexpected error: " + error.message);
-        } finally {
+            // Ignore NEXT_REDIRECT errors as they are part of the normal redirect flow
+            if (error.message === "NEXT_REDIRECT") {
+                return;
+            }
+            alert("Terjadi kesalahan: " + error.message);
             setIsSubmitting(false);
         }
     };
@@ -197,7 +228,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         <select
                             name="komisariat"
                             value={selectedKomisariat}
-                            onChange={(e) => setSelectedKomisariat(e.target.value)}
+                            onChange={handleKomisariatChange}
                             required
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
                         >
@@ -208,20 +239,39 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                         </select>
                     </div>
 
-                    {/* Kampus Dropdown - Dependent on Komisariat */}
+                    {/* Asal Kampus */}
                     <div>
                         <label className="block text-sm font-bold text-primary mb-2">Asal Kampus</label>
-                        <select
-                            name="campus"
-                            required
-                            defaultValue={initialData?.kaderProfile?.campus}
-                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                        >
-                            <option value="">Pilih Kampus</option>
-                            {availableCampuses.map((campus) => (
-                                <option key={campus} value={campus}>{campus}</option>
-                            ))}
-                        </select>
+                        {isNusantara ? (
+                            <select
+                                name="campus"
+                                value={selectedCampus}
+                                onChange={(e) => setSelectedCampus(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            >
+                                <option value="">-- Pilih Kampus --</option>
+                                {nusantaraCampuses.map((c) => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        ) : (
+                            <>
+                                <input
+                                    type="hidden"
+                                    name="campus"
+                                    value={selectedCampus}
+                                    readOnly
+                                />
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={selectedCampus}
+                                    onChange={() => {}}
+                                    className="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                                    placeholder="Otomatis sesuai Komisariat"
+                                />
+                            </>
+                        )}
                     </div>
 
                     {/* Fakultas */}
@@ -402,7 +452,6 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             placeholder="Contoh: PKC PMII Kaltim"
                         />
                     </div>
-                </div>
                 </div>
 
                 {/* PKN */}
