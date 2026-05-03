@@ -20,33 +20,34 @@ import { signOut, useSession } from "next-auth/react";
 export default function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const role = session?.user?.role;
+    const role = session?.user?.role as string;
     const [isOpen, setIsOpen] = useState(false);
 
-    // Close sidebar on route change
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
 
+    const ADMINS = ["SUPER_ADMIN", "ADMIN_CABANG"];
+    const PENGURUS = ["SUPER_ADMIN", "ADMIN_CABANG", "PENGURUS_CABANG", "PENGURUS_KOMISARIAT"];
+    const ALL_LOGIN = [...PENGURUS, "KADER"];
+
     const allMenuItems = [
-        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["SUPER_ADMIN", "PENGURUS"] }, // Admin Dashboard
-        { name: "Dashboard Anggota", href: "/dashboard/anggota", icon: LayoutDashboard, roles: ["KADER"] }, // Member Dashboard
-        { name: "Informasi & Kegiatan", href: "/dashboard/kegiatan", icon: Globe, roles: ["SUPER_ADMIN", "PENGURUS"] },
-        { name: "Database Kader", href: "/dashboard/kader", icon: Users, roles: ["SUPER_ADMIN", "PENGURUS"] },
-        { name: "Berita / Artikel", href: "/dashboard/berita", icon: FileText, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
-        { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen, roles: ["SUPER_ADMIN", "PENGURUS", "KADER"] },
-        { name: "Administrasi", href: "/dashboard/surat", icon: Mail, roles: ["SUPER_ADMIN", "PENGURUS"] },
-        { name: "Keuangan", href: "/dashboard/keuangan", icon: Wallet, roles: ["SUPER_ADMIN", "PENGURUS"] },
+        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: PENGURUS },
+        { name: "Dashboard Anggota", href: "/dashboard/anggota", icon: LayoutDashboard, roles: ["KADER"] },
+        { name: "Informasi & Kegiatan", href: "/dashboard/kegiatan", icon: Globe, roles: PENGURUS },
+        { name: "Database Kader", href: "/dashboard/kader", icon: Users, roles: ADMINS }, // Restricted to Admin as per latest request
+        { name: "Berita / Artikel", href: "/dashboard/berita", icon: FileText, roles: ALL_LOGIN },
+        { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen, roles: ALL_LOGIN },
+        { name: "Administrasi", href: "/dashboard/surat", icon: Mail, roles: PENGURUS },
+        { name: "Keuangan", href: "/dashboard/keuangan", icon: Wallet, roles: PENGURUS },
     ];
 
     const menuItems = allMenuItems.filter(item => !role || item.roles.includes(role));
 
     return (
         <>
-            {/* Mobile Header */}
             <div className="md:hidden fixed top-0 w-full h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-40">
                 <Link href="/" className="flex items-center space-x-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/PMII_BPP.png" alt="Logo PMII" className="w-8 h-8 object-contain" />
                     <span className="font-bold text-primary text-sm leading-tight">PMII<br /><span className="text-secondary text-[10px] tracking-widest uppercase opacity-60">Balikpapan</span></span>
                 </Link>
@@ -55,7 +56,6 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            {/* Mobile Overlay Backdrop */}
             {isOpen && (
                 <div 
                     className="md:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm transition-opacity"
@@ -67,7 +67,6 @@ export default function Sidebar() {
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <Link href="/" className="flex items-center space-x-3">
                         <div className="relative w-10 h-10">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src="/PMII_BPP.png" alt="Logo PMII" className="w-full h-full object-contain" />
                         </div>
                         <span className="font-bold text-primary text-lg leading-tight">PMII<br /><span className="text-secondary text-xs tracking-widest uppercase opacity-60">Balikpapan</span></span>
@@ -77,42 +76,42 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                {menuItems.map((item) => {
-                    const isActive = pathname.startsWith(item.href) && item.href !== "/dashboard" && item.href !== "/dashboard/anggota" || pathname === item.href;
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition ${isActive
-                                ? "bg-blue-50 text-primary font-bold"
-                                : "text-secondary hover:bg-gray-50 hover:text-primary"
-                                }`}
-                        >
-                            <item.icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-gray-400"}`} />
-                            <span>{item.name}</span>
-                        </Link>
-                    );
-                })}
-            </nav>
+                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    {menuItems.map((item) => {
+                        const isActive = (pathname.startsWith(item.href) && item.href !== "/dashboard" && item.href !== "/dashboard/anggota") || pathname === item.href;
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition ${isActive
+                                    ? "bg-blue-50 text-primary font-bold"
+                                    : "text-secondary hover:bg-gray-50 hover:text-primary"
+                                    }`}
+                            >
+                                <item.icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-gray-400"}`} />
+                                <span>{item.name}</span>
+                            </Link>
+                        );
+                    })}
+                </nav>
 
-            <div className="p-4 border-t border-gray-100 space-y-1">
-                <Link
-                    href="/"
-                    className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-sm font-medium text-secondary hover:bg-gray-50 hover:text-primary transition"
-                >
-                    <Globe className="w-5 h-5 text-gray-400" />
-                    <span>Ke Website Utama</span>
-                </Link>
-                <button
-                    onClick={() => signOut({ callbackUrl: "/masuk" })}
-                    className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition"
-                >
-                    <LogOut className="w-5 h-5" />
-                    <span>Keluar</span>
-                </button>
-            </div>
-        </aside>
+                <div className="p-4 border-t border-gray-100 space-y-1">
+                    <Link
+                        href="/"
+                        className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-sm font-medium text-secondary hover:bg-gray-50 hover:text-primary transition"
+                    >
+                        <Globe className="w-5 h-5 text-gray-400" />
+                        <span>Ke Website Utama</span>
+                    </Link>
+                    <button
+                        onClick={() => signOut({ callbackUrl: "/masuk" })}
+                        className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition"
+                    >
+                        <LogOut className="w-5 h-5" />
+                        <span>Keluar</span>
+                    </button>
+                </div>
+            </aside>
         </>
     );
 }

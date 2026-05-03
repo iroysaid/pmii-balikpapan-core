@@ -3,12 +3,12 @@
 import { createKader, updateKader } from "@/app/actions/kader";
 import { ArrowLeft, Edit, Save, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 const KOMISARIAT_DATA: Record<string, string[] | string> = {
     "Komisariat Uniba":      "Universitas Balikpapan",
-    "Komisariat Nusantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I College Balikpapan", "STMIK Bornep", "Universitas Terbuka"],
+    "Komisariat Nusantara": ["Institut Teknologi Kalimantan", "Politeknik Balikpapan", "LP3I College Balikpapan", "STMIK Borneo", "Universitas Terbuka"],
     "Komisariat Stitba":     "Sekolah Tinggi Ilmu Tarbiyah Balikpapan",
     "Komisariat Mulia":      "Universitas Mulia",
     "Komisariat Staiba":     "Sekolah Tinggi Agama Islam Balikpapan"
@@ -63,6 +63,21 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
         setOtherTrainings(otherTrainings.filter((_, i) => i !== index));
     };
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const passwordRef = useRef<HTMLInputElement>(null);
+    const [passwordGenerated, setPasswordGenerated] = useState(false);
+
+    const handleResetPassword = () => {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let res = "";
+        for (let i = 0; i < 4; i++) {
+            res += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        if (passwordRef.current) {
+            passwordRef.current.value = res;
+            setPasswordGenerated(true);
+            setTimeout(() => setPasswordGenerated(false), 3000);
+        }
+    };
     const [resultData, setResultData] = useState<{username: string, password: string, noInduk: string} | null>(null);
 
     const isNusantara = selectedKomisariat === "Komisariat Nusantara";
@@ -70,7 +85,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
         "Institut Teknologi Kalimantan",
         "Politeknik Balikpapan",
         "LP3I College Balikpapan",
-        "STMIK Bornep",
+        "STMIK Borneo",
         "Universitas Terbuka"
     ];
 
@@ -215,6 +230,35 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                             <p className="text-xs text-blue-500 mt-1">Biarkan kosong jika tidak ingin mengubah foto saat ini.</p>
                         )}
                     </div>
+                    {isEdit && isSuperAdmin && (
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-sm font-bold text-primary">Password Baru</label>
+                                <button 
+                                    type="button" 
+                                    onClick={handleResetPassword}
+                                    className="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded border border-orange-200 font-bold hover:bg-orange-100 transition"
+                                >
+                                    Reset Password
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    name="password"
+                                    ref={passwordRef}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                                    placeholder="Kosongkan jika tidak ingin diubah"
+                                />
+                                {passwordGenerated && (
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-green-600 bg-white px-1">
+                                        Password baru dibuat!
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-orange-600 mt-1">* Jika diisi, kader wajib mengganti password saat login berikutnya.</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

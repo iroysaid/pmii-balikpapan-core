@@ -211,6 +211,12 @@ export async function updateKader(userId: string, formData: FormData) {
     const parsedBirthDate = dateOfBirth ? new Date(dateOfBirth) : null;
     const finalBirthDate = parsedBirthDate && !isNaN(parsedBirthDate.getTime()) ? parsedBirthDate : null;
 
+    const password = formData.get("password") as string;
+    let hashedPassword;
+    if (password && password.trim() !== "") {
+        hashedPassword = await hash(password, 12);
+    }
+
     try {
         await prisma.user.update({
             where: { id: userId },
@@ -219,6 +225,7 @@ export async function updateKader(userId: string, formData: FormData) {
                 username,
                 ...(email ? { email } : {}),
                 ...(role ? { role } : {}),
+                ...(hashedPassword ? { password: hashedPassword, mustChangePassword: true } : {}),
                 ...(imageUrl ? { image: imageUrl } : {}),
                 ...(organizationId ? { organizationId } : {})
             },
