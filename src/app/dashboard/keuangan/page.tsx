@@ -5,7 +5,7 @@ import { Plus, TrendingUp, TrendingDown, Edit, Trash } from "lucide-react";
 import { deleteTransaction } from "@/app/actions/keuangan";
 import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import DataToolbar from "@/components/dashboard/DataToolbar";
 
 export default async function FinancePage({

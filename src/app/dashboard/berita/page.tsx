@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { deletePost } from "@/app/actions/berita";
 import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import DataToolbar from "@/components/dashboard/DataToolbar";
 
 export default async function PostsPage({

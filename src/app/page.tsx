@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Calendar, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import ActivitySlider from "@/components/ActivitySlider";
 
 export default async function Home() {

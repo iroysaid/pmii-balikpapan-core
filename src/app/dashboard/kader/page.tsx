@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Plus, CheckCircle, AlertCircle } from "lucide-react";
 import { verifyKader, deleteKader } from "@/app/actions/kader";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import DataToolbar from "@/components/dashboard/DataToolbar";
 
 export default async function KaderPage({
