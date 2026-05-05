@@ -1,8 +1,7 @@
 
-import { updateMaterial } from "@/app/actions/materi";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowLeft, FileText, Youtube } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { redirect } from "next/navigation";
 import EditMaterialForm from "./form";
 

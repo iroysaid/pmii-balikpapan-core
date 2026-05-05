@@ -6,12 +6,10 @@ const nextConfig: NextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
     experimental: {
+        proxyClientMaxBodySize: '100mb',
         serverActions: {
-            bodySizeLimit: '20mb',
+            bodySizeLimit: '100mb',
         },
     },
     async headers() {

@@ -20,6 +20,22 @@ async function getAuthorizedSession() {
     return session;
 }
 
+async function recalculateBalances(organizationId: string | null) {
+    const transactions = await prisma.transaction.findMany({
+        where: organizationId ? { organizationId } : { organizationId: null },
+        orderBy: [{ date: "asc" }, { createdAt: "asc" }],
+    });
+
+    let balance = 0;
+    for (const transaction of transactions) {
+        balance += transaction.type === "DEBIT" ? transaction.amount : -transaction.amount;
+        await prisma.transaction.update({
+            where: { id: transaction.id },
+            data: { balance },
+        });
+    }
+}
+
 export async function createTransaction(formData: FormData) {
     const session = await getAuthorizedSession();
     const organizationId = session.user.organizationId as string | null;
@@ -29,30 +45,17 @@ export async function createTransaction(formData: FormData) {
     const type = formData.get("type") as TransactionType; 
     const amount = parseFloat(formData.get("amount") as string);
 
-    const lastTransaction = await prisma.transaction.findFirst({
-        where: organizationId ? { organizationId } : {},
-        orderBy: { createdAt: "desc" },
-    });
-
-    const previousBalance = lastTransaction ? lastTransaction.balance : 0;
-    let newBalance = previousBalance;
-
-    if (type === "DEBIT") {
-        newBalance += amount;
-    } else {
-        newBalance -= amount;
-    }
-
     await prisma.transaction.create({
         data: {
             date: new Date(dateStr),
             description,
             type,
             amount,
-            balance: newBalance,
+            balance: 0,
             organizationId,
         },
     });
+    await recalculateBalances(organizationId);
 
     revalidatePath("/dashboard/keuangan");
     redirect("/dashboard/keuangan");
@@ -69,6 +72,7 @@ export async function deleteTransaction(id: string) {
     }
 
     await prisma.transaction.delete({ where: { id } });
+    await recalculateBalances(transaction.organizationId);
     revalidatePath("/dashboard/keuangan");
 }
 
@@ -96,6 +100,7 @@ export async function updateTransaction(id: string, formData: FormData) {
             amount,
         }
     });
+    await recalculateBalances(transaction.organizationId);
 
     revalidatePath("/dashboard/keuangan");
     redirect("/dashboard/keuangan");

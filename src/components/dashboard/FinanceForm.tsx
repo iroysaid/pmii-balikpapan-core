@@ -1,18 +1,20 @@
 "use client";
 
 import { createTransaction, updateTransaction } from "@/app/actions/keuangan";
+import SubmitButton from "@/components/dashboard/SubmitButton";
+import type { Transaction } from "@prisma/client";
 import { Wallet, TrendingUp, TrendingDown, Save } from "lucide-react";
 import { useState } from "react";
 
 interface FinanceFormProps {
-    initialData?: any;
+    initialData?: Transaction;
     isEdit?: boolean;
 }
 
 export default function FinanceForm({ initialData, isEdit = false }: FinanceFormProps) {
     const [type, setType] = useState(initialData?.type || "DEBIT");
 
-    const action = isEdit ? updateTransaction.bind(null, initialData.id) : createTransaction;
+    const action = isEdit ? updateTransaction.bind(null, initialData!.id) : createTransaction;
 
     return (
         <form action={action} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 space-y-6 h-fit">
@@ -74,10 +76,10 @@ export default function FinanceForm({ initialData, isEdit = false }: FinanceForm
             </div>
 
             <div className="pt-4 border-t border-gray-50 flex justify-end">
-                <button type="submit" className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center w-full justify-center lg:w-auto">
+                <SubmitButton pendingLabel={isEdit ? "Mengupdate..." : "Menyimpan..."} className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center w-full justify-center lg:w-auto">
                     {isEdit ? <Save className="w-4 h-4 mr-2" /> : <Wallet className="w-4 h-4 mr-2" />}
                     {isEdit ? "Update Transaksi" : "Simpan Transaksi"}
-                </button>
+                </SubmitButton>
             </div>
         </form>
     );

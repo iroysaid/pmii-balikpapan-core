@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Calendar, Users, Heart } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar, Users } from "lucide-react";
 import { deleteActivity } from "@/app/actions/kegiatan";
+import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -9,7 +11,7 @@ import DataToolbar from "@/components/dashboard/DataToolbar";
 export default async function ActivitiesPage({
     searchParams,
 }: {
-    searchParams: Promise<{ q?: string; sort?: string }>;
+    searchParams: Promise<{ q?: string; sort?: string; status?: string }>;
 }) {
     const session = await getServerSession(authOptions);
     const role = session?.user?.role;
@@ -17,7 +19,7 @@ export default async function ActivitiesPage({
     const organizationId = session?.user?.organizationId;
     const params = await searchParams;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.ActivityWhereInput = {};
     if (!isSuperAdmin && organizationId) {
         whereClause.organizationId = organizationId;
     }
@@ -29,10 +31,20 @@ export default async function ActivitiesPage({
         ];
     }
 
-    let orderBy: any = { startDate: "desc" };
-    if (params.sort === "date-asc") orderBy = { startDate: "asc" };
+    let orderBy: Prisma.ActivityOrderByWithRelationInput = { startDate: "asc" };
+    if (params.sort === "created-desc") orderBy = { createdAt: "desc" };
+    if (params.sort === "date-desc") orderBy = { startDate: "desc" };
 
-    const kegiatan = await prisma.activity.findMany({
+    const getActivityStatus = (startDate: Date, endDate: Date | null) => {
+        const now = new Date();
+        const end = endDate ? new Date(endDate) : new Date(startDate);
+        end.setHours(23, 59, 59, 999);
+        if (now < new Date(startDate)) return "upcoming";
+        if (now <= end) return "ongoing";
+        return "past";
+    };
+
+    let kegiatan = await prisma.activity.findMany({
         where: whereClause,
         orderBy: orderBy,
         include: {
@@ -41,6 +53,10 @@ export default async function ActivitiesPage({
             }
         }
     });
+
+    if (params.status) {
+        kegiatan = kegiatan.filter(activity => getActivityStatus(activity.startDate, activity.endDate) === params.status);
+    }
 
     const kegiatanForExport = isSuperAdmin ? kegiatan.map(a => ({
         Judul: a.title,
@@ -71,8 +87,21 @@ export default async function ActivitiesPage({
                 isSuperAdmin={isSuperAdmin}
                 searchPlaceholder="Cari Nama Kegiatan..."
                 sortOptions={[
-                    { label: "Terdekat/Terbaru", value: "date-desc" },
-                    { label: "Terlama", value: "date-asc" },
+                    { label: "Tanggal Terdekat", value: "date-asc" },
+                    { label: "Terbaru", value: "created-desc" },
+                    { label: "Terlama", value: "date-desc" },
+                ]}
+                showKomisariatTools={false}
+                filterOptions={[
+                    {
+                        key: "status",
+                        label: "Status Kegiatan",
+                        options: [
+                            { label: "Akan Datang", value: "upcoming" },
+                            { label: "Sedang Berlangsung", value: "ongoing" },
+                            { label: "Dokumentasi / Past", value: "past" },
+                        ],
+                    },
                 ]}
                 dataForExport={kegiatanForExport}
                 exportFilename={`Data-Kegiatan-${new Date().toISOString().split('T')[0]}`}
@@ -106,7 +135,9 @@ export default async function ActivitiesPage({
                                             )}
                                             <div>
                                                 <div className="font-medium text-primary flex items-center">
-                                                    {activity.title}
+                                                    <Link href={`/kegiatan/${activity.slug}`} className="hover:text-blue-600 hover:underline">
+                                                        {activity.title}
+                                                    </Link>
                                                     {activity.isInvitation && (
                                                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-pink-100 text-pink-600 uppercase">
                                                             Undangan
@@ -124,9 +155,13 @@ export default async function ActivitiesPage({
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {new Date(activity.startDate) > new Date() ? (
+                                        {getActivityStatus(activity.startDate, activity.endDate) === "upcoming" ? (
                                             <span className="px-2 py-1 rounded text-xs font-bold bg-accent/20 text-primary">
                                                 Coming Soon
+                                            </span>
+                                        ) : getActivityStatus(activity.startDate, activity.endDate) === "ongoing" ? (
+                                            <span className="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-600">
+                                                Berlangsung
                                             </span>
                                         ) : (
                                             <span className="px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-600">
@@ -158,9 +193,9 @@ export default async function ActivitiesPage({
                                                     <Edit className="w-4 h-4" />
                                                 </Link>
                                                 <form action={deleteActivity.bind(null, activity.id)}>
-                                                    <button type="submit" className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                                    <ConfirmDeleteButton className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
                                                         <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    </ConfirmDeleteButton>
                                                 </form>
                                             </div>
                                         </td>

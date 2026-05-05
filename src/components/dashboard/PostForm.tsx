@@ -3,6 +3,7 @@
 import { createPost, updatePost } from "@/app/actions/berita";
 import RichTextEditor from "@/components/editor/RichTextEditor";
 import TagSelector, { TagItem } from "@/components/editor/TagSelector";
+import SubmitButton from "@/components/dashboard/SubmitButton";
 import { Save, Edit, Image as ImageIcon, Upload, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef } from "react";
@@ -13,6 +14,7 @@ interface PostFormProps {
         title: string;
         content: string;
         image?: string | null;
+        published?: boolean;
         tags?: { tag: { id: string; name: string; group: string } }[];
     };
     isEdit?: boolean;
@@ -20,7 +22,7 @@ interface PostFormProps {
 }
 
 export default function PostForm({ initialData, isEdit = false, allTags }: PostFormProps) {
-    const action = isEdit ? updatePost.bind(null, initialData?.id) : createPost;
+    const action = isEdit ? updatePost.bind(null, initialData!.id) : createPost;
 
     const [uploading, setUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState(initialData?.image || "");
@@ -63,16 +65,28 @@ export default function PostForm({ initialData, isEdit = false, allTags }: PostF
                             : "Tulis dan publikasikan berita kegiatan PMII."}
                     </p>
                 </div>
-                <button
-                    type="submit"
-                    className="ml-auto flex items-center bg-primary text-white px-6 py-3 rounded-2xl font-black hover:bg-blue-900 transition shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
-                >
-                    {isEdit ? (
-                        <><Edit className="w-4 h-4 mr-2" /> Update Berita</>
-                    ) : (
-                        <><Save className="w-4 h-4 mr-2" /> Terbitkan</>
-                    )}
-                </button>
+                <div className="ml-auto flex flex-wrap justify-end gap-2">
+                    <SubmitButton
+                        name="published"
+                        value="false"
+                        pendingLabel="Menyimpan..."
+                        className="flex items-center border border-gray-200 bg-white text-secondary px-4 py-3 rounded-2xl font-black hover:bg-gray-50 transition"
+                    >
+                        <Save className="w-4 h-4 mr-2" /> Simpan Draft
+                    </SubmitButton>
+                    <SubmitButton
+                        name="published"
+                        value="true"
+                        pendingLabel={isEdit ? "Mengupdate..." : "Mempublish..."}
+                        className="flex items-center bg-primary text-white px-6 py-3 rounded-2xl font-black hover:bg-blue-900 transition shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                        {isEdit ? (
+                            <><Edit className="w-4 h-4 mr-2" /> Update & Publish</>
+                        ) : (
+                            <><Save className="w-4 h-4 mr-2" /> Publish</>
+                        )}
+                    </SubmitButton>
+                </div>
             </div>
 
             {/* 2-Column Layout */}

@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { Plus, TrendingUp, TrendingDown, Edit, Trash } from "lucide-react";
 import { deleteTransaction } from "@/app/actions/keuangan";
+import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -17,7 +19,7 @@ export default async function FinancePage({
     const organizationId = session?.user?.organizationId;
     const params = await searchParams;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.TransactionWhereInput = {};
     if (!isSuperAdmin && organizationId) {
         whereClause.organizationId = organizationId;
     }
@@ -29,8 +31,10 @@ export default async function FinancePage({
         whereClause.type = params.type;
     }
 
-    let orderBy: any = { date: "desc" };
+    let orderBy: Prisma.TransactionOrderByWithRelationInput = { date: "desc" };
     if (params.sort === "date-asc") orderBy = { date: "asc" };
+    if (params.sort === "amount-desc") orderBy = { amount: "desc" };
+    if (params.sort === "amount-asc") orderBy = { amount: "asc" };
 
     const transactions = await prisma.transaction.findMany({
         where: whereClause,
@@ -91,7 +95,10 @@ export default async function FinancePage({
                 sortOptions={[
                     { label: "Tanggal (Terbaru)", value: "date-desc" },
                     { label: "Tanggal (Terlama)", value: "date-asc" },
+                    { label: "Nominal (Terbesar)", value: "amount-desc" },
+                    { label: "Nominal (Terkecil)", value: "amount-asc" },
                 ]}
+                showKomisariatTools={false}
                 filterOptions={[
                     {
                         key: "type",
@@ -175,9 +182,9 @@ export default async function FinancePage({
                                                 <Edit className="w-4 h-4" />
                                             </Link>
                                             <form action={deleteTransaction.bind(null, t.id)}>
-                                                <button type="submit" className="text-red-400 hover:text-red-600 p-1">
+                                                <ConfirmDeleteButton className="text-red-400 hover:text-red-600 p-1">
                                                     <Trash className="w-4 h-4" />
-                                                </button>
+                                                </ConfirmDeleteButton>
                                             </form>
                                         </td>
                                     )}

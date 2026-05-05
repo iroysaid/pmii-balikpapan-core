@@ -25,6 +25,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
                     title: post.title,
                     content: post.content,
                     image: post.image,
+                    published: post.published,
                     tags: post.tags,
                 }}
                 isEdit={true}

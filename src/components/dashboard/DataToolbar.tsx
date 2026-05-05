@@ -1,20 +1,32 @@
 "use client";
 
-import { Search, Filter, ArrowUpDown, Download, X, Check } from "lucide-react";
+import { Search, Filter, ArrowUpDown, Download, Check } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
-// @ts-ignore
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+
+type ExportCell = string | number | boolean | null | undefined;
 
 interface DataToolbarProps {
     searchPlaceholder?: string;
-    dataForExport?: any[];
+    sortOptions?: { label: string; value: string }[];
+    filterOptions?: {
+        key: string;
+        label: string;
+        options: { label: string; value: string }[];
+        multiple?: boolean;
+    }[];
+    showKomisariatTools?: boolean;
+    dataForExport?: Record<string, ExportCell>[];
     exportFilename?: string;
     isSuperAdmin?: boolean;
 }
 
 export default function DataToolbar({
     searchPlaceholder = "Cari data...",
+    sortOptions,
+    filterOptions,
+    showKomisariatTools = true,
     dataForExport = [],
     exportFilename = "data_export",
     isSuperAdmin = false,
@@ -32,10 +44,15 @@ export default function DataToolbar({
     const currentKomisariats = searchParams.get("komisariat")?.split(",").filter(Boolean) || [];
     const isGrouped = searchParams.get("groupBy") === "komisariat";
 
-    const filterCount = currentRoles.length + currentKomisariats.length;
+    const configuredFilterCount = (filterOptions || []).reduce((count, filter) => {
+        const values = searchParams.get(filter.key)?.split(",").filter(Boolean) || [];
+        return count + values.length;
+    }, 0);
+    const filterCount = showKomisariatTools ? currentRoles.length + currentKomisariats.length : configuredFilterCount;
 
     const komisariatOptions = ["Nusantara", "Uniba", "Mulia", "Staiba", "Stitba"];
     const roleOptions = ["KADER", "PENGURUS_KOMISARIAT", "PENGURUS_CABANG", "ADMIN_CABANG", "SUPER_ADMIN"];
+    const hasFilters = showKomisariatTools || (filterOptions && filterOptions.length > 0);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -61,8 +78,13 @@ export default function DataToolbar({
         });
     };
 
-    const toggleFilter = (type: "role" | "komisariat", value: string) => {
-        const current = type === "role" ? currentRoles : currentKomisariats;
+    const toggleFilter = (type: string, value: string, multiple = true) => {
+        const current = searchParams.get(type)?.split(",").filter(Boolean) || [];
+        if (!multiple) {
+            updateParams({ [type]: current.includes(value) ? null : value });
+            return;
+        }
+
         let next;
         if (current.includes(value)) {
             next = current.filter(v => v !== value);
@@ -73,7 +95,10 @@ export default function DataToolbar({
     };
 
     const resetFilters = () => {
-        updateParams({ role: null, komisariat: null });
+        const resetKeys = showKomisariatTools
+            ? { role: null, komisariat: null }
+            : Object.fromEntries((filterOptions || []).map(filter => [filter.key, null])) as Record<string, null>;
+        updateParams(resetKeys);
         setShowFilters(false);
     };
 
@@ -89,7 +114,7 @@ export default function DataToolbar({
             const autoTable = (await import("jspdf-autotable")).default;
             const doc = new jsPDF();
             const headers = Object.keys(dataForExport[0]);
-            const body = dataForExport.map(row => Object.values(row)) as any[];
+            const body = dataForExport.map(row => Object.values(row).map(value => value == null ? "" : String(value)));
             doc.text(`${exportFilename.replace(/-/g, ' ')}`, 14, 15);
             doc.setFontSize(10);
             doc.text(`Generated on: ${new Date().toLocaleDateString("id-ID")}`, 14, 20);
@@ -121,22 +146,23 @@ export default function DataToolbar({
                     />
                 </div>
 
-                <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
-                    {/* Grouping Toggle */}
-                    <div className="flex items-center space-x-2 mr-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input 
-                                type="checkbox" 
-                                className="sr-only peer" 
-                                checked={isGrouped}
-                                onChange={(e) => updateParams({ groupBy: e.target.checked ? "komisariat" : null })}
-                            />
-                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                            <span className="ml-2 text-xs font-medium text-gray-700">Grup Komisariat</span>
-                        </label>
-                    </div>
+                <div className={`flex flex-wrap gap-2 w-full md:w-auto justify-end transition-opacity ${isPending ? "opacity-70" : "opacity-100"}`}>
+                    {showKomisariatTools && (
+                        <div className="flex items-center space-x-2 mr-2">
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={isGrouped}
+                                    onChange={(e) => updateParams({ groupBy: e.target.checked ? "komisariat" : null })}
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                <span className="ml-2 text-xs font-medium text-gray-700">Grup Komisariat</span>
+                            </label>
+                        </div>
+                    )}
 
-                    {/* Filter Dropdown */}
+                    {hasFilters && (
                     <div className="relative" ref={filterRef}>
                         <button
                             onClick={() => setShowFilters(!showFilters)}
@@ -154,41 +180,67 @@ export default function DataToolbar({
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div>
-                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Komisariat</h4>
-                                        <div className="space-y-1">
-                                            {komisariatOptions.map(opt => (
-                                                <button
-                                                    key={opt}
-                                                    onClick={() => toggleFilter("komisariat", opt)}
-                                                    className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-50 text-xs text-secondary"
-                                                >
-                                                    <span>{opt}</span>
-                                                    {currentKomisariats.includes(opt) && <Check className="w-3 h-3 text-primary" />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    {showKomisariatTools ? (
+                                        <>
+                                            <div>
+                                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Komisariat</h4>
+                                                <div className="space-y-1">
+                                                    {komisariatOptions.map(opt => (
+                                                        <button
+                                                            key={opt}
+                                                            onClick={() => toggleFilter("komisariat", opt)}
+                                                            className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-50 text-xs text-secondary"
+                                                        >
+                                                            <span>{opt}</span>
+                                                            {currentKomisariats.includes(opt) && <Check className="w-3 h-3 text-primary" />}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
 
-                                    <div>
-                                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Role User</h4>
-                                        <div className="space-y-1">
-                                            {roleOptions.map(opt => (
-                                                <button
-                                                    key={opt}
-                                                    onClick={() => toggleFilter("role", opt)}
-                                                    className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-50 text-xs text-secondary"
-                                                >
-                                                    <span className="truncate">{opt.replace(/_/g, ' ')}</span>
-                                                    {currentRoles.includes(opt) && <Check className="w-3 h-3 text-primary" />}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                            <div>
+                                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Role User</h4>
+                                                <div className="space-y-1">
+                                                    {roleOptions.map(opt => (
+                                                        <button
+                                                            key={opt}
+                                                            onClick={() => toggleFilter("role", opt)}
+                                                            className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-50 text-xs text-secondary"
+                                                        >
+                                                            <span className="truncate">{opt.replace(/_/g, ' ')}</span>
+                                                            {currentRoles.includes(opt) && <Check className="w-3 h-3 text-primary" />}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        (filterOptions || []).map(filter => {
+                                            const selected = searchParams.get(filter.key)?.split(",").filter(Boolean) || [];
+                                            return (
+                                                <div key={filter.key}>
+                                                    <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{filter.label}</h4>
+                                                    <div className="space-y-1">
+                                                        {filter.options.map(opt => (
+                                                            <button
+                                                                key={opt.value}
+                                                                onClick={() => toggleFilter(filter.key, opt.value, filter.multiple ?? false)}
+                                                                className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-50 text-xs text-secondary"
+                                                            >
+                                                                <span className="truncate">{opt.label}</span>
+                                                                {selected.includes(opt.value) && <Check className="w-3 h-3 text-primary" />}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
                                 </div>
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* Sort Dropdown */}
                     <div className="relative">
@@ -198,10 +250,14 @@ export default function DataToolbar({
                             defaultValue={searchParams.get("sort")?.toString()}
                         >
                             <option value="">Urutkan...</option>
-                            <option value="name-asc">Nama (A-Z)</option>
-                            <option value="name-desc">Nama (Z-A)</option>
-                            <option value="mapaba-desc">Angkatan (Terbaru)</option>
-                            <option value="mapaba-asc">Angkatan (Terlama)</option>
+                            {(sortOptions || [
+                                { label: "Nama (A-Z)", value: "name-asc" },
+                                { label: "Nama (Z-A)", value: "name-desc" },
+                                { label: "Angkatan (Terbaru)", value: "mapaba-desc" },
+                                { label: "Angkatan (Terlama)", value: "mapaba-asc" },
+                            ]).map(option => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                            ))}
                         </select>
                         <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     </div>

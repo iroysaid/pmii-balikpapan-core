@@ -1,6 +1,8 @@
 "use client";
 
 import { updateMaterial } from "@/app/actions/materi";
+import SubmitButton from "@/components/dashboard/SubmitButton";
+import type { Material, MaterialChapter } from "@prisma/client";
 import { FileText, Youtube, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
@@ -13,21 +15,22 @@ type Chapter = {
     youtubeUrl?: string;
 };
 
-export default function EditMaterialForm({ material }: { material: any }) {
+type MaterialWithChapters = Material & { chapters: MaterialChapter[] };
+
+export default function EditMaterialForm({ material }: { material: MaterialWithChapters }) {
     // Initialize chapters from material prop
     const initialChapters = material.chapters && material.chapters.length > 0
-        ? material.chapters.map((c: any) => ({
+        ? material.chapters.map((c) => ({
             id: c.id,
-            title: c.title,
-            description: c.description,
-            type: c.type,
-            fileUrl: c.fileUrl,
-            youtubeUrl: c.youtubeUrl
+            title: c.title || "",
+            description: c.description || "",
+            type: c.type === "YOUTUBE" ? "YOUTUBE" as const : "DOCUMENT" as const,
+            fileUrl: c.fileUrl || undefined,
+            youtubeUrl: c.youtubeUrl || undefined
         }))
-        : [{ id: Date.now(), title: "", description: "", type: "DOCUMENT" }];
+        : [{ id: "new-1", title: "", description: "", type: "DOCUMENT" as const }];
 
     const [chapters, setChapters] = useState<Chapter[]>(initialChapters);
-    const [isPublished, setIsPublished] = useState(material.isPublished);
 
     const updateMaterialWithId = updateMaterial.bind(null, material.id);
 
@@ -41,7 +44,7 @@ export default function EditMaterialForm({ material }: { material: any }) {
         }
     };
 
-    const updateChapter = (id: string | number, field: string, value: any) => {
+    const updateChapter = (id: string | number, field: keyof Chapter, value: Chapter[keyof Chapter]) => {
         setChapters(chapters.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
     };
 
@@ -58,9 +61,6 @@ export default function EditMaterialForm({ material }: { material: any }) {
                     <label className="block text-sm font-bold text-primary mb-2">Deskripsi Singkat</label>
                     <textarea name="description" defaultValue={material.description || ""} rows={3} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Penjelasan singkat..."></textarea>
                 </div>
-
-                {/* Hidden input to control publish state */}
-                <input type="hidden" name="isPublished" value={isPublished.toString()} />
             </div>
 
             {/* Chapters */}
@@ -153,20 +153,22 @@ export default function EditMaterialForm({ material }: { material: any }) {
             </div>
 
             <div className="pt-4 border-t border-gray-50 flex justify-end space-x-3">
-                <button
-                    type="submit"
-                    onClick={() => setIsPublished(false)}
+                <SubmitButton
+                    name="isPublished"
+                    value="false"
+                    pendingLabel="Menyimpan draft..."
                     className="border border-gray-300 text-secondary px-6 py-3 rounded-lg font-bold hover:bg-gray-50 transition"
                 >
                     Simpan sebagai Draft
-                </button>
-                <button
-                    type="submit"
-                    onClick={() => setIsPublished(true)}
+                </SubmitButton>
+                <SubmitButton
+                    name="isPublished"
+                    value="true"
+                    pendingLabel="Menyimpan..."
                     className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition"
                 >
-                    {isPublished ? "Simpan Perubahan" : "Publish Sekarang"}
-                </button>
+                    {material.isPublished ? "Simpan Perubahan" : "Publish Sekarang"}
+                </SubmitButton>
             </div>
         </form>
     );

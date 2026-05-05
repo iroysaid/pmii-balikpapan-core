@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { deletePost } from "@/app/actions/berita";
+import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -9,23 +11,38 @@ import DataToolbar from "@/components/dashboard/DataToolbar";
 export default async function PostsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ q?: string; sort?: string }>;
+    searchParams: Promise<{ q?: string; sort?: string; status?: string; tag?: string }>;
 }) {
     const session = await getServerSession(authOptions);
     const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
     const params = await searchParams;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.PostWhereInput = {};
     if (params.q) {
         whereClause.title = { contains: params.q };
     }
+    if (params.status === "draft") whereClause.published = false;
+    if (params.status === "published") whereClause.published = true;
+    if (params.tag) {
+        whereClause.tags = {
+            some: {
+                tag: { name: params.tag },
+            },
+        };
+    }
 
-    let orderBy: any = { createdAt: "desc" };
+    let orderBy: Prisma.PostOrderByWithRelationInput = { createdAt: "desc" };
     if (params.sort === "date-asc") orderBy = { createdAt: "asc" };
+    if (params.sort === "title-asc") orderBy = { title: "asc" };
+
+    const tags = await prisma.tag.findMany({ orderBy: [{ group: "asc" }, { name: "asc" }] });
 
     const posts = await prisma.post.findMany({
         where: whereClause,
         orderBy: orderBy,
+        include: {
+            tags: { include: { tag: true } },
+        },
     });
 
     const postsForExport = isSuperAdmin ? posts.map(p => ({
@@ -58,6 +75,23 @@ export default async function PostsPage({
                 sortOptions={[
                     { label: "Terbaru", value: "date-desc" },
                     { label: "Terlama", value: "date-asc" },
+                    { label: "Judul A-Z", value: "title-asc" },
+                ]}
+                showKomisariatTools={false}
+                filterOptions={[
+                    {
+                        key: "tag",
+                        label: "Kategori / Rubrik",
+                        options: tags.map(tag => ({ label: `${tag.group} - ${tag.name}`, value: tag.name })),
+                    },
+                    {
+                        key: "status",
+                        label: "Status",
+                        options: [
+                            { label: "Draft", value: "draft" },
+                            { label: "Published", value: "published" },
+                        ],
+                    },
                 ]}
                 dataForExport={postsForExport}
                 exportFilename={`Data-Berita-${new Date().toISOString().split('T')[0]}`}
@@ -85,16 +119,22 @@ export default async function PostsPage({
                             posts.map((post) => (
                                 <tr key={post.id} className="hover:bg-gray-50 transition">
                                     <td className="px-6 py-4 font-medium text-primary">
-                                        {post.title}
+                                        <Link href={`/berita/${post.slug}`} className="hover:text-blue-600 hover:underline">
+                                            {post.title}
+                                        </Link>
                                     </td>
-                                    <td className="px-6 py-4 text-secondary">Berita</td>
+                                    <td className="px-6 py-4 text-secondary">
+                                        {post.tags[0]?.tag.name || "Berita"}
+                                    </td>
                                     <td className="px-6 py-4 text-secondary">
                                         {new Date(post.createdAt).toLocaleDateString("id-ID")}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">
-                                            Published
-                                        </span>
+                                        {post.published ? (
+                                            <span className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-bold">Published</span>
+                                        ) : (
+                                            <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">Draft</span>
+                                        )}
                                     </td>
                                     {isSuperAdmin && (
                                         <td className="px-6 py-4 text-right flex justify-end space-x-2">
@@ -102,9 +142,9 @@ export default async function PostsPage({
                                                 <Edit className="w-4 h-4" />
                                             </Link>
                                             <form action={deletePost.bind(null, post.id)}>
-                                                <button type="submit" className="text-red-600 hover:text-red-800">
+                                                <ConfirmDeleteButton className="text-red-600 hover:text-red-800">
                                                     <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                </ConfirmDeleteButton>
                                             </form>
                                         </td>
                                     )}

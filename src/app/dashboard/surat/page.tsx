@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { Plus, Download, Mail, Send, Edit, Trash } from "lucide-react";
 import { deleteLetter } from "@/app/actions/surat";
-import { redirect } from "next/navigation";
+import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -19,7 +20,7 @@ export default async function SuratPage({
     const isSuperAdmin = role === "SUPER_ADMIN" || role === "ADMIN_CABANG" || role === "PENGURUS_CABANG";
     const organizationId = session?.user?.organizationId;
 
-    const whereClause: any = { type: currentType };
+    const whereClause: Prisma.LetterWhereInput = { type: currentType };
     if (!isSuperAdmin && organizationId) {
         whereClause.organizationId = organizationId;
     }
@@ -32,7 +33,7 @@ export default async function SuratPage({
         ];
     }
 
-    let orderBy: any = { date: "desc" };
+    let orderBy: Prisma.LetterOrderByWithRelationInput = { date: "desc" };
     if (params.sort === "date-asc") orderBy = { date: "asc" };
 
     const letters = await prisma.letter.findMany({
@@ -72,6 +73,7 @@ export default async function SuratPage({
                     { label: "Tanggal (Terbaru)", value: "date-desc" },
                     { label: "Tanggal (Terlama)", value: "date-asc" },
                 ]}
+                showKomisariatTools={false}
                 dataForExport={lettersForExport}
                 exportFilename={`Data-Surat-${currentType}-${new Date().toISOString().split('T')[0]}`}
             />
@@ -144,9 +146,9 @@ export default async function SuratPage({
                                                     <Edit className="w-4 h-4" />
                                                 </Link>
                                                 <form action={deleteLetter.bind(null, letter.id)}>
-                                                    <button type="submit" className="text-red-400 hover:text-red-600 p-1">
+                                                    <ConfirmDeleteButton className="text-red-400 hover:text-red-600 p-1">
                                                         <Trash className="w-4 h-4" />
-                                                    </button>
+                                                    </ConfirmDeleteButton>
                                                 </form>
                                             </>
                                         )}

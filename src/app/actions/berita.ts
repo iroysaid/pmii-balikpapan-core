@@ -52,6 +52,7 @@ export async function createPost(formData: FormData) {
     const content = formData.get("content") as string;
     const tagsJson = formData.get("tagsJson") as string;
     const imageUrlFromState = formData.get("imageUrl") as string; // from hidden input managed by React
+    const published = formData.get("published") !== "false";
 
     // Legacy: also support direct file upload if provided
     const imageFile = formData.get("image") as File;
@@ -74,7 +75,7 @@ export async function createPost(formData: FormData) {
             content,
             slug: `${slug}-${Date.now()}`,
             image: imageUrl,
-            published: true,
+            published,
             author: "Admin",
             tags: {
                 create: tagIds.map((tagId) => ({ tagId })),
@@ -104,6 +105,7 @@ export async function updatePost(id: string, formData: FormData) {
     const content = formData.get("content") as string;
     const tagsJson = formData.get("tagsJson") as string;
     const imageUrlFromState = formData.get("imageUrl") as string;
+    const published = formData.get("published") !== "false";
 
     const imageFile = formData.get("image") as File;
     let imageUrl: string | undefined = imageUrlFromState || undefined;
@@ -119,6 +121,7 @@ export async function updatePost(id: string, formData: FormData) {
         data: {
             title,
             content,
+            published,
             ...(imageUrl !== undefined ? { image: imageUrl || null } : {}),
             author: "Admin",
             // Sync tags: delete old, create new

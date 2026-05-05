@@ -1,18 +1,20 @@
 "use client";
 
 import { createLetter, updateLetter } from "@/app/actions/surat";
-import { ArrowLeft, Save, FileText, Mail } from "lucide-react";
+import SubmitButton from "@/components/dashboard/SubmitButton";
+import type { Letter } from "@prisma/client";
+import { Save } from "lucide-react";
 import { useState } from "react";
 
 interface LettersFormProps {
-    initialData?: any;
+    initialData?: Letter;
     isEdit?: boolean;
 }
 
 export default function LettersForm({ initialData, isEdit = false }: LettersFormProps) {
     const [type, setType] = useState(initialData?.type || "MASUK");
 
-    const action = isEdit ? updateLetter.bind(null, initialData.id) : createLetter;
+    const action = isEdit ? updateLetter.bind(null, initialData!.id) : createLetter;
 
     return (
         <form action={action} className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 space-y-6">
@@ -56,18 +58,18 @@ export default function LettersForm({ initialData, isEdit = false }: LettersForm
 
             <div>
                 <label className="block text-sm font-bold text-primary mb-2">Perihal / Subjek</label>
-                <input type="text" name="subject" required defaultValue={initialData?.subject} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Perihal surat..." />
+                <input type="text" name="subject" required defaultValue={initialData?.subject || ""} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Perihal surat..." />
             </div>
 
             {type === "MASUK" ? (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                     <label className="block text-sm font-bold text-primary mb-2">Pengirim (Instansi/Orang)</label>
-                    <input type="text" name="sender" required defaultValue={initialData?.sender} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Dari siapa..." />
+                    <input type="text" name="sender" required defaultValue={initialData?.sender || ""} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Dari siapa..." />
                 </div>
             ) : (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                     <label className="block text-sm font-bold text-primary mb-2">Penerima / Tujuan</label>
-                    <input type="text" name="receiver" required defaultValue={initialData?.receiver} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Kepada siapa..." />
+                    <input type="text" name="receiver" required defaultValue={initialData?.receiver || ""} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Kepada siapa..." />
                 </div>
             )}
 
@@ -81,9 +83,9 @@ export default function LettersForm({ initialData, isEdit = false }: LettersForm
             </div>
 
             <div className="pt-4 border-t border-gray-50 flex justify-end">
-                <button type="submit" className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center">
+                <SubmitButton pendingLabel={isEdit ? "Mengupdate..." : "Menyimpan..."} className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center">
                     <Save className="w-4 h-4 mr-2" /> {isEdit ? "Update Arsip" : "Simpan Arsip"}
-                </button>
+                </SubmitButton>
             </div>
         </form>
     );

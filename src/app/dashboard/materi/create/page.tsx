@@ -1,6 +1,7 @@
 "use client";
 
 import { createMaterial } from "@/app/actions/materi";
+import SubmitButton from "@/components/dashboard/SubmitButton";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, FileText, Youtube } from "lucide-react";
 import { useState } from "react";
@@ -11,10 +12,11 @@ type Chapter = {
 };
 
 export default function CreateMaterialPage() {
-    const [chapters, setChapters] = useState<Chapter[]>([{ id: Date.now(), type: "DOCUMENT" }]);
+    const [chapters, setChapters] = useState<Chapter[]>([{ id: 1, type: "DOCUMENT" }]);
 
     const addChapter = () => {
-        setChapters([...chapters, { id: Date.now(), type: "DOCUMENT" }]);
+        const nextId = Math.max(...chapters.map((chapter) => chapter.id)) + 1;
+        setChapters([...chapters, { id: nextId, type: "DOCUMENT" }]);
     };
 
     const removeChapter = (id: number) => {
@@ -48,10 +50,6 @@ export default function CreateMaterialPage() {
                     <div>
                         <label className="block text-sm font-bold text-primary mb-2">Deskripsi Singkat</label>
                         <textarea name="description" rows={3} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Penjelasan singkat..."></textarea>
-                    </div>
-                    <div className="flex items-center space-x-2 hidden">
-                        <input type="checkbox" name="isPublished" value="true" defaultChecked id="publish" className="w-4 h-4 text-primary" />
-                        <label htmlFor="publish" className="text-sm text-primary font-bold">Langsung Publikasikan?</label>
                     </div>
                 </div>
 
@@ -121,26 +119,22 @@ export default function CreateMaterialPage() {
                 </div>
 
                 <div className="pt-4 border-t border-gray-50 flex justify-end space-x-3">
-                    <button
-                        type="submit"
-                        onClick={() => {
-                            const input = document.getElementById('publish') as HTMLInputElement;
-                            if (input) input.checked = false;
-                        }}
+                    <SubmitButton
+                        name="isPublished"
+                        value="false"
+                        pendingLabel="Menyimpan draft..."
                         className="border border-gray-300 text-secondary px-6 py-3 rounded-lg font-bold hover:bg-gray-50 transition"
                     >
                         Simpan sebagai Draft
-                    </button>
-                    <button
-                        type="submit"
-                        onClick={() => {
-                            const input = document.getElementById('publish') as HTMLInputElement;
-                            if (input) input.checked = true;
-                        }}
+                    </SubmitButton>
+                    <SubmitButton
+                        name="isPublished"
+                        value="true"
+                        pendingLabel="Mempublish..."
                         className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition"
                     >
                         Publish Sekarang
-                    </button>
+                    </SubmitButton>
                 </div>
             </form>
         </div>
