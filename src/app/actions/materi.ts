@@ -18,76 +18,85 @@ async function checkSuperAdmin() {
 }
 
 export async function createMaterial(formData: FormData) {
-    await checkSuperAdmin();
+    try {
+        await checkSuperAdmin();
 
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const isPublished = formData.get("isPublished") === "true";
+        const title = formData.get("title") as string;
+        const description = formData.get("description") as string;
+        const isPublished = formData.get("isPublished") === "true";
 
-    // Parse chapters from FormData
-    // Expecting keys: chapters[0][title], chapters[0][type], chapters[0][file], etc.
-    const chapters = [];
-    let i = 0;
-    while (formData.has(`chapters[${i}][title]`)) {
-        const chapterTitle = formData.get(`chapters[${i}][title]`) as string;
-        const chapterDesc = formData.get(`chapters[${i}][description]`) as string;
-        const type = formData.get(`chapters[${i}][type]`) as string;
+        console.log("[MATERI DEBUG] Creating material:", title);
 
-        let fileUrl = null;
-        let youtubeUrl = null;
+        const chapters = [];
+        let i = 0;
+        while (formData.has(`chapters[${i}][title]`)) {
+            const chapterTitle = formData.get(`chapters[${i}][title]`) as string;
+            const chapterDesc = formData.get(`chapters[${i}][description]`) as string;
+            const type = formData.get(`chapters[${i}][type]`) as string;
 
-        if (type === "DOCUMENT") {
-            const file = formData.get(`chapters[${i}][file]`) as File;
-            if (file && file.size > 0) {
-                fileUrl = await uploadFile(file, "materials");
+            let fileUrl = null;
+            let youtubeUrl = null;
+
+            if (type === "DOCUMENT") {
+                const file = formData.get(`chapters[${i}][file]`) as File;
+                if (file && file.size > 0) {
+                    console.log(`[MATERI DEBUG] Uploading file for chapter ${i}:`, file.name);
+                    fileUrl = await uploadFile(file, "materials");
+                }
+            } else if (type === "YOUTUBE") {
+                youtubeUrl = formData.get(`chapters[${i}][youtubeUrl]`) as string;
             }
-        } else if (type === "YOUTUBE") {
-            youtubeUrl = formData.get(`chapters[${i}][youtubeUrl]`) as string;
+
+            chapters.push({
+                title: chapterTitle,
+                description: chapterDesc,
+                type,
+                fileUrl,
+                youtubeUrl,
+                sortOrder: i
+            });
+            i++;
         }
 
-        chapters.push({
-            title: chapterTitle,
-            description: chapterDesc,
-            type,
-            fileUrl,
-            youtubeUrl,
-            sortOrder: i
+        let featuredImage = null;
+        if (chapters.length > 0) {
+            if (chapters[0].type === "YOUTUBE" && chapters[0].youtubeUrl) {
+                const videoId = getYouTubeID(chapters[0].youtubeUrl);
+                if (videoId) {
+                    featuredImage = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                }
+            }
+        }
+
+        console.log("[MATERI DEBUG] Saving to database with chapters count:", chapters.length);
+
+        await prisma.material.create({
+            data: {
+                title,
+                description,
+                isPublished,
+                featuredImage,
+                chapters: {
+                    create: chapters.map(c => ({
+                        title: c.title,
+                        description: c.description,
+                        type: c.type,
+                        fileUrl: c.fileUrl,
+                        youtubeUrl: c.youtubeUrl,
+                        sortOrder: c.sortOrder
+                    }))
+                }
+            },
         });
-        i++;
+
+        console.log("[MATERI DEBUG] Success!");
+        revalidatePath("/dashboard/materi");
+    } catch (error: any) {
+        console.error("[MATERI ERROR]", error);
+        // We rethrow to let Next.js handle it, but now we have logs on the server.
+        throw error;
     }
-
-    // Determine Featured Image from Chapter 1 (index 0) if available
-    let featuredImage = null;
-    if (chapters.length > 0) {
-        if (chapters[0].type === "YOUTUBE" && chapters[0].youtubeUrl) {
-            const videoId = getYouTubeID(chapters[0].youtubeUrl);
-            if (videoId) {
-                featuredImage = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-            }
-        }
-        // If Document, we could prompt for a cover image, but for now leave null or standard placeholder
-    }
-
-    await prisma.material.create({
-        data: {
-            title,
-            description,
-            isPublished,
-            featuredImage,
-            chapters: {
-                create: chapters.map(c => ({
-                    title: c.title,
-                    description: c.description,
-                    type: c.type,
-                    fileUrl: c.fileUrl,
-                    youtubeUrl: c.youtubeUrl,
-                    sortOrder: c.sortOrder
-                }))
-            }
-        },
-    });
-
-    revalidatePath("/dashboard/materi");
+    // Redirect must be outside try/catch in some Next.js versions to work properly with Server Actions
     redirect("/dashboard/materi");
 }
 
