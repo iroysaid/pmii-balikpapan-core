@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { ArrowLeft, Clock, Calendar, Lock, BookOpen } from "lucide-react";
 import { redirect, notFound } from "next/navigation";
