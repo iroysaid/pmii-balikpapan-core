@@ -3,7 +3,8 @@ import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Image as ImageIcon } from "lucide-react";
+import { getYouTubeID } from "@/lib/youtube";
 import { deleteMaterial } from "@/app/actions/materi";
 import ConfirmDeleteButton from "@/components/dashboard/ConfirmDeleteButton";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -103,10 +104,33 @@ export default async function LearningDashboard({
                         {materials.map((item) => (
                             <tr key={item.id} className="hover:bg-gray-50 transition">
                                 <td className="p-4">
-                                    <Link href={`/materi/${item.id}`} className="font-bold text-primary hover:text-blue-600 hover:underline">
-                                        {item.title}
-                                    </Link>
-                                    <div className="text-xs text-gray-400 line-clamp-1">{item.description}</div>
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-12 h-12 rounded bg-gray-100 flex-shrink-0 overflow-hidden border">
+                                            {(() => {
+                                                let thumb = item.featuredImage;
+                                                if (!thumb && item.chapters.length > 0) {
+                                                    const first = item.chapters[0];
+                                                    if (first.type === "YOUTUBE" && first.youtubeUrl) {
+                                                        const vid = getYouTubeID(first.youtubeUrl);
+                                                        if (vid) thumb = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+                                                    }
+                                                }
+                                                return thumb ? (
+                                                    <img src={thumb} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                        <ImageIcon className="w-4 h-4" />
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                        <div>
+                                            <Link href={`/materi/${item.id}`} className="font-bold text-primary hover:text-blue-600 hover:underline line-clamp-1">
+                                                {item.title}
+                                            </Link>
+                                            <div className="text-xs text-gray-400 line-clamp-1">{item.description}</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td className="p-4">
                                     <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">

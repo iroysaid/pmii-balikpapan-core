@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getYouTubeID } from "@/lib/youtube";
 
 async function checkSuperAdmin() {
     const session = await getServerSession(authOptions);
@@ -57,9 +58,17 @@ export async function createMaterial(formData: FormData) {
             });
             i++;
         }
-
+        
+        // Handle Featured Image Upload
         let featuredImage = null;
-        if (chapters.length > 0) {
+        const featuredImageFile = formData.get("featuredImage") as File;
+        if (featuredImageFile && featuredImageFile.size > 0) {
+            console.log("[MATERI DEBUG] Uploading manual featured image");
+            featuredImage = await uploadFile(featuredImageFile, "materials/thumbnails");
+        } 
+        
+        // Fallback to YouTube Thumbnail if no manual upload
+        if (!featuredImage && chapters.length > 0) {
             if (chapters[0].type === "YOUTUBE" && chapters[0].youtubeUrl) {
                 const videoId = getYouTubeID(chapters[0].youtubeUrl);
                 if (videoId) {
@@ -151,8 +160,18 @@ export async function updateMaterial(id: string, formData: FormData) {
         i++;
     }
 
-    let featuredImage = null;
-    if (chapters.length > 0) {
+    // Handle Featured Image Upload
+    const existingFeaturedImage = formData.get("existingFeaturedImage") as string;
+    let featuredImage = existingFeaturedImage || null;
+    
+    const featuredImageFile = formData.get("featuredImage") as File;
+    if (featuredImageFile && featuredImageFile.size > 0) {
+        console.log("[MATERI DEBUG] Uploading new featured image");
+        featuredImage = await uploadFile(featuredImageFile, "materials/thumbnails");
+    } 
+
+    // Fallback to YouTube Thumbnail ONLY IF no manual image exists and no new one uploaded
+    if (!featuredImage && chapters.length > 0) {
         if (chapters[0].type === "YOUTUBE" && chapters[0].youtubeUrl) {
             const videoId = getYouTubeID(chapters[0].youtubeUrl);
             if (videoId) {
@@ -189,8 +208,3 @@ export async function updateMaterial(id: string, formData: FormData) {
     redirect("/dashboard/materi");
 }
 
-function getYouTubeID(url: string) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-}

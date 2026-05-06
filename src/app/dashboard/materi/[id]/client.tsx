@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Youtube, PlayCircle, ChevronRight, Download } from "lucide-react";
+import { FileText, Youtube, PlayCircle, ChevronRight, Download, AlertCircle } from "lucide-react";
+import { getYouTubeID } from "@/lib/youtube";
 
 export default function MaterialDetailClient({ material }: { material: any }) {
     const [activeChapter, setActiveChapter] = useState(material.chapters[0]);
@@ -19,12 +20,22 @@ export default function MaterialDetailClient({ material }: { material: any }) {
             {/* Viewer Section */}
             <div className="bg-black rounded-xl overflow-hidden shadow-lg aspect-video relative group">
                 {activeChapter.type === "YOUTUBE" && activeChapter.youtubeUrl ? (
-                    <iframe
-                        src={`https://www.youtube.com/embed/${getYouTubeId(activeChapter.youtubeUrl)}?autoplay=0`}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    />
+                    getYouTubeID(activeChapter.youtubeUrl) ? (
+                        <iframe
+                            src={`https://www.youtube.com/embed/${getYouTubeID(activeChapter.youtubeUrl)}?autoplay=0`}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center text-white p-6 text-center">
+                            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+                            <h3 className="text-lg font-bold text-white">URL Video Tidak Valid</h3>
+                            <p className="text-gray-400 text-sm mt-2">
+                                Sistem tidak dapat mengenali link YouTube ini.
+                            </p>
+                        </div>
+                    )
                 ) : activeChapter.type === "DOCUMENT" && activeChapter.fileUrl ? (
                     <div className="w-full h-full bg-slate-800 flex flex-col items-center justify-center text-white p-8 text-center">
                         <FileText className="w-16 h-16 mb-4 text-gray-400" />
@@ -89,8 +100,3 @@ export default function MaterialDetailClient({ material }: { material: any }) {
     );
 }
 
-function getYouTubeId(url: string) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-}

@@ -4,10 +4,10 @@ import { Search, BookOpen, Clock, PlayCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+import { getYouTubeID } from "@/lib/youtube";
+
 function getYouTubeThumbnail(url: string) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    const videoId = (match && match[2].length === 11) ? match[2] : null;
+    const videoId = getYouTubeID(url);
     return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
 }
 

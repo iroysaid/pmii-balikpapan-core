@@ -61,6 +61,18 @@ export default function EditMaterialForm({ material }: { material: MaterialWithC
                     <label className="block text-sm font-bold text-primary mb-2">Deskripsi Singkat</label>
                     <textarea name="description" defaultValue={material.description || ""} rows={3} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Penjelasan singkat..."></textarea>
                 </div>
+                <div>
+                    <label className="block text-sm font-bold text-primary mb-2">Featured Image (Sampul Materi)</label>
+                    <input type="hidden" name="existingFeaturedImage" value={material.featuredImage || ""} />
+                    {material.featuredImage && (
+                        <div className="mb-3">
+                            <img src={material.featuredImage} alt="Current thumbnail" className="w-40 h-24 object-cover rounded-lg border shadow-sm" />
+                            <p className="text-[10px] text-gray-400 mt-1">Sampul saat ini</p>
+                        </div>
+                    )}
+                    <input type="file" name="featuredImage" accept="image/*" className="block w-full text-sm text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-primary hover:file:bg-blue-100 transition" />
+                    <p className="text-[10px] text-gray-400 mt-1">*Pilih file baru jika ingin mengganti sampul. Akan dikonversi ke WebP.</p>
+                </div>
             </div>
 
             {/* Chapters */}
