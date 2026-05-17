@@ -3,6 +3,29 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     output: 'standalone',
+    turbopack: {
+        root: process.cwd(),
+    },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'api.dicebear.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.cnippet.dev',
+            },
+        ],
+    },
     typescript: {
         ignoreBuildErrors: true,
     },
@@ -28,7 +51,7 @@ const nextConfig: NextConfig = {
                     {
                         key: "Content-Security-Policy",
                         // CSP: Allow PDFs (object-src), YouTube (frame/img), Google Maps (frame/img), and self-embedding (frame-ancestors)
-                        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://img.youtube.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com; frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://maps.google.com; object-src 'self'; frame-ancestors 'self';",
+                        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://images.unsplash.com https://api.dicebear.com https://res.cloudinary.com https://images.cnippet.dev https://img.youtube.com https://maps.gstatic.com https://*.googleapis.com https://*.ggpht.com; frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://maps.google.com; object-src 'self'; frame-ancestors 'self';",
                     },
                 ],
             },
