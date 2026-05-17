@@ -87,7 +87,7 @@ function LatestRail({ posts }: { posts: PublishedPost[] }) {
                     <li key={post.id} className="relative mb-5 pl-4 last:mb-0">
                         <span className="absolute left-0 top-[0.45em] h-1 w-1 rounded-full bg-accent" />
                         <Link href={`/berita/${post.slug}`} className="group block">
-                            <h3 className="text-[17px] font-extrabold leading-[1.12] text-black">
+                            <h3 className="text-[17px] font-extrabold leading-[1.12] text-black transition-colors duration-150 group-hover:text-primary">
                                 {post.title}
                             </h3>
                             <p className="mt-2 font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-[#555555]">
@@ -123,7 +123,7 @@ function LeadStory({ post }: { post: PublishedPost }) {
                     {getPrimaryTag(post)}
                 </p>
                 <Link href={`/berita/${post.slug}`} className="block">
-                    <h2 className="text-[28px] font-black leading-[1.04] text-black md:text-[34px]">
+                    <h2 className="text-[28px] font-black leading-[1.04] text-black transition-colors duration-150 group-hover:text-primary md:text-[34px]">
                         {post.title}
                     </h2>
                 </Link>
@@ -159,7 +159,7 @@ function ArticleCard({
                     {getPrimaryTag(post)}
                 </p>
                 <Link href={`/berita/${post.slug}`}>
-                    <h3 className="text-[21px] font-black leading-[1.08] text-black">
+                    <h3 className="text-[21px] font-black leading-[1.08] text-black transition-colors duration-150 group-hover:text-primary">
                         {post.title}
                     </h3>
                 </Link>
@@ -185,7 +185,7 @@ function TextListArticle({ post }: { post: PublishedPost }) {
                     <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.08em] text-black">
                         {getPrimaryTag(post)}
                     </p>
-                    <h3 className="text-[19px] font-black leading-[1.1] text-black">
+                    <h3 className="text-[19px] font-black leading-[1.1] text-black transition-colors duration-150 group-hover:text-primary">
                         {post.title}
                     </h3>
                     <p className="mt-2 hidden font-serif text-[16px] leading-[1.35] text-black sm:block">
@@ -306,7 +306,7 @@ export default async function NewsPage() {
             <header className="border-b-2 border-accent bg-white">
                 <div className="mx-auto max-w-[1320px] px-5 py-6 lg:px-10">
                     <div className="grid items-end gap-5 md:grid-cols-[1fr_auto_1fr]">
-                        <nav className="hidden gap-5 text-sm font-extrabold text-black md:flex">
+                        <nav className="hidden gap-5 text-sm font-extrabold text-primary md:flex">
                             <Link href="/profil" className="hover:border-b hover:border-accent">
                                 Profil
                             </Link>
@@ -318,33 +318,33 @@ export default async function NewsPage() {
                             </Link>
                         </nav>
                         <div className="text-center">
-                            <p className="font-mono text-xs uppercase tracking-[0.18em] text-black">
+                            <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">
                                 Kanal Berita
                             </p>
-                            <h1 className="mt-2 text-4xl font-black leading-none text-black md:text-6xl">
+                            <h1 className="mt-2 text-4xl font-black leading-none text-primary md:text-6xl">
                                 PMII Balikpapan
                             </h1>
                         </div>
                         <div className="flex items-center justify-center gap-4 md:justify-end">
                             <Link
                                 href="/masuk"
-                                className="hidden h-[35px] items-center rounded-[5px] border border-black px-4 font-mono text-xs uppercase tracking-[0.08em] text-black transition-colors duration-150 hover:bg-black hover:text-white md:inline-flex"
+                                className="hidden h-[35px] items-center rounded-[5px] border border-primary px-4 font-mono text-xs uppercase tracking-[0.08em] text-primary transition-colors duration-150 hover:bg-primary hover:text-white md:inline-flex"
                             >
                                 Masuk
                             </Link>
                             <button
                                 type="button"
                                 aria-label="Cari berita"
-                                className="flex h-9 w-9 items-center justify-center text-black transition-colors duration-150 hover:text-black/70"
+                                className="flex h-9 w-9 items-center justify-center text-primary transition-colors duration-150 hover:text-secondary"
                             >
                                 <Search className="h-5 w-5" />
                             </button>
                         </div>
                     </div>
                     <div className="mt-5 overflow-x-auto border-y border-[#CACACA] py-3">
-                        <div className="mx-auto flex w-max max-w-full items-center gap-4 px-1 font-mono text-xs uppercase tracking-[0.08em] text-black">
+                        <div className="mx-auto flex w-max max-w-full items-center gap-4 px-1 font-mono text-xs uppercase tracking-[0.08em] text-primary">
                             {beats.map((beat, index) => (
-                                <Link key={beat} href="/berita" className="whitespace-nowrap hover:text-black/70">
+                                <Link key={beat} href="/berita" className="whitespace-nowrap hover:text-secondary">
                                     {index > 0 && <span className="mr-4 inline-block h-1 w-1 rounded-full bg-accent align-middle" />}
                                     {beat}
                                 </Link>

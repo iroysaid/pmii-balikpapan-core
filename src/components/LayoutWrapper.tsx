@@ -17,7 +17,7 @@ export default function LayoutWrapper({
         <>
             {!isDashboard && !isStandaloneLanding && <Navbar />}
             <main className="flex-grow">{children}</main>
-            {!isDashboard && !isStandaloneLanding && <Footer />}
+            {!isDashboard && <Footer />}
         </>
     );
 }

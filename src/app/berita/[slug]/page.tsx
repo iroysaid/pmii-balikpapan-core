@@ -116,7 +116,7 @@ function RelatedCard({
                     <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-black">
                         {primaryTag(post)}
                     </p>
-                    <h3 className="text-[20px] font-black leading-[1.08] text-black">
+                    <h3 className="text-[20px] font-black leading-[1.08] text-black transition-colors group-hover:text-primary">
                         {post.title}
                     </h3>
                     <p className="mt-3 font-serif text-[16px] leading-[1.4] text-black/75">
