@@ -61,7 +61,7 @@ const CircularBadge = () => (
         />
         <text
           className="text-[10px] font-black uppercase tracking-[0.18em]"
-          fill="#1f3369"
+          fill="#0043ef"
         >
           <textPath href="#pmiiCirclePath" startOffset="0%">
             GABUNG PMII BALIKPAPAN • GABUNG PMII •
@@ -93,7 +93,7 @@ const statCards = [
 
 export const Component = () => {
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#1f3369] font-sans text-white selection:bg-[#c49e3a] selection:text-primary">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#0043ef] font-sans text-white selection:bg-[#c49e3a] selection:text-primary">
       <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,#ffffff16_1px,transparent_1px),linear-gradient(to_bottom,#ffffff16_1px,transparent_1px)] bg-[size:4rem_4rem]" />
       <div className="absolute -left-24 top-28 h-64 w-64 rounded-full bg-[#c49e3a]/20 blur-3xl" />
 

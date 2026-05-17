@@ -1,214 +1,411 @@
+/* eslint-disable @next/next/no-img-element */
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Calendar, ArrowRight, TrendingUp, Clock, Tag } from "lucide-react";
-
+import {
+    ArrowRight,
+    ChevronDown,
+    Mail,
+    Search,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+type PublishedPost = Awaited<ReturnType<typeof getPublishedPosts>>[number];
+
+const beats = ["Kaderisasi", "Opini", "Daerah", "Pergerakan"];
 
 function stripHtml(html: string) {
     return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export default async function NewsPage() {
-    const posts = await prisma.post.findMany({
+function excerpt(content: string, limit = 150) {
+    const text = stripHtml(content);
+    return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
+}
+
+function formatDate(date: Date) {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(date);
+}
+
+function readingTime(content: string) {
+    const words = stripHtml(content).split(/\s+/).filter(Boolean).length;
+    return `${Math.max(1, Math.ceil(words / 180))} menit baca`;
+}
+
+function getPrimaryTag(post: PublishedPost) {
+    return post.tags[0]?.tag.name ?? "PMII Balikpapan";
+}
+
+async function getPublishedPosts() {
+    return prisma.post.findMany({
         where: { published: true },
         orderBy: { createdAt: "desc" },
         include: {
             tags: { include: { tag: true } },
         },
     });
+}
 
-    if (posts.length === 0) {
+function NewsImage({
+    post,
+    className = "",
+}: {
+    post: PublishedPost;
+    className?: string;
+}) {
+    if (!post.image) {
         return (
-            <div className="bg-background min-h-screen pb-20">
-                <div className="container mx-auto px-4 py-20 text-center">
-                    <h1 className="text-4xl font-bold text-primary mb-4">Berita & Artikel</h1>
-                    <p className="text-gray-400">Belum ada berita yang diterbitkan.</p>
-                </div>
+            <div className={`flex h-full w-full items-center justify-center bg-primary text-accent ${className}`}>
+                <span className="font-mono text-xs uppercase tracking-[0.18em]">PMII</span>
             </div>
         );
     }
 
-    const featuredPost = posts[0];
-    const secondaryPosts = posts.slice(1, 3);
-    const regularPosts = posts.slice(3);
-    const trendingPosts = posts.slice(0, 5); // Just using latest as trending for now
+    return (
+        <img
+            src={post.image}
+            alt={post.title}
+            className={`h-full w-full object-cover ${className}`}
+        />
+    );
+}
+
+function LatestRail({ posts }: { posts: PublishedPost[] }) {
+    return (
+        <aside className="rounded-[5px] border border-[#CACACA] bg-white p-5 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-hidden lg:p-[25px]">
+            <div className="border-b border-[#CACACA] pb-4">
+                <h2 className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                    Terbaru
+                </h2>
+            </div>
+            <ol className="pt-5">
+                {posts.slice(0, 10).map((post) => (
+                    <li key={post.id} className="relative mb-5 pl-4 last:mb-0">
+                        <span className="absolute left-0 top-[0.45em] h-1 w-1 rounded-full bg-blue-600" />
+                        <Link href={`/berita/${post.slug}`} className="group block">
+                            <h3 className="text-[17px] font-extrabold leading-[1.12] text-primary transition-colors duration-150 group-hover:text-blue-600">
+                                {post.title}
+                            </h3>
+                            <p className="mt-2 font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-[#555555]">
+                                {formatDate(post.createdAt)} <span className="text-blue-600">•</span>{" "}
+                                {readingTime(post.content)}
+                            </p>
+                        </Link>
+                    </li>
+                ))}
+            </ol>
+            {posts.length > 10 && (
+                <button className="mt-2 flex w-full flex-col items-center gap-1 border-t border-[#CACACA] pt-4 font-mono text-xs uppercase tracking-[0.08em] text-blue-600">
+                    Muat lagi
+                    <ChevronDown className="h-4 w-4" />
+                </button>
+            )}
+        </aside>
+    );
+}
+
+function LeadStory({ post }: { post: PublishedPost }) {
+    return (
+        <article className="group grid gap-[25px] border-b border-[#CACACA] pb-8 md:grid-cols-12">
+            <Link
+                href={`/berita/${post.slug}`}
+                className="relative aspect-video overflow-hidden bg-primary md:col-span-8"
+                aria-label={post.title}
+            >
+                <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.025]" />
+            </Link>
+            <div className="flex flex-col justify-center md:col-span-4">
+                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-blue-600">
+                    {getPrimaryTag(post)}
+                </p>
+                <Link href={`/berita/${post.slug}`} className="block">
+                    <h2 className="text-[28px] font-black leading-[1.04] text-primary transition-colors duration-150 group-hover:text-blue-600 md:text-[34px]">
+                        {post.title}
+                    </h2>
+                </Link>
+                <p className="mt-4 font-serif text-[17.5px] leading-[1.35] text-[#262626] transition-colors duration-150 group-hover:text-blue-600">
+                    {excerpt(post.content, 180)}
+                </p>
+                <p className="mt-4 text-xs font-semibold leading-tight text-[#111111]">
+                    Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
+                </p>
+            </div>
+        </article>
+    );
+}
+
+function ArticleCard({
+    post,
+    compact = false,
+}: {
+    post: PublishedPost;
+    compact?: boolean;
+}) {
+    return (
+        <article className="group">
+            <Link
+                href={`/berita/${post.slug}`}
+                className={`relative block overflow-hidden bg-primary ${compact ? "aspect-square" : "aspect-video"}`}
+                aria-label={post.title}
+            >
+                <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.03]" />
+            </Link>
+            <div className="pt-4">
+                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-blue-600">
+                    {getPrimaryTag(post)}
+                </p>
+                <Link href={`/berita/${post.slug}`}>
+                    <h3 className="text-[21px] font-black leading-[1.08] text-primary transition-colors duration-150 group-hover:text-blue-600">
+                        {post.title}
+                    </h3>
+                </Link>
+                <p className="mt-3 font-serif text-[17px] leading-[1.35] text-[#262626] transition-colors duration-150 group-hover:text-blue-600">
+                    {excerpt(post.content, compact ? 95 : 130)}
+                </p>
+                <p className="mt-3 text-xs font-semibold text-[#111111]">
+                    Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
+                </p>
+            </div>
+        </article>
+    );
+}
+
+function TextListArticle({ post }: { post: PublishedPost }) {
+    return (
+        <article className="group border-b border-[#CACACA] py-5 first:pt-0">
+            <Link href={`/berita/${post.slug}`} className="grid gap-4 sm:grid-cols-[120px_1fr]">
+                <div className="aspect-square overflow-hidden bg-primary sm:order-2">
+                    <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.04]" />
+                </div>
+                <div>
+                    <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.08em] text-blue-600">
+                        {getPrimaryTag(post)}
+                    </p>
+                    <h3 className="text-[19px] font-black leading-[1.1] text-primary transition-colors duration-150 group-hover:text-blue-600">
+                        {post.title}
+                    </h3>
+                    <p className="mt-2 hidden font-serif text-[16px] leading-[1.35] text-[#262626] transition-colors duration-150 group-hover:text-blue-600 sm:block">
+                        {excerpt(post.content, 110)}
+                    </p>
+                    <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-[#555555]">
+                        {formatDate(post.createdAt)}
+                    </p>
+                </div>
+            </Link>
+        </article>
+    );
+}
+
+function TopicSection({
+    title,
+    posts,
+}: {
+    title: string;
+    posts: PublishedPost[];
+}) {
+    if (posts.length === 0) return null;
 
     return (
-        <div className="bg-[#f8f9fa] min-h-screen">
-            {/* Professional News Header */}
-            <div className="bg-white border-b border-gray-200 py-8 md:py-12">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                        <div>
-                            <span className="text-blue-600 font-bold text-sm tracking-widest uppercase mb-2 block">Jendela Pergerakan</span>
-                            <h1 className="text-4xl md:text-5xl font-black text-primary leading-tight">Berita & <span className="text-blue-600">Artikel</span></h1>
+        <section className="border-t border-[#CACACA] pt-8">
+            <div className="mb-5 border-b border-[#CACACA] pb-4">
+                <Link href="/berita" className="group inline-flex items-end gap-2">
+                    <h2 className="text-[28px] font-black leading-none text-primary">
+                        {title}
+                    </h2>
+                    <span className="font-mono text-lg leading-none text-blue-600 transition-transform duration-150 group-hover:translate-x-1">
+                        &gt;
+                    </span>
+                </Link>
+            </div>
+            <div className="grid gap-[25px] md:grid-cols-3">
+                {posts.slice(0, 3).map((post) => (
+                    <ArticleCard key={post.id} post={post} compact />
+                ))}
+            </div>
+        </section>
+    );
+}
+
+function NewsletterBand() {
+    return (
+        <section className="grid gap-[25px] bg-primary px-5 py-12 text-white lg:grid-cols-16 lg:px-10 lg:py-14">
+            <div className="lg:col-start-5 lg:col-span-8">
+                <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.08em] text-accent">
+                    <Mail className="h-4 w-4" />
+                    Kabar Pergerakan
+                </div>
+                <h2 className="mt-4 text-[34px] font-black leading-none text-accent md:text-[42px]">
+                    Berita PMII dalam satu ruang baca
+                </h2>
+                <p className="mt-4 max-w-2xl font-serif text-[19px] leading-[1.45] text-white/90">
+                    Ikuti catatan kegiatan, gagasan kader, dan dinamika organisasi PMII
+                    Cabang Balikpapan dengan format yang ringkas, aktual, dan mudah dipindai.
+                </p>
+            </div>
+            <div className="flex items-end lg:col-span-4">
+                <Link
+                    href="/kontak"
+                    className="inline-flex h-[35px] items-center rounded-[5px] bg-accent px-5 font-mono text-xs uppercase tracking-[0.08em] text-primary transition-colors duration-150 hover:bg-white"
+                >
+                    Kirim informasi
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+            </div>
+        </section>
+    );
+}
+
+function EmptyState() {
+    return (
+        <div className="min-h-screen bg-[#F9F7EF]">
+            <section className="mx-auto max-w-[1320px] px-5 py-20 text-center lg:px-10">
+                <p className="font-mono text-xs uppercase tracking-[0.08em] text-blue-600">
+                    Berita PMII Balikpapan
+                </p>
+                <h1 className="mt-3 text-4xl font-black leading-tight text-primary">
+                    Belum ada berita yang diterbitkan.
+                </h1>
+                <p className="mx-auto mt-4 max-w-xl font-serif text-xl leading-relaxed text-[#555555]">
+                    Begitu tulisan pertama dipublikasikan, halaman ini akan otomatis
+                    berubah menjadi ruang baca editorial.
+                </p>
+            </section>
+        </div>
+    );
+}
+
+export default async function NewsPage() {
+    const posts = await getPublishedPosts();
+
+    if (posts.length === 0) {
+        return <EmptyState />;
+    }
+
+    const featuredPost = posts[0];
+    const secondaryPosts = posts.slice(1, 3);
+    const listPosts = posts.slice(3, 7);
+    const remainingPosts = posts.slice(7);
+    const topicGroups = beats.map((beat, index) => ({
+        title: beat,
+        posts: posts
+            .filter((post) =>
+                post.tags.some(({ tag }) =>
+                    `${tag.name} ${tag.group}`.toLowerCase().includes(beat.toLowerCase())
+                )
+            )
+            .concat(posts.slice(index * 3, index * 3 + 3))
+            .filter((post, postIndex, source) => source.findIndex((item) => item.id === post.id) === postIndex),
+    }));
+
+    return (
+        <div className="min-h-screen bg-[#F9F7EF] text-[#111111]">
+            <header className="border-b-2 border-blue-600 bg-white">
+                <div className="mx-auto max-w-[1320px] px-5 py-6 lg:px-10">
+                    <div className="grid items-end gap-5 md:grid-cols-[1fr_auto_1fr]">
+                        <nav className="hidden gap-5 text-sm font-extrabold text-primary md:flex">
+                            <Link href="/profil" className="hover:border-b hover:border-blue-600">
+                                Profil
+                            </Link>
+                            <Link href="/kegiatan" className="hover:border-b hover:border-blue-600">
+                                Agenda
+                            </Link>
+                            <Link href="/galeri" className="hover:border-b hover:border-blue-600">
+                                Galeri
+                            </Link>
+                        </nav>
+                        <div className="text-center">
+                            <p className="font-mono text-xs uppercase tracking-[0.18em] text-blue-600">
+                                Kanal Berita
+                            </p>
+                            <h1 className="mt-2 text-4xl font-black leading-none text-primary md:text-6xl">
+                                PMII Balikpapan
+                            </h1>
                         </div>
-                        <p className="text-gray-500 max-w-md text-sm md:text-base">
-                            Informasi terkini mengenai kegiatan, opini, dan perkembangan organisasi PMII Cabang Balikpapan.
-                        </p>
+                        <div className="flex items-center justify-center gap-4 md:justify-end">
+                            <Link
+                                href="/masuk"
+                                className="hidden h-[35px] items-center rounded-[5px] border border-blue-600 px-4 font-mono text-xs uppercase tracking-[0.08em] text-primary transition-colors duration-150 hover:bg-blue-600 hover:text-white md:inline-flex"
+                            >
+                                Masuk
+                            </Link>
+                            <button
+                                type="button"
+                                aria-label="Cari berita"
+                                className="flex h-9 w-9 items-center justify-center text-primary transition-colors duration-150 hover:text-blue-600"
+                            >
+                                <Search className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mt-5 overflow-x-auto border-y border-[#CACACA] py-3">
+                        <div className="mx-auto flex w-max max-w-full items-center gap-4 px-1 font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                            {beats.map((beat, index) => (
+                                <Link key={beat} href="/berita" className="whitespace-nowrap hover:text-blue-600">
+                                    {index > 0 && <span className="mr-4 inline-block h-1 w-1 rounded-full bg-blue-600 align-middle" />}
+                                    {beat}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="container mx-auto px-4 py-8 md:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    
-                    {/* Main Content Area (8 Columns) */}
-                    <div className="lg:col-span-8 space-y-12">
-                        
-                        {/* 1. HERO FEATURED POST */}
-                        <section>
-                            <Link href={`/berita/${featuredPost.slug}`} className="group block relative overflow-hidden rounded-3xl bg-primary aspect-[16/9]">
-                                {featuredPost.image ? (
-                                    <img 
-                                        src={featuredPost.image} 
-                                        alt={featuredPost.title}
-                                        className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-700"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-600 font-bold text-4xl">PMII</div>
-                                )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 md:p-10 flex flex-col justify-end">
-                                    <div className="flex items-center space-x-3 text-white/80 text-xs md:text-sm mb-4">
-                                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full font-bold">UTAMA</span>
-                                        <span className="flex items-center"><Calendar className="w-4 h-4 mr-1" /> {new Date(featuredPost.createdAt).toLocaleDateString("id-ID")}</span>
-                                    </div>
-                                    <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 group-hover:text-blue-400 transition leading-tight">
-                                        {featuredPost.title}
-                                    </h2>
-                                    <p className="text-white/70 text-sm md:text-base line-clamp-2 md:max-w-2xl">
-                                        {stripHtml(featuredPost.content).substring(0, 150)}...
-                                    </p>
-                                </div>
-                            </Link>
-                        </section>
+            <main className="mx-auto max-w-[1320px] px-5 py-8 lg:px-10">
+                <section className="grid gap-[25px] lg:grid-cols-16">
+                    <div className="lg:col-span-4">
+                        <LatestRail posts={posts} />
+                    </div>
 
-                        {/* 2. SECONDARY POSTS (2nd Row - 2 Containers) */}
+                    <div className="space-y-10 lg:col-span-12">
+                        <LeadStory post={featuredPost} />
+
                         {secondaryPosts.length > 0 && (
-                            <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                            <div className="grid gap-[25px] md:grid-cols-2">
                                 {secondaryPosts.map((post) => (
-                                    <Link key={post.id} href={`/berita/${post.slug}`} className="group space-y-4">
-                                        <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-gray-200 relative">
-                                            {post.image ? (
-                                                <img 
-                                                    src={post.image} 
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400 italic">No Image</div>
-                                            )}
-                                            <div className="absolute top-4 left-4">
-                                                <span className="bg-white/90 backdrop-blur-md text-primary text-[10px] font-bold px-2 py-1 rounded">TERBARU</span>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                                                <Clock className="w-3 h-3 mr-1" /> {new Date(post.createdAt).toLocaleDateString("id-ID")}
-                                            </div>
-                                            <h3 className="text-xl font-bold text-primary group-hover:text-blue-600 transition leading-snug">
-                                                {post.title}
-                                            </h3>
-                                            <p className="text-gray-500 text-sm line-clamp-2">
-                                                {stripHtml(post.content).substring(0, 80)}...
-                                            </p>
-                                        </div>
-                                    </Link>
+                                    <ArticleCard key={post.id} post={post} />
+                                ))}
+                            </div>
+                        )}
+
+                        {listPosts.length > 0 && (
+                            <section className="grid gap-[25px] border-t border-[#CACACA] pt-8 md:grid-cols-2">
+                                {listPosts.map((post) => (
+                                    <TextListArticle key={post.id} post={post} />
                                 ))}
                             </section>
                         )}
-
-                        <div className="h-px bg-gray-200"></div>
-
-                        {/* 3. REGULAR LIST (Varid Grid) */}
-                        <section className="space-y-8">
-                            <h3 className="text-2xl font-black text-primary flex items-center">
-                                <span className="w-2 h-8 bg-blue-600 mr-3 inline-block"></span>
-                                Telusuri Lebih Lanjut
-                            </h3>
-                            <div className="space-y-6">
-                                {regularPosts.map((post) => (
-                                    <Link key={post.id} href={`/berita/${post.slug}`} className="flex flex-col sm:flex-row gap-6 group">
-                                        <div className="sm:w-1/3 aspect-[3/2] shrink-0 overflow-hidden rounded-xl bg-gray-200">
-                                            {post.image ? (
-                                                <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
-                                            ) : (
-                                                <div className="w-full h-full bg-gray-100"></div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 py-1">
-                                            <div className="flex items-center text-xs text-blue-600 font-bold mb-2">
-                                                PMII BALIKPAPAN
-                                            </div>
-                                            <h4 className="text-lg font-bold text-primary group-hover:text-blue-600 transition mb-2">
-                                                {post.title}
-                                            </h4>
-                                            <p className="text-gray-500 text-sm line-clamp-2 mb-4">
-                                                {stripHtml(post.content).substring(0, 120)}...
-                                            </p>
-                                            <div className="flex items-center text-[10px] text-gray-400 font-medium">
-                                                <Calendar className="w-3 h-3 mr-1" /> {new Date(post.createdAt).toLocaleDateString("id-ID")}
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
                     </div>
+                </section>
+            </main>
 
-                    {/* Sidebar (4 Columns) */}
-                    <div className="lg:col-span-4 space-y-10">
-                        {/* Sidebar Section 1: Dynamic Trending Style */}
-                        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-                            <h3 className="text-lg font-black text-primary mb-6 flex items-center">
-                                <TrendingUp className="w-5 h-5 mr-2 text-blue-600" /> Populer
-                            </h3>
-                            <div className="space-y-6">
-                                {trendingPosts.map((post, index) => (
-                                    <Link key={post.id} href={`/berita/${post.slug}`} className="flex items-start gap-4 group">
-                                        <span className="text-3xl font-black text-gray-100 group-hover:text-blue-100 transition leading-none">{index + 1}</span>
-                                        <div className="space-y-1">
-                                            <h4 className="text-sm font-bold text-primary group-hover:text-blue-600 transition leading-snug line-clamp-2">
-                                                {post.title}
-                                            </h4>
-                                            <p className="text-[10px] text-gray-400 font-bold">{new Date(post.createdAt).toLocaleDateString("id-ID")}</p>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
+            <NewsletterBand />
+
+            <div className="mx-auto max-w-[1320px] space-y-10 px-5 py-10 lg:px-10">
+                {topicGroups.map((group) => (
+                    <TopicSection key={group.title} title={group.title} posts={group.posts} />
+                ))}
+
+                {remainingPosts.length > 0 && (
+                    <section className="border-t border-[#CACACA] pt-8">
+                        <div className="mb-5 flex items-end justify-between border-b border-[#CACACA] pb-4">
+                            <h2 className="text-[28px] font-black leading-none text-primary">
+                                Arsip Terbaru
+                            </h2>
+                            <p className="hidden font-mono text-xs uppercase tracking-[0.08em] text-[#555555] sm:block">
+                                {remainingPosts.length} tulisan
+                            </p>
                         </div>
-
-                        {/* Sidebar Section 2: Banner/Info */}
-                        <div className="bg-primary rounded-3xl p-8 text-white relative overflow-hidden group">
-                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl group-hover:bg-blue-600/40 transition duration-700"></div>
-                            <div className="relative z-10">
-                                <h3 className="text-xl font-bold mb-4 italic">"Dzikir, Fikir, Amal Sholeh."</h3>
-                                <p className="text-blue-200 text-xs mb-6 leading-relaxed">
-                                    Dapatkan update resmi kegiatan PMII Cabang Balikpapan langsung di perangkat Anda.
-                                </p>
-                                <Link href="/" className="bg-white text-primary px-5 py-2 rounded-full text-xs font-black inline-flex items-center group/btn hover:bg-blue-50 transition">
-                                    Lihat Profil <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition" />
-                                </Link>
-                            </div>
+                        <div className="grid gap-x-[25px] md:grid-cols-2 lg:grid-cols-4">
+                            {remainingPosts.slice(0, 8).map((post) => (
+                                <TextListArticle key={post.id} post={post} />
+                            ))}
                         </div>
-
-                        {/* Sidebar Section 3: Categories Tags */}
-                        <div>
-                            <h3 className="text-lg font-black text-primary mb-4 flex items-center uppercase tracking-tight">
-                                <Tag className="w-5 h-5 mr-2" /> Topik Hangat
-                            </h3>
-                            <div className="flex flex-wrap gap-2 text-xs">
-                                <span className="bg-gray-100 hover:bg-blue-100 cursor-pointer px-4 py-2 rounded-full font-bold text-gray-600 hover:text-blue-600 transition">Organisasi</span>
-                                <span className="bg-gray-100 hover:bg-blue-100 cursor-pointer px-4 py-2 rounded-full font-bold text-gray-600 hover:text-blue-600 transition">Pengaderan</span>
-                                <span className="bg-gray-100 hover:bg-blue-100 cursor-pointer px-4 py-2 rounded-full font-bold text-gray-600 hover:text-blue-600 transition">Opini</span>
-                                <span className="bg-gray-100 hover:bg-blue-100 cursor-pointer px-4 py-2 rounded-full font-bold text-gray-600 hover:text-blue-600 transition">Internal</span>
-                                <span className="bg-gray-100 hover:bg-blue-100 cursor-pointer px-4 py-2 rounded-full font-bold text-gray-600 hover:text-blue-600 transition">Balikpapan</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+                    </section>
+                )}
             </div>
         </div>
     );
