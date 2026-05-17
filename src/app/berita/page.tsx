@@ -78,7 +78,7 @@ function LatestRail({ posts }: { posts: PublishedPost[] }) {
     return (
         <aside className="rounded-[5px] border border-[#CACACA] bg-white p-5 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-hidden lg:p-[25px]">
             <div className="border-b border-[#CACACA] pb-4">
-                <h2 className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                <h2 className="font-mono text-xs uppercase tracking-[0.08em] text-black">
                     Terbaru
                 </h2>
             </div>
@@ -87,7 +87,7 @@ function LatestRail({ posts }: { posts: PublishedPost[] }) {
                     <li key={post.id} className="relative mb-5 pl-4 last:mb-0">
                         <span className="absolute left-0 top-[0.45em] h-1 w-1 rounded-full bg-accent" />
                         <Link href={`/berita/${post.slug}`} className="group block">
-                            <h3 className="text-[17px] font-extrabold leading-[1.12] text-primary transition-colors duration-150 group-hover:text-secondary">
+                            <h3 className="text-[17px] font-extrabold leading-[1.12] text-black">
                                 {post.title}
                             </h3>
                             <p className="mt-2 font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-[#555555]">
@@ -99,7 +99,7 @@ function LatestRail({ posts }: { posts: PublishedPost[] }) {
                 ))}
             </ol>
             {posts.length > 10 && (
-                <button className="mt-2 flex w-full flex-col items-center gap-1 border-t border-[#CACACA] pt-4 font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                <button className="mt-2 flex w-full flex-col items-center gap-1 border-t border-[#CACACA] pt-4 font-mono text-xs uppercase tracking-[0.08em] text-black">
                     Muat lagi
                     <ChevronDown className="h-4 w-4" />
                 </button>
@@ -119,18 +119,18 @@ function LeadStory({ post }: { post: PublishedPost }) {
                 <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.025]" />
             </Link>
             <div className="flex flex-col justify-center md:col-span-4">
-                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-primary">
+                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-black">
                     {getPrimaryTag(post)}
                 </p>
                 <Link href={`/berita/${post.slug}`} className="block">
-                    <h2 className="text-[28px] font-black leading-[1.04] text-primary transition-colors duration-150 group-hover:text-secondary md:text-[34px]">
+                    <h2 className="text-[28px] font-black leading-[1.04] text-black md:text-[34px]">
                         {post.title}
                     </h2>
                 </Link>
-                <p className="mt-4 font-serif text-[17.5px] leading-[1.35] text-black transition-colors duration-150 group-hover:text-secondary">
+                <p className="mt-4 font-serif text-[17.5px] leading-[1.35] text-black">
                     {excerpt(post.content, 180)}
                 </p>
-                <p className="mt-4 text-xs font-semibold leading-tight text-[#111111]">
+                <p className="mt-4 text-xs font-semibold leading-tight text-black">
                     Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
                 </p>
             </div>
@@ -155,18 +155,18 @@ function ArticleCard({
                 <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.03]" />
             </Link>
             <div className="pt-4">
-                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-primary">
+                <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-black">
                     {getPrimaryTag(post)}
                 </p>
                 <Link href={`/berita/${post.slug}`}>
-                    <h3 className="text-[21px] font-black leading-[1.08] text-primary transition-colors duration-150 group-hover:text-secondary">
+                    <h3 className="text-[21px] font-black leading-[1.08] text-black">
                         {post.title}
                     </h3>
                 </Link>
-                <p className="mt-3 font-serif text-[17px] leading-[1.35] text-black transition-colors duration-150 group-hover:text-secondary">
+                <p className="mt-3 font-serif text-[17px] leading-[1.35] text-black">
                     {excerpt(post.content, compact ? 95 : 130)}
                 </p>
-                <p className="mt-3 text-xs font-semibold text-[#111111]">
+                <p className="mt-3 text-xs font-semibold text-black">
                     Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
                 </p>
             </div>
@@ -182,13 +182,13 @@ function TextListArticle({ post }: { post: PublishedPost }) {
                     <NewsImage post={post} className="transition-transform duration-500 group-hover:scale-[1.04]" />
                 </div>
                 <div>
-                    <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.08em] text-primary">
+                    <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.08em] text-black">
                         {getPrimaryTag(post)}
                     </p>
-                    <h3 className="text-[19px] font-black leading-[1.1] text-primary transition-colors duration-150 group-hover:text-secondary">
+                    <h3 className="text-[19px] font-black leading-[1.1] text-black">
                         {post.title}
                     </h3>
-                    <p className="mt-2 hidden font-serif text-[16px] leading-[1.35] text-black transition-colors duration-150 group-hover:text-secondary sm:block">
+                    <p className="mt-2 hidden font-serif text-[16px] leading-[1.35] text-black sm:block">
                         {excerpt(post.content, 110)}
                     </p>
                     <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-[#555555]">
@@ -213,7 +213,7 @@ function TopicSection({
         <section className="border-t border-[#CACACA] pt-8">
             <div className="mb-5 border-b border-[#CACACA] pb-4">
                 <Link href="/berita" className="group inline-flex items-end gap-2">
-                    <h2 className="text-[28px] font-black leading-none text-primary">
+                    <h2 className="text-[28px] font-black leading-none text-black">
                         {title}
                     </h2>
                     <span className="font-mono text-lg leading-none text-accent transition-transform duration-150 group-hover:translate-x-1">
@@ -249,7 +249,7 @@ function NewsletterBand() {
             <div className="flex items-end lg:col-span-4">
                 <Link
                     href="/kontak"
-                    className="inline-flex h-[35px] items-center rounded-[5px] bg-accent px-5 font-mono text-xs uppercase tracking-[0.08em] text-secondary transition-colors duration-150 hover:bg-white"
+                    className="inline-flex h-[35px] items-center rounded-[5px] bg-accent px-5 font-mono text-xs uppercase tracking-[0.08em] text-black transition-colors duration-150 hover:bg-white"
                 >
                     Kirim informasi
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -263,10 +263,10 @@ function EmptyState() {
     return (
         <div className="news-serif min-h-screen bg-white">
             <section className="mx-auto max-w-[1320px] px-5 py-20 text-center lg:px-10">
-                <p className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                <p className="font-mono text-xs uppercase tracking-[0.08em] text-black">
                     Berita PMII Balikpapan
                 </p>
-                <h1 className="mt-3 text-4xl font-black leading-tight text-primary">
+                <h1 className="mt-3 text-4xl font-black leading-tight text-black">
                     Belum ada berita yang diterbitkan.
                 </h1>
                 <p className="mx-auto mt-4 max-w-xl font-serif text-xl leading-relaxed text-black/70">
@@ -306,7 +306,7 @@ export default async function NewsPage() {
             <header className="border-b-2 border-accent bg-white">
                 <div className="mx-auto max-w-[1320px] px-5 py-6 lg:px-10">
                     <div className="grid items-end gap-5 md:grid-cols-[1fr_auto_1fr]">
-                        <nav className="hidden gap-5 text-sm font-extrabold text-primary md:flex">
+                        <nav className="hidden gap-5 text-sm font-extrabold text-black md:flex">
                             <Link href="/profil" className="hover:border-b hover:border-accent">
                                 Profil
                             </Link>
@@ -318,33 +318,33 @@ export default async function NewsPage() {
                             </Link>
                         </nav>
                         <div className="text-center">
-                            <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">
+                            <p className="font-mono text-xs uppercase tracking-[0.18em] text-black">
                                 Kanal Berita
                             </p>
-                            <h1 className="mt-2 text-4xl font-black leading-none text-primary md:text-6xl">
+                            <h1 className="mt-2 text-4xl font-black leading-none text-black md:text-6xl">
                                 PMII Balikpapan
                             </h1>
                         </div>
                         <div className="flex items-center justify-center gap-4 md:justify-end">
                             <Link
                                 href="/masuk"
-                                className="hidden h-[35px] items-center rounded-[5px] border border-primary px-4 font-mono text-xs uppercase tracking-[0.08em] text-primary transition-colors duration-150 hover:bg-primary hover:text-white md:inline-flex"
+                                className="hidden h-[35px] items-center rounded-[5px] border border-black px-4 font-mono text-xs uppercase tracking-[0.08em] text-black transition-colors duration-150 hover:bg-black hover:text-white md:inline-flex"
                             >
                                 Masuk
                             </Link>
                             <button
                                 type="button"
                                 aria-label="Cari berita"
-                                className="flex h-9 w-9 items-center justify-center text-primary transition-colors duration-150 hover:text-secondary"
+                                className="flex h-9 w-9 items-center justify-center text-black transition-colors duration-150 hover:text-black/70"
                             >
                                 <Search className="h-5 w-5" />
                             </button>
                         </div>
                     </div>
                     <div className="mt-5 overflow-x-auto border-y border-[#CACACA] py-3">
-                        <div className="mx-auto flex w-max max-w-full items-center gap-4 px-1 font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                        <div className="mx-auto flex w-max max-w-full items-center gap-4 px-1 font-mono text-xs uppercase tracking-[0.08em] text-black">
                             {beats.map((beat, index) => (
-                                <Link key={beat} href="/berita" className="whitespace-nowrap hover:text-primary">
+                                <Link key={beat} href="/berita" className="whitespace-nowrap hover:text-black/70">
                                     {index > 0 && <span className="mr-4 inline-block h-1 w-1 rounded-full bg-accent align-middle" />}
                                     {beat}
                                 </Link>
@@ -392,7 +392,7 @@ export default async function NewsPage() {
                 {remainingPosts.length > 0 && (
                     <section className="border-t border-[#CACACA] pt-8">
                         <div className="mb-5 flex items-end justify-between border-b border-[#CACACA] pb-4">
-                            <h2 className="text-[28px] font-black leading-none text-primary">
+                            <h2 className="text-[28px] font-black leading-none text-black">
                                 Arsip Terbaru
                             </h2>
                             <p className="hidden font-mono text-xs uppercase tracking-[0.08em] text-[#555555] sm:block">
