@@ -54,7 +54,7 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
       if (now.toDateString() === startDate.toDateString()) {
           return { label: "HARI INI", color: "bg-red-500 text-white" };
       }
-      return { label: "AKAN DATANG", color: "bg-blue-500 text-white" };
+      return { label: "AKAN DATANG", color: "bg-primary text-white" };
     } else if (now >= startDate && now <= endDate) {
       return { label: "SEDANG BERLANGSUNG", color: "bg-red-500 text-white animate-pulse" };
     } else {

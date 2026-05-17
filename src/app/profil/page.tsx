@@ -9,7 +9,7 @@ export default function ProfilPage() {
             <div className="bg-primary text-white py-20 text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-accent opacity-10 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <h1 className="text-4xl md:text-5xl font-black mb-4 relative">Profil Organisasi</h1>
-                <p className="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto relative px-4">
+                <p className="text-white/85 text-lg md:text-xl max-w-2xl mx-auto relative px-4">
                     Mengenal lebih dekat Pergerakan Mahasiswa Islam Indonesia Cabang Balikpapan
                 </p>
             </div>
@@ -19,7 +19,7 @@ export default function ProfilPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
                     {/* Card Sejarah */}
                     <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border-t-8 border-accent transform hover:-translate-y-2 transition duration-500">
-                        <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
+                        <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
                             <Milestone className="w-8 h-8" />
                         </div>
                         <h3 className="text-2xl font-black text-primary mb-4">Sejarah Singkat</h3>
@@ -33,7 +33,7 @@ export default function ProfilPage() {
 
                     {/* Card Visi Misi */}
                     <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border-t-8 border-primary transform hover:-translate-y-2 transition duration-500">
-                        <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
+                        <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
                             <Target className="w-8 h-8" />
                         </div>
                         <h3 className="text-2xl font-black text-primary mb-4">Visi & Misi</h3>
@@ -55,7 +55,7 @@ export default function ProfilPage() {
 
                     {/* Card Nilai Dasar */}
                     <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border-t-8 border-accent transform hover:-translate-y-2 transition duration-500">
-                        <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
+                        <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center text-primary mb-8 shadow-inner">
                             <Users className="w-8 h-8" />
                         </div>
                         <h3 className="text-2xl font-black text-primary mb-4">Nilai Dasar (NDP)</h3>

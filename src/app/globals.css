@@ -2,12 +2,13 @@
 @import "tw-animate-css";
 
 @theme {
-  --color-primary: #0043ef;
-  --color-accent: #C49E3A;
+  --color-primary: #262EED;
+  --color-accent: #F5CA0F;
   --color-background: #F7FAFF;
-  --color-text: #1E293B;
-  --color-secondary: #1D4ED8;
+  --color-text: #0B1020;
+  --color-secondary: #122562;
   --font-sans: var(--font-inter), sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 }
@@ -22,8 +23,12 @@ body {
 }
 
 ::selection {
-  background-color: #0043ef;
+  background-color: #262EED;
   color: white;
+}
+
+.news-serif {
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 @keyframes marquee {

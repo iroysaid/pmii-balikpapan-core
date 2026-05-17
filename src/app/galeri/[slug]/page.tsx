@@ -42,7 +42,7 @@ export default async function AlbumDetailPage({
                 {new Date(album.eventDate).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
               <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-primary/5">
-                <User className="w-4 h-4 mr-2 text-blue-500" />
+                <User className="w-4 h-4 mr-2 text-primary" />
                 Dikonversi ke WebP & Optimal
               </div>
             </div>

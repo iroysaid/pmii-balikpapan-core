@@ -51,7 +51,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
   const getBadgeStyle = (status: string) => {
     switch (status) {
       case "HARI_INI": return "bg-red-500 text-white animate-pulse shadow-red-500/50";
-      case "AKAN_DATANG": return "bg-blue-500 text-white shadow-blue-500/50";
+      case "AKAN_DATANG": return "bg-primary text-white shadow-primary/40";
       case "SEDANG_BERLANGSUNG": return "bg-red-500 text-white animate-pulse shadow-red-500/50";
       case "DOKUMENTASI": return "bg-gray-800 text-white shadow-gray-800/50";
       default: return "bg-gray-200 text-gray-800";
@@ -83,7 +83,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
             <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary"></div>
         )}
 
         <div className="container mx-auto px-4 relative z-10 pb-16">
@@ -119,7 +119,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
              </div>
              {activity.location && (
                  <div className="flex items-center bg-black/20 px-5 py-3 rounded-2xl backdrop-blur-sm border border-white/10">
-                    <MapPin className="w-5 h-5 mr-3 text-red-400" />
+                    <MapPin className="w-5 h-5 mr-3 text-accent" />
                     <div>
                        <div className="text-xs text-white/50 uppercase font-bold tracking-wider mb-0.5">Lokasi</div>
                        <div className="font-medium text-sm">{activity.location}</div>
@@ -138,7 +138,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
             <div className="lg:col-span-2">
                 <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100">
                     <h2 className="text-2xl font-black text-primary mb-6">Tentang Kegiatan</h2>
-                    <div className="prose prose-lg prose-blue max-w-none text-secondary leading-relaxed whitespace-pre-line">
+                    <div className="prose prose-lg max-w-none text-secondary leading-relaxed whitespace-pre-line">
                         {activity.description}
                     </div>
                 </div>
@@ -150,7 +150,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
                     <h3 className="text-xl font-black text-primary mb-6">Informasi Detail</h3>
                     <ul className="space-y-6">
                         <li className="flex items-start">
-                            <div className="bg-blue-50 p-3 rounded-xl text-primary shrink-0 mr-4">
+                            <div className="bg-primary/10 p-3 rounded-xl text-primary shrink-0 mr-4">
                                 <Users className="w-5 h-5" />
                             </div>
                             <div>

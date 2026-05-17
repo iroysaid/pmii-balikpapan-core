@@ -49,7 +49,7 @@ export default async function Home() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/profil"
-                className="bg-accent text-primary px-8 py-3 rounded-full font-bold hover:bg-yellow-400 transition flex items-center"
+                className="bg-accent text-secondary px-8 py-3 rounded-full font-bold hover:bg-white transition flex items-center"
               >
                 Tentang Kami <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -90,7 +90,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Visi */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transform hover:-translate-y-1 transition duration-300">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -104,8 +104,8 @@ export default async function Home() {
 
             {/* Misi */}
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transform hover:-translate-y-1 transition duration-300">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
@@ -131,10 +131,10 @@ export default async function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Tauhid", desc: "Mengesakan Allah SWT sebagai sumber dari segala sumber kebenaran.", color: "bg-blue-600" },
-            { title: "Hablum Minallah", desc: "Menjaga hubungan vertikal dengan Allah SWT melalui ibadah dan ketaqwaan.", color: "bg-green-600" },
-            { title: "Hablum Minannas", desc: "Menjaga hubungan baik antar sesama manusia dengan prinsip egaliter dan persaudaraan.", color: "bg-yellow-500" },
-            { title: "Hablum Minal Alam", desc: "Menjaga kelestarian alam semesta sebagai tempat hidup dan beribadah.", color: "bg-red-500" }
+            { title: "Tauhid", desc: "Mengesakan Allah SWT sebagai sumber dari segala sumber kebenaran.", color: "bg-primary" },
+            { title: "Hablum Minallah", desc: "Menjaga hubungan vertikal dengan Allah SWT melalui ibadah dan ketaqwaan.", color: "bg-secondary" },
+            { title: "Hablum Minannas", desc: "Menjaga hubungan baik antar sesama manusia dengan prinsip egaliter dan persaudaraan.", color: "bg-accent" },
+            { title: "Hablum Minal Alam", desc: "Menjaga kelestarian alam semesta sebagai tempat hidup dan beribadah.", color: "bg-black" }
           ].map((item, idx) => (
             <div key={idx} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition group">
               <div className={`h-2 ${item.color}`}></div>
@@ -230,9 +230,9 @@ export default async function Home() {
           <ActivitySlider kegiatan={latestActivities} />
           
           {/* E-Learning CTA Banner */}
-          <div className="mt-16 bg-white p-8 md:p-12 rounded-[2.5rem] border border-primary/5 shadow-lg shadow-blue-900/5 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-8 group">
+          <div className="mt-16 bg-white p-8 md:p-12 rounded-[2.5rem] border border-primary/5 shadow-lg shadow-secondary/10 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-8 group">
             <div className="flex items-center gap-8">
-               <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center text-primary shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+               <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
                   <BookOpen className="w-10 h-10" />
                </div>
                <div>
@@ -256,12 +256,12 @@ export default async function Home() {
           <div className="bg-primary rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden">
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Bergabung Bersama PMII</h2>
-              <p className="text-blue-100 max-w-2xl mx-auto mb-8">
+              <p className="text-white/85 max-w-2xl mx-auto mb-8">
                 Jadilah bagian dari mahasiswa pergerakan yang siap membawa perubahan positif bagi bangsa dan agama.
               </p>
               <Link
                 href="/daftar"
-                className="inline-block bg-accent text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-400 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="inline-block bg-accent text-secondary px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 Daftar Sekarang
               </Link>

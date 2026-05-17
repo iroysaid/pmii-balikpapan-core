@@ -14,7 +14,7 @@ type Activity = {
   location: string | null;
   organizer: string | null;
   image: string | null;
-  photos: any[];
+  photos: { id: string }[];
 };
 
 export default function KegiatanClient({ activities }: { activities: Activity[] }) {
@@ -59,7 +59,7 @@ export default function KegiatanClient({ activities }: { activities: Activity[] 
   const getBadgeStyle = (status: string) => {
     switch (status) {
       case "HARI_INI": return "bg-red-500 text-white animate-pulse";
-      case "AKAN_DATANG": return "bg-blue-500 text-white";
+      case "AKAN_DATANG": return "bg-primary text-white";
       case "SEDANG_BERLANGSUNG": return "bg-red-500 text-white animate-pulse";
       case "DOKUMENTASI": return "bg-gray-800 text-white";
       default: return "bg-gray-200 text-gray-800";
@@ -80,10 +80,10 @@ export default function KegiatanClient({ activities }: { activities: Activity[] 
     <div className="pb-24">
       {/* Hero Header */}
       <section className="bg-primary text-white py-20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-accent opacity-10 skew-x-12 translate-x-20"></div>
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-accent opacity-15 skew-x-12 translate-x-20"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-black mb-4">Agenda & Aktivitas</h1>
-          <p className="text-lg text-gray-200 max-w-2xl mx-auto">
+          <p className="text-lg text-white/85 max-w-2xl mx-auto">
             Pantau seluruh jadwal kegiatan, kajian, dan aksi PMII Balikpapan. Temukan juga berbagai dokumentasi momen pergerakan kami.
           </p>
         </div>
@@ -176,7 +176,7 @@ export default function KegiatanClient({ activities }: { activities: Activity[] 
                             </div>
                             {activity.location && (
                               <div className="flex items-center text-sm text-secondary">
-                                <MapPin className="w-4 h-4 mr-2 text-red-400 shrink-0" />
+                <MapPin className="w-4 h-4 mr-2 text-accent shrink-0" />
                                 <span className="line-clamp-1">{activity.location}</span>
                               </div>
                             )}

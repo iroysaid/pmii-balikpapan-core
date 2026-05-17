@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="bg-primary text-white py-10 mt-auto">
+        <footer className="mt-auto border-t border-accent/40 bg-secondary py-10 text-white">
             <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h3 className="text-xl font-bold mb-4 text-accent flex items-center space-x-2">
@@ -19,7 +19,7 @@ export default function Footer() {
                             href="https://www.instagram.com/pmiibalikpapan?igsh=MWxyZGZtd2F4MWh1dA=="
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white hover:text-accent transition"
+                            className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-accent hover:bg-accent hover:text-secondary"
                         >
                             {/* Instagram Icon - simple text or lucide if imported */}
                             Instagram
@@ -60,7 +60,7 @@ export default function Footer() {
                                 href="https://maps.app.goo.gl/acFYwLwgVrvWUrZY9"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-accent hover:underline flex items-center"
+                                className="inline-flex rounded-full bg-accent px-4 py-2 font-bold text-secondary transition hover:bg-white"
                             >
                                 Lihat di Google Maps
                             </a>
@@ -69,7 +69,7 @@ export default function Footer() {
                     </ul>
                 </div>
             </div>
-            <div className="text-center text-xs text-white/65 mt-10 pt-4 border-t border-white/20">
+            <div className="text-center text-xs text-white/65 mt-10 pt-4 border-t border-accent/30">
                 &copy; 2025 @royhss_id beta version 0.0.0.60
             </div>
         </footer>

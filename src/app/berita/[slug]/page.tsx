@@ -116,13 +116,13 @@ function RelatedCard({
                     <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-primary">
                         {primaryTag(post)}
                     </p>
-                    <h3 className="text-[20px] font-black leading-[1.08] text-primary transition-colors group-hover:text-blue-600">
+                    <h3 className="text-[20px] font-black leading-[1.08] text-primary transition-colors group-hover:text-secondary">
                         {post.title}
                     </h3>
-                    <p className="mt-3 font-serif text-[16px] leading-[1.4] text-slate-700 transition-colors group-hover:text-primary">
+                    <p className="mt-3 font-serif text-[16px] leading-[1.4] text-black/75 transition-colors group-hover:text-primary">
                         {excerpt(post.content, 115)}
                     </p>
-                    <p className="mt-3 text-xs font-semibold text-slate-900">
+                    <p className="mt-3 text-xs font-semibold text-black">
                         Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
                     </p>
                 </div>
@@ -164,8 +164,8 @@ export default async function SinglePostPage({
     const author = post.author || "Admin PMII";
 
     return (
-        <article className="min-h-screen bg-[#F7FAFF] text-slate-950">
-            <header className="border-b border-primary/20 bg-white">
+        <article className="news-serif min-h-screen bg-white text-black">
+            <header className="border-b-2 border-accent bg-white">
                 <div className="mx-auto max-w-[1320px] px-5 py-8 lg:px-10 lg:py-12">
                     <Link
                         href="/berita"
@@ -203,7 +203,7 @@ export default async function SinglePostPage({
                                 {post.title}
                             </h1>
 
-                            <p className="mt-6 max-w-3xl font-serif text-[21px] leading-[1.38] text-slate-700 md:text-[24px]">
+                            <p className="mt-6 max-w-3xl font-serif text-[21px] leading-[1.38] text-black/75 md:text-[24px]">
                                 {dek}
                             </p>
 
@@ -213,19 +213,19 @@ export default async function SinglePostPage({
                                         <UserRound className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-black/55">
                                             Oleh
                                         </p>
                                         <p className="text-[18px] font-black leading-tight text-primary">
                                             {author}
                                         </p>
-                                        <p className="mt-1 max-w-lg text-sm leading-relaxed text-slate-600">
+                                        <p className="mt-1 max-w-lg text-sm leading-relaxed text-black/65">
                                             Catatan redaksi PMII Balikpapan tentang kaderisasi,
                                             organisasi, dan dinamika pergerakan mahasiswa.
                                         </p>
                                     </div>
                                 </div>
-                                <div className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.08em] text-slate-600 md:text-right">
+                                <div className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.08em] text-black/65 md:text-right">
                                     <p className="inline-flex items-center gap-2 md:justify-end">
                                         <CalendarDays className="h-4 w-4 text-primary" />
                                         {formatLongDate(post.createdAt)}
@@ -254,7 +254,7 @@ export default async function SinglePostPage({
                         </div>
                     )}
                 </div>
-                <figcaption className="mt-3 border-b border-primary/20 pb-5 font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                <figcaption className="mt-3 border-b border-primary/20 pb-5 font-mono text-[11px] uppercase tracking-[0.08em] text-black/55">
                     Dokumentasi PMII Balikpapan
                 </figcaption>
             </figure>
@@ -269,7 +269,7 @@ export default async function SinglePostPage({
                         <p className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
                             Ringkasan
                         </p>
-                        <p className="mt-3 font-serif text-[18px] leading-[1.45] text-slate-700">
+                        <p className="mt-3 font-serif text-[18px] leading-[1.45] text-black/75">
                             {dek}
                         </p>
                     </div>
@@ -280,9 +280,9 @@ export default async function SinglePostPage({
                             [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-white [&_blockquote]:px-6 [&_blockquote]:py-5 [&_blockquote]:font-serif [&_blockquote]:text-[22px] [&_blockquote]:leading-snug [&_blockquote]:text-primary
                             [&_h2]:mb-4 [&_h2]:mt-10 [&_h2]:text-[30px] [&_h2]:font-black [&_h2]:leading-tight [&_h2]:text-primary
                             [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:text-[23px] [&_h3]:font-black [&_h3]:leading-tight [&_h3]:text-primary
-                            [&_li]:mb-2 [&_li]:font-serif [&_li]:text-[20px] [&_li]:leading-[1.65] [&_li]:text-slate-800
+                            [&_li]:mb-2 [&_li]:font-serif [&_li]:text-[20px] [&_li]:leading-[1.65] [&_li]:text-black
                             [&_ol]:mb-7 [&_ol]:list-decimal [&_ol]:pl-7
-                            [&_p]:mb-7 [&_p]:font-serif [&_p]:text-[20px] [&_p]:leading-[1.68] [&_p]:text-slate-800
+                            [&_p]:mb-7 [&_p]:font-serif [&_p]:text-[20px] [&_p]:leading-[1.68] [&_p]:text-black
                             [&_strong]:font-black [&_strong]:text-primary
                             [&_ul]:mb-7 [&_ul]:list-disc [&_ul]:pl-7"
                         dangerouslySetInnerHTML={{ __html: post.content }}
@@ -293,7 +293,7 @@ export default async function SinglePostPage({
                             Tentang penulis
                         </p>
                         <h2 className="mt-3 text-2xl font-black text-primary">{author}</h2>
-                        <p className="mt-3 font-serif text-[18px] leading-[1.5] text-slate-700">
+                        <p className="mt-3 font-serif text-[18px] leading-[1.5] text-black/75">
                             {author} menulis untuk kanal berita PMII Balikpapan, dengan
                             fokus pada dokumentasi kegiatan, gagasan kader, dan isu
                             keorganisasian.
@@ -309,7 +309,7 @@ export default async function SinglePostPage({
                             </p>
                             <dl className="mt-4 divide-y divide-primary/15 border-y border-primary/15 text-sm">
                                 <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
-                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-black/55">
                                         Tanggal
                                     </dt>
                                     <dd className="font-semibold text-primary">
@@ -317,7 +317,7 @@ export default async function SinglePostPage({
                                     </dd>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
-                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-black/55">
                                         Kanal
                                     </dt>
                                     <dd className="font-semibold text-primary">
@@ -325,7 +325,7 @@ export default async function SinglePostPage({
                                     </dd>
                                 </div>
                                 <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
-                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-black/55">
                                         Durasi
                                     </dt>
                                     <dd className="font-semibold text-primary">
@@ -335,7 +335,7 @@ export default async function SinglePostPage({
                             </dl>
                         </div>
 
-                        <div className="bg-primary p-6 text-white">
+                        <div className="bg-secondary p-6 text-white">
                             <p className="font-mono text-xs uppercase tracking-[0.08em] text-accent">
                                 Kabar Pergerakan
                             </p>
@@ -348,7 +348,7 @@ export default async function SinglePostPage({
                             </p>
                             <Link
                                 href="/kontak"
-                                className="mt-5 inline-flex items-center rounded-[5px] bg-accent px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-primary transition hover:bg-white"
+                                className="mt-5 inline-flex items-center rounded-[5px] bg-accent px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-secondary transition hover:bg-white"
                             >
                                 Hubungi redaksi
                                 <ArrowRight className="ml-2 h-4 w-4" />

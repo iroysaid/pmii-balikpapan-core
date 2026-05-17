@@ -8,7 +8,7 @@ import { ArrowRight, BookOpen, CalendarDays, Sparkles } from "lucide-react";
 const ArrowGreenLeft = () => (
   <svg
     viewBox="0 0 100 100"
-    className="h-full w-full overflow-visible stroke-current text-[#c49e3a]"
+    className="h-full w-full overflow-visible stroke-current text-[#F5CA0F]"
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -22,7 +22,7 @@ const ArrowGreenLeft = () => (
 const ArrowGreenRight = () => (
   <svg
     viewBox="0 0 100 100"
-    className="h-full w-full overflow-visible stroke-current text-[#c49e3a]"
+    className="h-full w-full overflow-visible stroke-current text-[#F5CA0F]"
     fill="none"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -50,7 +50,7 @@ const ArrowBlack = () => (
 const CircularBadge = () => (
   <Link
     href="/daftar"
-    className="relative flex h-28 w-28 rotate-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-black/5 bg-[#c49e3a] shadow-xl transition-transform hover:scale-105 md:h-36 md:w-36"
+    className="relative flex h-28 w-28 rotate-12 cursor-pointer items-center justify-center rounded-full border-[3px] border-black/5 bg-[#F5CA0F] shadow-xl transition-transform hover:scale-105 md:h-36 md:w-36"
   >
     <div className="absolute inset-1 animate-[spin_10s_linear_infinite]">
       <svg viewBox="0 0 100 100" className="h-full w-full">
@@ -61,7 +61,7 @@ const CircularBadge = () => (
         />
         <text
           className="text-[10px] font-black uppercase tracking-[0.18em]"
-          fill="#0043ef"
+          fill="#122562"
         >
           <textPath href="#pmiiCirclePath" startOffset="0%">
             GABUNG PMII BALIKPAPAN • GABUNG PMII •
@@ -93,9 +93,9 @@ const statCards = [
 
 export const Component = () => {
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#0043ef] font-sans text-white selection:bg-[#c49e3a] selection:text-primary">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#262EED] font-sans text-white selection:bg-[#F5CA0F] selection:text-secondary">
       <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,#ffffff16_1px,transparent_1px),linear-gradient(to_bottom,#ffffff16_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      <div className="absolute -left-24 top-28 h-64 w-64 rounded-full bg-[#c49e3a]/20 blur-3xl" />
+      <div className="absolute -left-24 top-28 h-64 w-64 rounded-full bg-[#F5CA0F]/20 blur-3xl" />
 
       <nav className="relative z-20 mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-6 md:px-10 md:py-8">
         <Link href="/" className="flex items-center gap-3">
@@ -109,7 +109,7 @@ export const Component = () => {
             />
           </div>
           <div className="leading-tight">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#c49e3a]">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F5CA0F]">
               PC PMII
             </p>
             <p className="text-sm font-black uppercase tracking-[0.18em]">
@@ -148,11 +148,11 @@ export const Component = () => {
           <div className="relative z-40 flex w-full flex-col items-center space-y-2 md:space-y-4">
             <div className="relative z-30 flex w-full justify-start pl-[8%] md:pl-[18%]">
               <h1
-                className="m-0 p-0 text-[clamp(4rem,11vw,150px)] font-black uppercase leading-[0.85] tracking-normal text-[#c49e3a]"
+                className="m-0 p-0 text-[clamp(4rem,11vw,150px)] font-black uppercase leading-[0.85] tracking-normal text-[#F5CA0F]"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #10204d, 2px 2px 0 #10204d, 3px 3px 0 #10204d, 4px 4px 0 #10204d, 5px 5px 0 #10204d, 6px 6px 0 #10204d, 7px 7px 0 #10204d, 8px 8px 0 #10204d, 9px 9px 0 #10204d, 10px 10px 0 #10204d",
+                    "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562, 6px 6px 0 #122562, 7px 7px 0 #122562, 8px 8px 0 #122562, 9px 9px 0 #122562, 10px 10px 0 #122562",
                 }}
               >
                 PMII
@@ -165,7 +165,7 @@ export const Component = () => {
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #10204d, 2px 2px 0 #10204d, 3px 3px 0 #10204d, 4px 4px 0 #10204d, 5px 5px 0 #10204d, 6px 6px 0 #10204d, 7px 7px 0 #10204d, 8px 8px 0 #10204d, 9px 9px 0 #10204d, 10px 10px 0 #10204d",
+                    "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562, 6px 6px 0 #122562, 7px 7px 0 #122562, 8px 8px 0 #122562, 9px 9px 0 #122562, 10px 10px 0 #122562",
                 }}
               >
                 BALIKPAPAN
@@ -178,7 +178,7 @@ export const Component = () => {
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #10204d, 2px 2px 0 #10204d, 3px 3px 0 #10204d, 4px 4px 0 #10204d, 5px 5px 0 #10204d, 6px 6px 0 #10204d, 7px 7px 0 #10204d, 8px 8px 0 #10204d",
+                    "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562, 6px 6px 0 #122562, 7px 7px 0 #122562, 8px 8px 0 #122562",
                 }}
               >
                 BERGERAK
@@ -198,7 +198,7 @@ export const Component = () => {
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             >
               <div className="flex aspect-[3/3.5] w-40 rotate-[-12deg] flex-col items-center justify-center rounded-[2rem] border border-white/40 bg-white/20 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-0 md:w-52">
-                <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-full border-[3px] border-white/50 bg-[#c49e3a] shadow-inner md:h-24 md:w-24">
+                <div className="relative mb-4 h-16 w-16 overflow-hidden rounded-full border-[3px] border-white/50 bg-[#F5CA0F] shadow-inner md:h-24 md:w-24">
                   <Image
                     src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600&auto=format&fit=crop"
                     alt="Kader PMII berdiskusi"
@@ -265,7 +265,7 @@ export const Component = () => {
 
             return (
               <div
-                className="relative flex min-h-64 flex-col items-center rounded-[2rem] border border-gray-100 bg-[#f9f7ef] p-8 text-center"
+                className="relative flex min-h-64 flex-col items-center rounded-[2rem] border border-secondary/10 bg-white p-8 text-center"
                 key={item.title}
               >
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white shadow-lg">
