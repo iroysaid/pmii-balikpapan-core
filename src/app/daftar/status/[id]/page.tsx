@@ -30,7 +30,7 @@ export default async function RegistrationStatusPage({ params }: { params: Promi
                         </p>
                         <Link
                             href="/masuk"
-                            className="inline-block w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-900 transition"
+                            className="inline-block w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition"
                         >
                             Login Sekarang
                         </Link>

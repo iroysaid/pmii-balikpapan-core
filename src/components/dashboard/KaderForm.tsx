@@ -157,7 +157,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                     </div>
                 </div>
 
-                <Link href="/dashboard/kader" className="inline-block bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-900 transition">
+                <Link href="/dashboard/kader" className="inline-block bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition">
                     Kembali ke Daftar Kader
                 </Link>
             </div>
@@ -587,7 +587,7 @@ export default function KaderForm({ initialData, isEdit = false, isSuperAdmin = 
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center shadow-lg disabled:opacity-50"
+                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition flex items-center shadow-lg disabled:opacity-50"
                 >
                     {isEdit ? <Edit className="w-4 h-4 mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                     {isSubmitting ? "Menyimpan..." : (submitLabel || (isEdit ? "Update Data Kader" : "Simpan Data Kader"))}

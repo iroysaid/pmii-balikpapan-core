@@ -145,7 +145,7 @@ export default function TagSelector({
                         <button
                             type="button"
                             onClick={() => addNewTag(group.key)}
-                            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-blue-900 transition active:scale-95"
+                            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition active:scale-95"
                         >
                             <Plus className="w-3 h-3" />
                             Add

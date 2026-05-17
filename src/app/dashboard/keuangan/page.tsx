@@ -82,7 +82,7 @@ export default async function FinancePage({
                 {isSuperAdmin && (
                     <Link
                         href="/dashboard/keuangan/create"
-                        className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-blue-900 transition"
+                        className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-primary/90 transition"
                     >
                         <Plus className="w-4 h-4 mr-2" /> Catat Transaksi
                     </Link>

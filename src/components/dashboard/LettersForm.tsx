@@ -83,7 +83,7 @@ export default function LettersForm({ initialData, isEdit = false }: LettersForm
             </div>
 
             <div className="pt-4 border-t border-gray-50 flex justify-end">
-                <SubmitButton pendingLabel={isEdit ? "Mengupdate..." : "Menyimpan..."} className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition flex items-center">
+                <SubmitButton pendingLabel={isEdit ? "Mengupdate..." : "Menyimpan..."} className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition flex items-center">
                     <Save className="w-4 h-4 mr-2" /> {isEdit ? "Update Arsip" : "Simpan Arsip"}
                 </SubmitButton>
             </div>

@@ -133,7 +133,7 @@ export default async function DashboardPage() {
                     </div>
                 </div>
 
-                <div className="bg-blue-900 rounded-xl p-8 text-white relative overflow-hidden flex flex-col justify-center items-start">
+                <div className="bg-primary rounded-xl p-8 text-white relative overflow-hidden flex flex-col justify-center items-start">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                     <h3 className="text-xl font-bold mb-2 relative z-10">Pusat Bantuan</h3>
                     <p className="text-blue-100 text-sm mb-6 relative z-10 max-w-xs">

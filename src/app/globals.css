@@ -4,9 +4,9 @@
 @theme {
   --color-primary: #0043ef;
   --color-accent: #C49E3A;
-  --color-background: #F9F7EF;
-  --color-text: #3C4048;
-  --color-secondary: #4B5864;
+  --color-background: #F7FAFF;
+  --color-text: #1E293B;
+  --color-secondary: #1D4ED8;
   --font-sans: var(--font-inter), sans-serif;
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
@@ -19,6 +19,11 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text);
+}
+
+::selection {
+  background-color: #0043ef;
+  color: white;
 }
 
 @keyframes marquee {

@@ -318,7 +318,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="flex items-center bg-primary text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-blue-900 transition shadow-md disabled:opacity-50"
+                    className="flex items-center bg-primary text-white px-6 py-3 rounded-2xl text-sm font-bold hover:bg-primary/90 transition shadow-md disabled:opacity-50"
                 >
                     {uploading ? (
                         <>
@@ -373,7 +373,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
         <button
           type="submit"
           disabled={loading || uploading}
-          className="flex-[2] bg-primary text-white py-5 rounded-3xl font-black text-lg hover:bg-blue-900 transition shadow-2xl shadow-primary/20 hover:shadow-primary/40 transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 flex items-center justify-center"
+          className="flex-[2] bg-primary text-white py-5 rounded-3xl font-black text-lg hover:bg-primary/90 transition shadow-2xl shadow-primary/20 hover:shadow-primary/40 transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 flex items-center justify-center"
         >
           {loading ? (
              <>

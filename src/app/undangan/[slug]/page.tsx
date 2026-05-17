@@ -34,7 +34,7 @@ export default async function InvitationPage({
 
     // Theme Styles
     const themes: Record<string, string> = {
-        "modern-blue": "from-blue-900 via-blue-800 to-indigo-900 text-white",
+        "modern-blue": "from-primary via-blue-600 to-blue-700 text-white",
         "classic-gold": "from-amber-900 via-yellow-950 to-amber-950 text-white",
         "midnight-dark": "from-slate-950 via-gray-900 to-slate-900 text-white",
     };

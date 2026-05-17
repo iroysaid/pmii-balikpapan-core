@@ -83,7 +83,7 @@ export default async function DetailKegiatanPage({ params }: { params: Promise<{
             <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-700"></div>
         )}
 
         <div className="container mx-auto px-4 relative z-10 pb-16">

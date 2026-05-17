@@ -78,7 +78,7 @@ export default function PostForm({ initialData, isEdit = false, allTags }: PostF
                         name="published"
                         value="true"
                         pendingLabel={isEdit ? "Mengupdate..." : "Mempublish..."}
-                        className="flex items-center bg-primary text-white px-6 py-3 rounded-2xl font-black hover:bg-blue-900 transition shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
+                        className="flex items-center bg-primary text-white px-6 py-3 rounded-2xl font-black hover:bg-primary/90 transition shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0"
                     >
                         {isEdit ? (
                             <><Edit className="w-4 h-4 mr-2" /> Update & Publish</>

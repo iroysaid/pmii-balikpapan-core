@@ -1,7 +1,135 @@
+/* eslint-disable @next/next/no-img-element */
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowLeft, Calendar, User, Tag } from "lucide-react";
+import {
+    ArrowLeft,
+    ArrowRight,
+    CalendarDays,
+    Facebook,
+    Link2,
+    Mail,
+    UserRound,
+} from "lucide-react";
 import { notFound } from "next/navigation";
+
+function stripHtml(html: string) {
+    return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function excerpt(content: string, limit = 185) {
+    const text = stripHtml(content);
+    return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
+}
+
+function formatLongDate(date: Date) {
+    return new Intl.DateTimeFormat("id-ID", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+}
+
+function formatShortDate(date: Date) {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(date);
+}
+
+function readingTime(content: string) {
+    const words = stripHtml(content).split(/\s+/).filter(Boolean).length;
+    return `${Math.max(1, Math.ceil(words / 180))} menit baca`;
+}
+
+function primaryTag(post: {
+    tags: { tag: { name: string } }[];
+}) {
+    return post.tags[0]?.tag.name ?? "Berita PMII";
+}
+
+function ShareRail() {
+    return (
+        <aside className="hidden lg:block">
+            <div className="sticky top-28 border-t border-primary pt-5">
+                <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.08em] text-primary">
+                    Bagikan
+                </p>
+                <div className="flex flex-col gap-3">
+                    {[
+                        { label: "Facebook", icon: Facebook },
+                        { label: "Email", icon: Mail },
+                        { label: "Salin tautan", icon: Link2 },
+                    ].map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.label}
+                                type="button"
+                                aria-label={item.label}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-primary text-primary transition-colors hover:bg-primary hover:text-white"
+                            >
+                                <Icon className="h-4 w-4" />
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </aside>
+    );
+}
+
+function RelatedCard({
+    post,
+}: {
+    post: {
+        id: string;
+        slug: string;
+        title: string;
+        content: string;
+        image: string | null;
+        author: string | null;
+        createdAt: Date;
+        tags: { tag: { name: string } }[];
+    };
+}) {
+    return (
+        <article className="group">
+            <Link href={`/berita/${post.slug}`} className="block border-b-0">
+                <div className="relative aspect-[4/3] overflow-hidden bg-primary">
+                    {post.image ? (
+                        <img
+                            src={post.image}
+                            alt={post.title}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
+                        />
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center text-accent">
+                            <span className="font-mono text-xs uppercase tracking-[0.18em]">
+                                PMII
+                            </span>
+                        </div>
+                    )}
+                </div>
+                <div className="pt-4">
+                    <p className="mb-2 font-mono text-xs uppercase leading-none tracking-[0.08em] text-primary">
+                        {primaryTag(post)}
+                    </p>
+                    <h3 className="text-[20px] font-black leading-[1.08] text-primary transition-colors group-hover:text-blue-600">
+                        {post.title}
+                    </h3>
+                    <p className="mt-3 font-serif text-[16px] leading-[1.4] text-slate-700 transition-colors group-hover:text-primary">
+                        {excerpt(post.content, 115)}
+                    </p>
+                    <p className="mt-3 text-xs font-semibold text-slate-900">
+                        Oleh <span className="uppercase">{post.author || "Admin PMII"}</span>
+                    </p>
+                </div>
+            </Link>
+        </article>
+    );
+}
 
 export default async function SinglePostPage({
     params,
@@ -16,98 +144,240 @@ export default async function SinglePostPage({
         },
     });
 
-    if (!post) {
+    if (!post || !post.published) {
         notFound();
     }
 
-    const groupColorMap: Record<string, string> = {
-        Wilayah: "bg-blue-100 text-blue-700",
-        Isu: "bg-red-100 text-red-700",
-        Kaderisasi: "bg-green-100 text-green-700",
-        Umum: "bg-gray-100 text-gray-600",
-    };
+    const relatedPosts = await prisma.post.findMany({
+        where: {
+            published: true,
+            slug: { not: slug },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        include: {
+            tags: { include: { tag: true } },
+        },
+    });
+
+    const dek = excerpt(post.content);
+    const author = post.author || "Admin PMII";
 
     return (
-        <div className="bg-[#f8f9fa] min-h-screen pb-20 pt-24">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <Link
-                    href="/berita"
-                    className="inline-flex items-center text-secondary hover:text-primary mb-8 transition font-medium"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Kembali ke Berita
-                </Link>
+        <article className="min-h-screen bg-[#F7FAFF] text-slate-950">
+            <header className="border-b border-primary/20 bg-white">
+                <div className="mx-auto max-w-[1320px] px-5 py-8 lg:px-10 lg:py-12">
+                    <Link
+                        href="/berita"
+                        className="mb-10 inline-flex items-center border-b border-transparent font-mono text-xs uppercase tracking-[0.08em] text-primary transition hover:border-primary"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Berita
+                    </Link>
 
-                <article className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                    {/* Cover Image */}
-                    {post.image && (
-                        <div className="w-full aspect-video">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src={post.image}
-                                alt={post.title}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    )}
-
-                    <div className="p-8 md:p-12">
-                        {/* Meta */}
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-secondary mb-6">
-                            <div className="flex items-center">
-                                <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                                {new Date(post.createdAt).toLocaleDateString("id-ID", {
-                                    weekday: "long",
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                })}
-                            </div>
-                            <div className="flex items-center">
-                                <User className="w-4 h-4 mr-2 text-blue-500" />
-                                {post.author || "Admin PMII"}
+                    <div className="grid gap-8 lg:grid-cols-16 lg:gap-x-[25px]">
+                        <div className="lg:col-span-3">
+                            <div className="hidden border-t border-primary pt-5 lg:block">
+                                <p className="font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-primary">
+                                    Kanal
+                                </p>
+                                <p className="mt-3 text-[22px] font-black leading-none text-primary">
+                                    {primaryTag(post)}
+                                </p>
                             </div>
                         </div>
 
-                        {/* Title */}
-                        <h1 className="text-3xl md:text-5xl font-black text-primary leading-tight mb-6">
-                            {post.title}
-                        </h1>
-
-                        {/* Tags */}
-                        {post.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-gray-100">
-                                <Tag className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                                {post.tags.map(({ tag }) => (
+                        <div className="lg:col-span-10">
+                            <div className="mb-5 flex flex-wrap items-center gap-2">
+                                {(post.tags.length ? post.tags : [{ tag: { id: "default", name: "PMII Balikpapan" } }]).map(({ tag }) => (
                                     <span
                                         key={tag.id}
-                                        className={`text-xs font-bold px-3 py-1 rounded-full ${groupColorMap[tag.group] || "bg-gray-100 text-gray-600"}`}
+                                        className="border border-primary px-2.5 py-1 font-mono text-[11px] uppercase leading-none tracking-[0.08em] text-primary"
                                     >
                                         {tag.name}
                                     </span>
                                 ))}
                             </div>
-                        )}
 
-                        {/* Rich HTML Content */}
-                        <div
-                            className="prose prose-lg max-w-none text-gray-700 leading-relaxed
-                                prose-headings:text-primary prose-headings:font-black
-                                prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
-                                prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
-                                prose-p:mb-4 prose-p:leading-relaxed
-                                prose-strong:text-primary
-                                prose-em:text-gray-600
-                                prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
-                                prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
-                                prose-li:text-gray-700
-                                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-500 prose-blockquote:bg-blue-50 prose-blockquote:py-2 prose-blockquote:rounded-r-lg
-                                prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
-                                prose-hr:border-gray-200"
-                            dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
+                            <h1 className="max-w-5xl text-[42px] font-black leading-[0.98] tracking-tight text-primary md:text-[64px] lg:text-[76px]">
+                                {post.title}
+                            </h1>
+
+                            <p className="mt-6 max-w-3xl font-serif text-[21px] leading-[1.38] text-slate-700 md:text-[24px]">
+                                {dek}
+                            </p>
+
+                            <div className="mt-8 grid gap-5 border-t border-primary/25 pt-6 md:grid-cols-[1fr_auto] md:items-end">
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary bg-primary text-white">
+                                        <UserRound className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                            Oleh
+                                        </p>
+                                        <p className="text-[18px] font-black leading-tight text-primary">
+                                            {author}
+                                        </p>
+                                        <p className="mt-1 max-w-lg text-sm leading-relaxed text-slate-600">
+                                            Catatan redaksi PMII Balikpapan tentang kaderisasi,
+                                            organisasi, dan dinamika pergerakan mahasiswa.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.08em] text-slate-600 md:text-right">
+                                    <p className="inline-flex items-center gap-2 md:justify-end">
+                                        <CalendarDays className="h-4 w-4 text-primary" />
+                                        {formatLongDate(post.createdAt)}
+                                    </p>
+                                    <p>{readingTime(post.content)}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </article>
+                </div>
+            </header>
+
+            <figure className="mx-auto max-w-[1320px] px-5 pt-8 lg:px-10">
+                <div className="relative aspect-[16/9] overflow-hidden bg-primary">
+                    {post.image ? (
+                        <img
+                            src={post.image}
+                            alt={post.title}
+                            className="h-full w-full object-cover"
+                        />
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center text-accent">
+                            <span className="font-mono text-sm uppercase tracking-[0.18em]">
+                                Dokumentasi PMII
+                            </span>
+                        </div>
+                    )}
+                </div>
+                <figcaption className="mt-3 border-b border-primary/20 pb-5 font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                    Dokumentasi PMII Balikpapan
+                </figcaption>
+            </figure>
+
+            <div className="mx-auto grid max-w-[1320px] gap-8 px-5 py-10 lg:grid-cols-16 lg:gap-x-[25px] lg:px-10">
+                <div className="lg:col-span-3">
+                    <ShareRail />
+                </div>
+
+                <div className="lg:col-span-8">
+                    <div className="mb-8 rounded-[5px] border border-primary/25 bg-white p-5">
+                        <p className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                            Ringkasan
+                        </p>
+                        <p className="mt-3 font-serif text-[18px] leading-[1.45] text-slate-700">
+                            {dek}
+                        </p>
+                    </div>
+
+                    <div
+                        className="article-content max-w-none
+                            [&_a]:border-b [&_a]:border-primary [&_a]:text-primary
+                            [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:bg-white [&_blockquote]:px-6 [&_blockquote]:py-5 [&_blockquote]:font-serif [&_blockquote]:text-[22px] [&_blockquote]:leading-snug [&_blockquote]:text-primary
+                            [&_h2]:mb-4 [&_h2]:mt-10 [&_h2]:text-[30px] [&_h2]:font-black [&_h2]:leading-tight [&_h2]:text-primary
+                            [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:text-[23px] [&_h3]:font-black [&_h3]:leading-tight [&_h3]:text-primary
+                            [&_li]:mb-2 [&_li]:font-serif [&_li]:text-[20px] [&_li]:leading-[1.65] [&_li]:text-slate-800
+                            [&_ol]:mb-7 [&_ol]:list-decimal [&_ol]:pl-7
+                            [&_p]:mb-7 [&_p]:font-serif [&_p]:text-[20px] [&_p]:leading-[1.68] [&_p]:text-slate-800
+                            [&_strong]:font-black [&_strong]:text-primary
+                            [&_ul]:mb-7 [&_ul]:list-disc [&_ul]:pl-7"
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
+
+                    <footer className="mt-12 border-t-4 border-primary pt-6">
+                        <p className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                            Tentang penulis
+                        </p>
+                        <h2 className="mt-3 text-2xl font-black text-primary">{author}</h2>
+                        <p className="mt-3 font-serif text-[18px] leading-[1.5] text-slate-700">
+                            {author} menulis untuk kanal berita PMII Balikpapan, dengan
+                            fokus pada dokumentasi kegiatan, gagasan kader, dan isu
+                            keorganisasian.
+                        </p>
+                    </footer>
+                </div>
+
+                <aside className="lg:col-span-5">
+                    <div className="sticky top-28 space-y-6">
+                        <div className="border-t border-primary pt-5">
+                            <p className="font-mono text-xs uppercase tracking-[0.08em] text-primary">
+                                Metadata
+                            </p>
+                            <dl className="mt-4 divide-y divide-primary/15 border-y border-primary/15 text-sm">
+                                <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                        Tanggal
+                                    </dt>
+                                    <dd className="font-semibold text-primary">
+                                        {formatShortDate(post.createdAt)}
+                                    </dd>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                        Kanal
+                                    </dt>
+                                    <dd className="font-semibold text-primary">
+                                        {primaryTag(post)}
+                                    </dd>
+                                </div>
+                                <div className="grid grid-cols-[100px_1fr] gap-4 py-3">
+                                    <dt className="font-mono text-[11px] uppercase tracking-[0.08em] text-slate-500">
+                                        Durasi
+                                    </dt>
+                                    <dd className="font-semibold text-primary">
+                                        {readingTime(post.content)}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+
+                        <div className="bg-primary p-6 text-white">
+                            <p className="font-mono text-xs uppercase tracking-[0.08em] text-accent">
+                                Kabar Pergerakan
+                            </p>
+                            <h2 className="mt-3 text-2xl font-black leading-tight text-white">
+                                Punya informasi kegiatan PMII?
+                            </h2>
+                            <p className="mt-3 text-sm leading-relaxed text-white/85">
+                                Kirim dokumentasi, agenda, atau catatan organisasi agar
+                                dapat diterbitkan di kanal berita PMII Balikpapan.
+                            </p>
+                            <Link
+                                href="/kontak"
+                                className="mt-5 inline-flex items-center rounded-[5px] bg-accent px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-primary transition hover:bg-white"
+                            >
+                                Hubungi redaksi
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </div>
+                    </div>
+                </aside>
             </div>
-        </div>
+
+            {relatedPosts.length > 0 && (
+                <section className="mx-auto max-w-[1320px] border-t border-primary/25 px-5 py-10 lg:px-10">
+                    <div className="mb-6 flex items-end justify-between border-b border-primary/25 pb-4">
+                        <h2 className="text-[32px] font-black leading-none text-primary">
+                            Baca juga
+                        </h2>
+                        <Link
+                            href="/berita"
+                            className="hidden font-mono text-xs uppercase tracking-[0.08em] text-primary hover:border-b hover:border-primary md:block"
+                        >
+                            Semua berita &gt;
+                        </Link>
+                    </div>
+                    <div className="grid gap-[25px] md:grid-cols-3">
+                        {relatedPosts.map((related) => (
+                            <RelatedCard key={related.id} post={related} />
+                        ))}
+                    </div>
+                </section>
+            )}
+        </article>
     );
 }

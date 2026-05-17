@@ -29,27 +29,27 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="bg-primary text-white shadow-md sticky top-0 z-50">
+        <nav className="sticky top-0 z-50 border-b border-white/15 bg-primary text-white shadow-lg shadow-primary/20">
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-center h-20">
                     {/* Logo Area */}
                     <Link href="/" className="font-bold text-xl flex items-center gap-3">
-                        <div className="flex items-center space-x-2">
-                            <div className="relative w-12 h-12">
+                        <div className="flex items-center space-x-2 rounded-2xl bg-white/95 px-2 py-1 shadow-sm">
+                            <div className="relative w-11 h-11">
                                 <Image
                                     src="/PB_PMII.png"
                                     alt="Logo PMII"
                                     fill
-                                    sizes="48px"
+                                    sizes="44px"
                                     className="object-contain"
                                 />
                             </div>
-                            <div className="relative w-12 h-12">
+                            <div className="relative w-11 h-11">
                                 <Image
                                     src="/PMII_BPP.png"
                                     alt="Logo PMII Balikpapan"
                                     fill
-                                    sizes="48px"
+                                    sizes="44px"
                                     className="object-contain"
                                 />
                             </div>
@@ -61,12 +61,12 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop Links */}
-                    <div className="hidden md:flex space-x-6 items-center">
+                    <div className="hidden md:flex space-x-1 items-center rounded-full bg-white/10 p-1 backdrop-blur">
                         {links.map((link) => (
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                className="hover:text-accent transition duration-200 font-medium"
+                                className="rounded-full px-4 py-2 font-medium transition duration-200 hover:bg-white hover:text-primary"
                             >
                                 {link.name}
                             </Link>
@@ -74,14 +74,14 @@ export default function Navbar() {
                         {session ? (
                             <Link
                                 href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
-                                className="bg-accent text-primary px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition"
+                                className="bg-accent text-primary px-4 py-2 rounded-full font-bold hover:bg-white transition"
                             >
                                 {session.user?.name?.split(' ')[0] || "Akun"}
                             </Link>
                         ) : (
                             <Link
                                 href="/masuk"
-                                className="bg-accent text-primary px-4 py-1.5 rounded-full font-bold hover:bg-yellow-400 transition"
+                                className="bg-accent text-primary px-4 py-2 rounded-full font-bold hover:bg-white transition"
                             >
                                 Login
                             </Link>
@@ -92,7 +92,7 @@ export default function Navbar() {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-white focus:outline-none"
+                            className="rounded-xl bg-white/10 p-2 text-white transition hover:bg-white hover:text-primary focus:outline-none"
                         >
                             {isOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
@@ -102,14 +102,14 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-primary pb-4">
+                <div className="md:hidden border-t border-white/10 bg-primary pb-4 shadow-xl shadow-primary/20">
                     <div className="flex flex-col space-y-2 px-4">
                         {links.map((link) => (
                             <Link
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setIsOpen(false)}
-                                className="block py-2 hover:text-accent transition border-b border-white/10"
+                                className="block rounded-xl px-3 py-3 transition hover:bg-white hover:text-primary border-b border-white/10"
                             >
                                 {link.name}
                             </Link>
@@ -118,7 +118,7 @@ export default function Navbar() {
                             <Link
                                 href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
                                 onClick={() => setIsOpen(false)}
-                                className="block py-2 text-accent font-bold"
+                                className="block rounded-xl px-3 py-3 text-accent font-bold hover:bg-white hover:text-primary"
                             >
                                 {session.user?.name}
                             </Link>
@@ -126,7 +126,7 @@ export default function Navbar() {
                             <Link
                                 href="/masuk"
                                 onClick={() => setIsOpen(false)}
-                                className="block py-2 text-accent font-bold"
+                                className="block rounded-xl px-3 py-3 text-accent font-bold hover:bg-white hover:text-primary"
                             >
                                 Login Area
                             </Link>

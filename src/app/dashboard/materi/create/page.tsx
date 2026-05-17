@@ -136,7 +136,7 @@ export default function CreateMaterialPage() {
                         name="isPublished"
                         value="true"
                         pendingLabel="Mempublish..."
-                        className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition"
+                        className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition"
                     >
                         Publish Sekarang
                     </SubmitButton>

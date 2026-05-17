@@ -153,7 +153,7 @@ export default function EditMaterialForm({ material }: { material: any }) {
             </div>
 
             <div className="pt-4 border-t border-gray-50 flex justify-end">
-                <button type="submit" className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition w-full md:w-auto">
+                <button type="submit" className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition w-full md:w-auto">
                     Simpan Perubahan
                 </button>
             </div>

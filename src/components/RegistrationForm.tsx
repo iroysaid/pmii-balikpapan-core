@@ -149,7 +149,7 @@ export default function RegistrationForm({ activityId }: { activityId: string })
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-blue-900 transition flex items-center justify-center disabled:opacity-70 mt-6"
+                    className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition flex items-center justify-center disabled:opacity-70 mt-6"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                     {loading ? "Memproses..." : "Kirim Formulir Pendaftaran"}

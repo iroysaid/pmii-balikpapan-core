@@ -153,7 +153,7 @@ export default async function KaderPage({
                     <p className="text-secondary text-sm">Kelola data anggota dan pengurus.</p>
                 </div>
                 {isSuperAdmin && (
-                    <Link href="/dashboard/kader/create" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-blue-900 transition">
+                    <Link href="/dashboard/kader/create" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-primary/90 transition">
                         <Plus className="w-4 h-4 mr-2" /> Tambah Kader
                     </Link>
                 )}

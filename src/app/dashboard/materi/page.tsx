@@ -59,7 +59,7 @@ export default async function LearningDashboard({
                 {canEdit && (
                     <Link
                         href="/dashboard/materi/create"
-                        className="bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-900 transition flex items-center"
+                        className="bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition flex items-center"
                     >
                         <Plus className="w-4 h-4 mr-2" /> Upload Materi Baru
                     </Link>

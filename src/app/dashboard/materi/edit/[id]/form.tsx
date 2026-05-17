@@ -177,7 +177,7 @@ export default function EditMaterialForm({ material }: { material: MaterialWithC
                     name="isPublished"
                     value="true"
                     pendingLabel="Menyimpan..."
-                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition"
+                    className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition"
                 >
                     {material.isPublished ? "Simpan Perubahan" : "Publish Sekarang"}
                 </SubmitButton>

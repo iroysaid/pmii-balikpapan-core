@@ -62,7 +62,7 @@ export default async function PostsPage({
                 {isSuperAdmin && (
                     <Link
                         href="/dashboard/berita/create"
-                        className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-blue-900 transition"
+                        className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-primary/90 transition"
                     >
                         <Plus className="w-4 h-4 mr-2" /> Tulis Berita
                     </Link>
