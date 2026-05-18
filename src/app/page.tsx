@@ -1,271 +1,618 @@
+/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Calendar, ChevronRight } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import {
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  ChevronRight,
+  GraduationCap,
+  Handshake,
+  Images,
+  Leaf,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
 import ActivitySlider from "@/components/ActivitySlider";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+const teamMembers = [
+  {
+    image:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=700&auto=format&fit=crop",
+    name: "Ketua Cabang",
+    role: "Koordinator Gerakan",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=700&auto=format&fit=crop",
+    name: "Sekretaris",
+    role: "Administrasi Organisasi",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=700&auto=format&fit=crop",
+    name: "Bendahara",
+    role: "Tata Kelola Keuangan",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=700&auto=format&fit=crop",
+    name: "Kaderisasi",
+    role: "Pengembangan Kader",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=700&auto=format&fit=crop",
+    name: "Media",
+    role: "Publikasi dan Informasi",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?q=80&w=700&auto=format&fit=crop",
+    name: "Advokasi",
+    role: "Kajian dan Aksi",
+  },
+];
+
+const ndpItems = [
+  {
+    title: "Tauhid",
+    desc: "Mengesakan Allah SWT sebagai sumber dari segala sumber kebenaran.",
+  },
+  {
+    title: "Hablum Minallah",
+    desc: "Menjaga hubungan vertikal dengan Allah SWT melalui ibadah dan ketaqwaan.",
+  },
+  {
+    title: "Hablum Minannas",
+    desc: "Menjaga hubungan baik antar sesama manusia dengan prinsip egaliter dan persaudaraan.",
+  },
+  {
+    title: "Hablum Minal Alam",
+    desc: "Menjaga kelestarian alam semesta sebagai tempat hidup dan beribadah.",
+  },
+];
+
+const movementCards = [
+  {
+    title: "Kaderisasi",
+    text: "Dibangun untuk bertumbuh bersama.",
+    image:
+      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
+    icon: GraduationCap,
+  },
+  {
+    title: "Gerakan",
+    text: "Berpihak pada masyarakat.",
+    image:
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop",
+    icon: Handshake,
+  },
+  {
+    title: "Solidaritas",
+    text: "Sahabat dalam satu barisan.",
+    image:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop",
+    icon: Users,
+  },
+];
+
+function stripHtml(html: string) {
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function excerpt(content: string, limit = 120) {
+  const text = stripHtml(content);
+  return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
+}
+
+function HeroSection() {
+  return (
+    <section className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-primary text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff18_1px,transparent_1px),linear-gradient(to_bottom,#ffffff18_1px,transparent_1px)] bg-[size:3.25rem_3.25rem]" />
+      <div className="absolute -left-20 top-28 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
+      <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-secondary/30 blur-3xl" />
+
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] flex-col px-4 py-8 md:py-12">
+        <div className="flex flex-1 items-center justify-center py-8">
+          <div className="relative w-full max-w-6xl text-center">
+            <div className="relative z-20 space-y-2 md:space-y-4">
+              <div className="flex justify-start pl-[8%] md:pl-[18%]">
+                <h1
+                  className="text-[clamp(4rem,18vw,10rem)] font-black uppercase leading-[0.83] tracking-normal text-accent"
+                  style={{
+                    fontFamily: '"Arial Black", Impact, sans-serif',
+                    textShadow:
+                      "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562, 6px 6px 0 #122562, 7px 7px 0 #122562",
+                  }}
+                >
+                  PMII
+                </h1>
+              </div>
+              <h2
+                className="text-[clamp(3rem,12vw,7rem)] font-black uppercase leading-[0.86] tracking-normal"
+                style={{
+                  fontFamily: '"Arial Black", Impact, sans-serif',
+                  textShadow:
+                    "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562, 6px 6px 0 #122562",
+                }}
+              >
+                Balikpapan
+              </h2>
+              <div className="flex justify-start pl-[14%] md:pl-[30%]">
+                <h2
+                  className="text-[clamp(2.7rem,11vw,6rem)] font-black uppercase leading-[0.86] tracking-normal"
+                  style={{
+                    fontFamily: '"Arial Black", Impact, sans-serif',
+                    textShadow:
+                      "1px 1px 0 #122562, 2px 2px 0 #122562, 3px 3px 0 #122562, 4px 4px 0 #122562, 5px 5px 0 #122562",
+                  }}
+                >
+                  Bergerak
+                </h2>
+              </div>
+            </div>
+
+            <p className="relative z-30 mx-auto mt-8 max-w-2xl text-base font-semibold leading-relaxed text-white/88 md:text-xl">
+              Website resmi PC PMII Kota Balikpapan untuk kaderisasi,
+              dokumentasi gerakan, kabar organisasi, dan ruang belajar kader.
+            </p>
+
+            <div className="relative z-30 mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/daftar"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 font-black text-secondary shadow-xl transition hover:bg-white"
+              >
+                Gabung PMII Balikpapan
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <Link
+                href="/materi"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-3 font-bold text-white backdrop-blur transition hover:bg-white hover:text-secondary"
+              >
+                Mulai Belajar
+              </Link>
+            </div>
+
+            <div className="pointer-events-none absolute inset-0 hidden md:block">
+              <div className="absolute -left-8 bottom-[8%] w-44 -rotate-12 rounded-[2rem] border border-white/35 bg-white/15 p-4 shadow-2xl backdrop-blur-md">
+                <div className="relative mb-3 h-20 overflow-hidden rounded-2xl">
+                  <Image
+                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=500&auto=format&fit=crop"
+                    alt="Kader PMII berdiskusi"
+                    fill
+                    sizes="176px"
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-left text-sm font-black">kaderisasi</p>
+                <p className="text-left text-xs text-white/75">ruang belajar bersama</p>
+              </div>
+              <div className="absolute -right-8 top-[8%] w-44 rotate-12 rounded-[2rem] border border-white/35 bg-white/15 p-4 shadow-2xl backdrop-blur-md">
+                <div className="relative mb-3 h-20 overflow-hidden rounded-2xl">
+                  <Image
+                    src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=500&auto=format&fit=crop"
+                    alt="Forum organisasi mahasiswa"
+                    fill
+                    sizes="176px"
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-left text-sm font-black">forum kader</p>
+                <p className="text-left text-xs text-white/75">diskusi dan advokasi</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function VisionMissionSection() {
+  return (
+    <section id="profil" className="bg-white px-4 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 max-w-3xl">
+          <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
+            Profil Organisasi
+          </p>
+          <h2 className="text-3xl font-black leading-tight text-black md:text-5xl">
+            Visi & Misi PMII Balikpapan
+          </h2>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2">
+          <article className="rounded-[2rem] border border-secondary/10 bg-background p-6 md:p-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <h3 className="mb-4 text-2xl font-black text-primary">Visi</h3>
+            <p className="text-base leading-relaxed text-secondary md:text-lg">
+              Terbentuknya pribadi muslim Indonesia yang bertaqwa kepada Allah
+              SWT, berbudi luhur, berilmu, cakap dan bertanggung jawab dalam
+              mengamalkan ilmunya serta komitmen memperjuangkan cita-cita
+              kemerdekaan Indonesia.
+            </p>
+          </article>
+          <article className="rounded-[2rem] border border-secondary/10 bg-secondary p-6 text-white md:p-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-secondary">
+              <Leaf className="h-6 w-6" />
+            </div>
+            <h3 className="mb-4 text-2xl font-black text-accent">Misi</h3>
+            <ul className="space-y-4 text-base leading-relaxed text-white/88 md:text-lg">
+              <li>Komitmen terhadap nilai-nilai keislaman Ahlussunnah wal Jamaah.</li>
+              <li>Memperjuangkan keadilan dan kesejahteraan sosial.</li>
+              <li>Mengembangkan intelektualitas dan profesionalitas kader.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NdpSection() {
+  return (
+    <section className="bg-background px-4 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-black text-primary md:text-5xl">
+            Nilai Dasar Pergerakan
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-secondary md:text-lg">
+            Landasan berfikir, bersikap, dan bertindak setiap kader PMII dalam
+            kehidupan sehari-hari maupun organisasi.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {ndpItems.map((item, index) => (
+            <article
+              key={item.title}
+              className="rounded-[1.5rem] border border-secondary/10 bg-white p-6 shadow-sm"
+            >
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-accent font-black text-secondary">
+                {index + 1}
+              </div>
+              <h3 className="mb-3 text-xl font-black text-primary">{item.title}</h3>
+              <p className="text-sm leading-relaxed text-secondary">{item.desc}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TeamSection() {
+  return (
+    <section className="overflow-hidden bg-white px-4 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
+              Struktur
+            </p>
+            <h2 className="text-3xl font-black text-black md:text-5xl">
+              Pengurus PMII Balikpapan
+            </h2>
+          </div>
+          <p className="max-w-xl text-secondary">
+            Default grayscale, lalu tampil warna asli saat hover, focus, atau
+            sentuhan. Di mobile, geser ke samping untuk melihat semua pengurus.
+          </p>
+        </div>
+
+        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-5 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:grid-cols-6">
+          {teamMembers.map((member) => (
+            <article
+              key={member.name}
+              tabIndex={0}
+              className="group w-[72vw] max-w-[18rem] shrink-0 snap-start overflow-hidden rounded-[1.75rem] border border-secondary/10 bg-white shadow-sm outline-none transition focus-within:shadow-xl focus:shadow-xl active:scale-[0.99] md:w-auto md:max-w-none"
+            >
+              <div className="relative h-80 overflow-hidden bg-secondary/5 md:h-72">
+                <Image
+                  src={member.image}
+                  alt={member.name}
+                  fill
+                  sizes="(max-width: 768px) 72vw, 180px"
+                  className="object-cover grayscale transition duration-500 group-hover:grayscale-0 group-focus:grayscale-0 group-active:grayscale-0"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-black text-black">{member.name}</h3>
+                <p className="mt-1 text-sm text-secondary">{member.role}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DocumentationSection({
+  galleryItems,
+}: {
+  galleryItems: { id: string; slug: string; title: string; image: string | null; photos: { id: string; url: string }[] }[];
+}) {
+  const photoTiles = galleryItems
+    .flatMap((activity) =>
+      activity.photos.map((photo) => ({
+        id: photo.id,
+        url: photo.url,
+        title: activity.title,
+        slug: activity.slug,
+      }))
+    )
+    .slice(0, 6);
+
+  return (
+    <section id="galeri" className="bg-background px-4 py-16 md:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
+              Dokumentasi
+            </p>
+            <h2 className="text-3xl font-black text-black md:text-5xl">
+              Jejak Kegiatan PMII
+            </h2>
+          </div>
+          <Link
+            href="/galeri"
+            className="inline-flex items-center font-black text-primary hover:text-secondary"
+          >
+            Buka Galeri
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+        </div>
+
+        {photoTiles.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-6 md:gap-4">
+            {photoTiles.map((photo, index) => (
+              <Link
+                key={photo.id}
+                href={`/galeri/${photo.slug}`}
+                className={`group relative overflow-hidden rounded-[1.5rem] bg-secondary/10 ${
+                  index === 0 ? "col-span-2 row-span-2 aspect-square md:col-span-2" : "aspect-square"
+                }`}
+              >
+                <img
+                  src={photo.url}
+                  alt={photo.title}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition group-hover:opacity-100" />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[2rem] border border-dashed border-secondary/20 bg-white p-8 text-center text-secondary">
+            <Images className="mx-auto mb-4 h-10 w-10 text-primary" />
+            Dokumentasi kegiatan akan tampil otomatis setelah foto diunggah.
+          </div>
+        )}
+
+        <div className="mt-7 text-center">
+          <Link
+            href="/galeri"
+            className="inline-flex rounded-full bg-primary px-7 py-3 font-black text-white transition hover:bg-secondary"
+          >
+            Lihat Lainnya
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MovementSection() {
+  return (
+    <section className="bg-white px-4 py-16 md:py-24">
+      <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
+        {movementCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <article
+              key={card.title}
+              className="group relative min-h-[22rem] overflow-hidden rounded-[2rem] bg-secondary text-white"
+            >
+              <Image
+                src={card.image}
+                alt={card.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover opacity-70 transition duration-700 group-hover:scale-105 motion-reduce:transition-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/55 to-transparent" />
+              <div className="relative z-10 flex h-full min-h-[22rem] flex-col justify-end p-6">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-secondary">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h2 className="text-3xl font-black">{card.title}</h2>
+                <p className="mt-3 text-lg font-semibold text-white/90">{card.text}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  
-  const latestPosts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-  });
-
-  const upcomingActivities = await prisma.activity.findMany({
-    where: { published: true, scope: "PUBLIC", startDate: { gte: new Date() } },
-    orderBy: { startDate: "asc" },
-    take: 5,
-  });
-
-  const pastActivities = await prisma.activity.findMany({
-    where: { published: true, scope: "PUBLIC", startDate: { lt: new Date() } },
-    orderBy: { startDate: "desc" },
-    take: 5,
-  });
+  const [latestPosts, upcomingActivities, pastActivities, galleryItems] =
+    await Promise.all([
+      prisma.post.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+      prisma.activity.findMany({
+        where: { published: true, scope: "PUBLIC", startDate: { gte: new Date() } },
+        orderBy: { startDate: "asc" },
+        take: 5,
+      }),
+      prisma.activity.findMany({
+        where: { published: true, scope: "PUBLIC", startDate: { lt: new Date() } },
+        orderBy: { startDate: "desc" },
+        take: 5,
+      }),
+      prisma.activity.findMany({
+        where: { published: true, photos: { some: {} } },
+        include: { photos: { take: 4, orderBy: { createdAt: "desc" } } },
+        orderBy: { startDate: "desc" },
+        take: 4,
+      }),
+    ]);
 
   const latestActivities = [...upcomingActivities, ...pastActivities].slice(0, 5);
 
   return (
-    <div className="flex flex-col gap-16 pb-16">
-      {/* Hero Section */}
-      <section className="bg-primary text-white py-20 md:py-32 relative overflow-hidden">
-        {/* Background Pattern Enhancement */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-accent opacity-10 skew-x-12 translate-x-20"></div>
+    <div className="bg-background">
+      <HeroSection />
+      <VisionMissionSection />
+      <NdpSection />
+      <TeamSection />
+      <DocumentationSection galleryItems={galleryItems} />
+      <MovementSection />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl">
-            <h2 className="text-xl md:text-2xl font-bold text-accent mb-2 uppercase tracking-wider">
-              PC PMII KOTA BALIKPAPAN
-            </h2>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Dzikir, Fikir, dan <span className="text-accent">Amal Shaleh</span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
-              Selamat datang di Website Resmi Pengurus Cabang Pergerakan Mahasiswa Islam Indonesia (PMII) Kota Balikpapan. Wadah kaderisasi mahasiswa islam yang berlandaskan Ahlussunnah wal Jamaah.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/profil"
-                className="bg-accent text-secondary px-8 py-3 rounded-full font-bold hover:bg-white transition flex items-center"
-              >
-                Tentang Kami <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <Link
-                href="/berita"
-                className="bg-white/10 text-white border border-white/30 px-8 py-3 rounded-full font-bold hover:bg-white/20 transition backdrop-blur-sm"
-              >
-                Baca Berita
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sejarah Singkat */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-primary mb-4 relative">
-              Sejarah Singkat <span className="absolute bottom-1 left-0 w-1/3 h-2 bg-accent/30 -z-10"></span>
-            </h2>
-            <p className="text-secondary leading-relaxed text-justify">
-              Pergerakan Mahasiswa Islam Indonesia (PMII) lahir dari kegelisahan mahasiswa Nahdlatul Ulama yang ingin memiliki wadah pergerakan yang independen namun tetap berpegang teguh pada nilai-nilai Ahlussunnah wal Jamaah. PMII didirikan pada tanggal 17 April 1960 di Surabaya. Sejak kelahirannya, PMII berkomitmen untuk mempertahankan dan mengamalkan Pancasila serta UUD 1945. Di Balikpapan, PMII terus tumbuh menjadi organisasi yang kritis, inovatif, dan berkontribusi nyata bagi pembangunan daerah maupun nasional.
-            </p>
-          </div>
-          <div className="bg-gray-100 rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-            {/* Placeholder for Historical Image */}
-            <span className="text-gray-400 font-medium">Foto Sejarah / Dokumentasi PMII</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Visi & Misi */}
-      <section className="bg-primary/5 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-12">Visi & Misi</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Visi */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transform hover:-translate-y-1 transition duration-300">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4">Visi</h3>
-              <p className="text-secondary leading-relaxed">
-                Terbentuknya pribadi muslim Indonesia yang bertaqwa kepada Allah SWT, berbudi luhur, berilmu, cakap dan bertanggung jawab dalam mengamalkan ilmunya serta komitmen memperjuangkan cita-cita kemerdekaan Indonesia.
+      <section id="berita" className="bg-white px-4 py-16 md:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
+                Kabar Terbaru
               </p>
-            </div>
-
-            {/* Misi */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transform hover:-translate-y-1 transition duration-300">
-              <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-primary mb-4">Misi</h3>
-              <ul className="text-secondary text-left space-y-2 list-disc list-inside">
-                <li>Komitmen terhadap nilai-nilai keislaman Ahlussunnah wal Jamaah.</li>
-                <li>Memperjuangkan keadilan dan kesejahteraan sosial.</li>
-                <li>Mengembangkan intelektualitas dan profesionalitas kader.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Nilai Dasar Pergerakan (NDP) */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-primary mb-4">Nilai Dasar Pergerakan</h2>
-          <p className="text-secondary max-w-2xl mx-auto">
-            Landasan berfikir, bersikap, dan bertindak setiap kader PMII dalam kehidupan sehari-hari maupun organisasi.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { title: "Tauhid", desc: "Mengesakan Allah SWT sebagai sumber dari segala sumber kebenaran.", color: "bg-primary" },
-            { title: "Hablum Minallah", desc: "Menjaga hubungan vertikal dengan Allah SWT melalui ibadah dan ketaqwaan.", color: "bg-secondary" },
-            { title: "Hablum Minannas", desc: "Menjaga hubungan baik antar sesama manusia dengan prinsip egaliter dan persaudaraan.", color: "bg-accent" },
-            { title: "Hablum Minal Alam", desc: "Menjaga kelestarian alam semesta sebagai tempat hidup dan beribadah.", color: "bg-black" }
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition group">
-              <div className={`h-2 ${item.color}`}></div>
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-primary mb-2 group-hover:text-accent transition">{item.title}</h3>
-                <p className="text-sm text-secondary leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Highlights / News Preview */}
-      <section className="container mx-auto px-4">
-        <div className="flex justify-between items-end mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-primary mb-2">Kabar Terbaru</h2>
-            <div className="h-1 w-20 bg-accent rounded"></div>
-          </div>
-          <Link href="/berita" className="text-primary hover:text-accent font-medium flex items-center">
-            Lihat Semua <ArrowRight className="ml-1 w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {latestPosts.length === 0 ? (
-            <div className="col-span-3 text-center py-12 bg-gray-50 rounded-xl text-gray-400">
-              Belum ada berita terbaru.
-            </div>
-          ) : (
-            latestPosts.map((post) => (
-              <div key={post.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition border border-gray-100 group">
-                <div className="h-48 bg-gray-200 relative overflow-hidden">
-                  {post.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                  <div className="absolute top-4 left-4 bg-primary text-white text-xs px-3 py-1 rounded-full">
-                    Berita
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center text-xs text-secondary mb-3 space-x-2">
-                    <Calendar className="w-3 h-3" />
-                    <span>{new Date(post.createdAt).toLocaleDateString("id-ID")}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-primary mb-3 group-hover:text-accent transition line-clamp-2">
-                    <Link href={`/berita/${post.slug}`}>
-                      {post.title}
-                    </Link>
-                  </h3>
-                  <p className="text-secondary text-sm line-clamp-2 mb-4">
-                    {post.content}
-                  </p>
-                  <Link href={`/berita/${post.slug}`} className="text-primary font-bold text-sm hover:underline">
-                    Baca Selengkapnya
-                  </Link>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* Informas & Kegiatan - Dynamic Slider */}
-      <section className="bg-gray-50/50 py-24 relative overflow-hidden">
-        {/* Abstract Background Element */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10"></div>
-        
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-black text-primary mb-6 relative inline-block">
-                Informasi & Kegiatan
-                <span className="absolute -bottom-2 left-0 w-1/2 h-2 bg-accent/50 rounded-full"></span>
+              <h2 className="text-3xl font-black text-black md:text-5xl">
+                Kabar Terbaru
               </h2>
-              <p className="text-xl text-secondary leading-relaxed">
-                Ikuti perkembangan kegiatan PMII Balikpapan. Mulai dari pelatihan kaderisasi hingga aksi kemanusiaan.
-              </p>
             </div>
-            
-            <Link href="/kegiatan" className="group flex items-center bg-white text-primary font-bold px-8 py-4 rounded-2xl shadow-sm hover:shadow-md transition border border-primary/5">
-              Lihat Agenda Lengkap 
-              <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition" />
+            <Link
+              href="/berita"
+              className="inline-flex shrink-0 items-center font-black text-primary hover:text-secondary"
+            >
+              Lihat Semua
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
 
-          {/* DYNAMIC SLIDER COMPONENT */}
-          <ActivitySlider kegiatan={latestActivities} />
-          
-          {/* E-Learning CTA Banner */}
-          <div className="mt-16 bg-white p-8 md:p-12 rounded-[2.5rem] border border-primary/5 shadow-lg shadow-secondary/10 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-8 group">
-            <div className="flex items-center gap-8">
-               <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary shrink-0 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                  <BookOpen className="w-10 h-10" />
-               </div>
-               <div>
-                  <h4 className="text-2xl font-black text-primary mb-2">E-Learning Kader</h4>
-                  <p className="text-secondary leading-relaxed max-w-xl text-lg">
-                    Akses materi modul MAPABA dan PKD secara digital melalui sistem manajemen belajar terpadu kami.
-                  </p>
-               </div>
-            </div>
-            <Link href="/materi" className="shrink-0 group/btn relative inline-flex items-center justify-center px-8 py-4 font-bold text-white bg-primary rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
-                <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
-                <span className="relative flex items-center gap-2">Mulai Belajar <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" /></span>
-            </Link>
+          <div className="grid gap-5 md:grid-cols-3">
+            {latestPosts.length === 0 ? (
+              <div className="rounded-[2rem] border border-dashed border-secondary/20 p-8 text-center text-secondary md:col-span-3">
+                Belum ada berita terbaru.
+              </div>
+            ) : (
+              latestPosts.map((post) => (
+                <article
+                  key={post.id}
+                  className="group overflow-hidden rounded-[1.75rem] border border-secondary/10 bg-white shadow-sm"
+                >
+                  <Link href={`/berita/${post.slug}`} className="block">
+                    <div className="relative aspect-video overflow-hidden bg-secondary/10">
+                      {post.image ? (
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-primary">
+                          PMII
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <div className="mb-3 flex items-center text-xs font-bold uppercase tracking-wider text-secondary/70">
+                        <Calendar className="mr-2 h-4 w-4 text-primary" />
+                        {new Date(post.createdAt).toLocaleDateString("id-ID")}
+                      </div>
+                      <h3 className="line-clamp-2 text-xl font-black leading-tight text-black transition group-hover:text-primary">
+                        {post.title}
+                      </h3>
+                      <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">
+                        {excerpt(post.content)}
+                      </p>
+                    </div>
+                  </Link>
+                </article>
+              ))
+            )}
           </div>
         </div>
       </section>
 
-      {/* CTA Registration - ONLY for Public (Not logged in) */}
-      {!session && (
-        <section className="container mx-auto px-4 mb-16">
-          <div className="bg-primary rounded-3xl p-8 md:p-16 text-center text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Bergabung Bersama PMII</h2>
-              <p className="text-white/85 max-w-2xl mx-auto mb-8">
-                Jadilah bagian dari mahasiswa pergerakan yang siap membawa perubahan positif bagi bangsa dan agama.
+      <section id="agenda" className="bg-background px-4 py-16 md:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
+                Informasi Kegiatan
               </p>
+              <h2 className="text-3xl font-black text-black md:text-5xl">
+                Informasi Kegiatan
+              </h2>
+            </div>
+            <Link
+              href="/kegiatan"
+              className="inline-flex items-center rounded-full bg-white px-6 py-3 font-black text-primary shadow-sm transition hover:bg-primary hover:text-white"
+            >
+              Lihat Agenda Lengkap
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+          <ActivitySlider kegiatan={latestActivities} />
+
+          <div className="mt-10 rounded-[2rem] border border-primary/10 bg-white p-6 shadow-sm md:p-8">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="flex gap-5">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-white">
+                  <BookOpen className="h-7 w-7" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-primary">E-Learning Kader</h3>
+                  <p className="mt-2 max-w-xl text-secondary">
+                    Akses pedoman, modul MAPABA, dan materi pendalaman kader
+                    melalui ruang belajar digital.
+                  </p>
+                </div>
+              </div>
               <Link
-                href="/daftar"
-                className="inline-block bg-accent text-secondary px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                href="/materi"
+                className="inline-flex justify-center rounded-full bg-primary px-7 py-3 font-black text-white transition hover:bg-secondary"
               >
-                Daftar Sekarang
+                Mulai Belajar
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {!session && (
+        <section className="bg-white px-4 py-16">
+          <div className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-primary p-7 text-center text-white md:p-14">
+            <h2 className="text-3xl font-black md:text-5xl">
+              Bergabung Bersama PMII
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-white/85">
+              Jadilah bagian dari mahasiswa pergerakan yang siap belajar,
+              berorganisasi, dan mengabdi untuk masyarakat.
+            </p>
+            <Link
+              href="/daftar"
+              className="mt-7 inline-flex rounded-full bg-accent px-8 py-4 font-black text-secondary transition hover:bg-white"
+            >
+              Daftar Sekarang
+            </Link>
           </div>
         </section>
       )}
