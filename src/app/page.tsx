@@ -112,6 +112,37 @@ function excerpt(content: string, limit = 120) {
   return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
 }
 
+function RotatingStudyButton() {
+  return (
+    <Link
+      href="/materi"
+      aria-label="Mulai belajar di E-Learning Kader"
+      className="group relative flex h-24 w-24 shrink-0 rotate-6 items-center justify-center rounded-full bg-white text-secondary shadow-2xl ring-4 ring-white/20 transition hover:rotate-0 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent/70 active:scale-95 sm:h-28 sm:w-28"
+    >
+      <div className="absolute inset-1 motion-safe:animate-[spin_12s_linear_infinite]">
+        <svg viewBox="0 0 100 100" className="h-full w-full">
+          <path
+            id="studyCirclePath"
+            d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+            fill="none"
+          />
+          <text
+            className="text-[8px] font-black uppercase tracking-[0.2em] sm:text-[9px]"
+            fill="#122562"
+          >
+            <textPath href="#studyCirclePath" startOffset="0%">
+              MULAI BELAJAR • E-LEARNING KADER •
+            </textPath>
+          </text>
+        </svg>
+      </div>
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-secondary transition group-hover:bg-primary group-hover:text-white sm:h-14 sm:w-14">
+        <BookOpen className="h-6 w-6" />
+      </span>
+    </Link>
+  );
+}
+
 function HeroSection() {
   return (
     <section className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-primary text-white">
@@ -164,7 +195,7 @@ function HeroSection() {
               dokumentasi gerakan, kabar organisasi, dan ruang belajar kader.
             </p>
 
-            <div className="relative z-30 mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="relative z-30 mt-7 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/daftar"
                 className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-7 py-3 font-black text-secondary shadow-xl transition hover:bg-white"
@@ -172,12 +203,7 @@ function HeroSection() {
                 Gabung PMII Balikpapan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <Link
-                href="/materi"
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-3 font-bold text-white backdrop-blur transition hover:bg-white hover:text-secondary"
-              >
-                Mulai Belajar
-              </Link>
+              <RotatingStudyButton />
             </div>
 
             <div className="pointer-events-none absolute inset-0 hidden md:block">
