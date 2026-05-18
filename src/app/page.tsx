@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -149,13 +148,13 @@ function HeroSection() {
       <div className="absolute -left-20 top-28 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
       <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-secondary/30 blur-3xl" />
 
-      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] flex-col px-4 py-8 md:py-12">
-        <div className="flex flex-1 items-center justify-center py-8">
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] flex-col px-4 py-6 md:py-12">
+        <div className="flex flex-1 items-center justify-center py-5 md:py-8">
           <div className="relative w-full max-w-6xl text-center">
-            <div className="relative z-20 space-y-2 md:space-y-4">
-              <div className="flex items-start justify-start gap-2 pl-[6%] md:items-center md:gap-5 md:pl-[18%]">
+            <div className="relative z-20 space-y-0.5 md:space-y-3">
+              <div className="flex items-start justify-start gap-2 pl-[4%] md:items-center md:gap-5 md:pl-[18%]">
                 <h1
-                  className="text-[clamp(3.9rem,17vw,10rem)] font-black uppercase leading-[0.83] tracking-normal text-accent"
+                  className="text-[clamp(3.7rem,16vw,10rem)] font-black uppercase leading-[0.82] tracking-normal text-accent"
                   style={{
                     fontFamily: '"Arial Black", Impact, sans-serif',
                     textShadow:
@@ -164,10 +163,10 @@ function HeroSection() {
                 >
                   PMII
                 </h1>
-                <RotatingStudyButton className="mt-0 h-[5.25rem] w-[5.25rem] sm:h-32 sm:w-32 md:h-36 md:w-36" />
+                <RotatingStudyButton className="mt-0 h-[5rem] w-[5rem] sm:h-32 sm:w-32 md:h-36 md:w-36" />
               </div>
               <h2
-                className="text-[clamp(3rem,12vw,7rem)] font-black uppercase leading-[0.86] tracking-normal"
+                className="text-[clamp(2.8rem,11.5vw,7rem)] font-black uppercase leading-[0.83] tracking-normal"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
@@ -178,7 +177,7 @@ function HeroSection() {
               </h2>
               <div className="flex justify-start pl-[14%] md:pl-[30%]">
                 <h2
-                  className="text-[clamp(2.7rem,11vw,6rem)] font-black uppercase leading-[0.86] tracking-normal"
+                  className="text-[clamp(2.45rem,10.5vw,6rem)] font-black uppercase leading-[0.83] tracking-normal"
                   style={{
                     fontFamily: '"Arial Black", Impact, sans-serif',
                     textShadow:
@@ -190,7 +189,7 @@ function HeroSection() {
               </div>
             </div>
 
-            <p className="relative z-30 mx-auto mt-8 max-w-2xl text-base font-semibold leading-relaxed text-white/88 md:text-xl">
+            <p className="relative z-30 mx-auto mt-6 max-w-2xl text-base font-semibold leading-relaxed text-white/88 md:mt-8 md:text-xl">
               Website resmi PC PMII Kota Balikpapan untuk kaderisasi,
               dokumentasi gerakan, kabar organisasi, dan ruang belajar kader.
             </p>
@@ -206,10 +205,7 @@ function HeroSection() {
             </div>
 
             <div className="pointer-events-none absolute inset-0 z-10">
-              <div
-                className="absolute -left-2 bottom-[4%] w-28 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-75 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_7s_ease-in-out_infinite] sm:w-36 md:-left-8 md:bottom-[8%] md:w-44 md:-rotate-12 md:p-4 md:opacity-100"
-                style={{ "--pmii-rotate": "-8deg", "--pmii-float-x": "5px" } as CSSProperties}
-              >
+              <div className="absolute -left-2 bottom-[4%] w-28 -rotate-6 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-75 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_7s_ease-in-out_infinite] sm:w-36 md:-left-8 md:bottom-[8%] md:w-44 md:-rotate-12 md:p-4 md:opacity-100">
                 <div className="relative mb-2 h-14 overflow-hidden rounded-xl md:mb-3 md:h-20 md:rounded-2xl">
                   <Image
                     src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=500&auto=format&fit=crop"
@@ -222,10 +218,7 @@ function HeroSection() {
                 <p className="text-left text-[11px] font-black md:text-sm">kaderisasi</p>
                 <p className="text-left text-[9px] text-white/75 md:text-xs">ruang belajar bersama</p>
               </div>
-              <div
-                className="absolute right-0 top-[8%] w-24 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-70 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_8s_ease-in-out_infinite] sm:w-36 md:-right-8 md:w-44 md:rotate-12 md:p-4 md:opacity-100"
-                style={{ "--pmii-rotate": "8deg", "--pmii-float-x": "-6px" } as CSSProperties}
-              >
+              <div className="absolute right-0 top-[8%] w-24 rotate-6 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-70 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_8s_ease-in-out_infinite] sm:w-36 md:-right-8 md:w-44 md:rotate-12 md:p-4 md:opacity-100">
                 <div className="relative mb-2 h-12 overflow-hidden rounded-xl md:mb-3 md:h-20 md:rounded-2xl">
                   <Image
                     src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=500&auto=format&fit=crop"
@@ -253,7 +246,7 @@ function VisionMissionSection() {
       className="relative z-20 -mt-10 rounded-t-[2.5rem] bg-white px-4 py-16 shadow-[0_-20px_50px_rgba(18,37,98,0.16)] md:-mt-14 md:rounded-t-[3.5rem] md:py-24"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 max-w-3xl">
+        <div className="mx-auto mb-10 max-w-3xl text-center">
           <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
             Profil Organisasi
           </p>
@@ -262,8 +255,8 @@ function VisionMissionSection() {
           </h2>
         </div>
         <div className="grid gap-5 md:grid-cols-2">
-          <article className="rounded-[2rem] border border-secondary/10 bg-background p-6 md:p-8">
-            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white">
+          <article className="rounded-[2rem] border border-secondary/10 bg-background p-6 text-center md:p-8">
+            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white">
               <Sparkles className="h-6 w-6" />
             </div>
             <h3 className="mb-4 text-2xl font-black text-primary">Visi</h3>
@@ -274,8 +267,8 @@ function VisionMissionSection() {
               kemerdekaan Indonesia.
             </p>
           </article>
-          <article className="rounded-[2rem] border border-secondary/10 bg-secondary p-6 text-white md:p-8">
-            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-secondary">
+          <article className="rounded-[2rem] border border-secondary/10 bg-secondary p-6 text-center text-white md:p-8">
+            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-secondary">
               <Leaf className="h-6 w-6" />
             </div>
             <h3 className="mb-4 text-2xl font-black text-accent">Misi</h3>

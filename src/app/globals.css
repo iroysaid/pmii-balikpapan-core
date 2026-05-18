@@ -51,10 +51,10 @@ body {
 
 @keyframes pmii-float-soft {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(var(--pmii-rotate, 0deg)) scale(1);
+    transform: translateY(0);
   }
   50% {
-    transform: translate3d(var(--pmii-float-x, 6px), -10px, 0) rotate(calc(var(--pmii-rotate, 0deg) + 1deg)) scale(1.025);
+    transform: translateY(-9px);
   }
 }
 
