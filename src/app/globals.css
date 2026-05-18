@@ -48,3 +48,21 @@ body {
     transform: translateY(calc(-100% - var(--gap)));
   }
 }
+
+@keyframes pmii-float-soft {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(var(--pmii-rotate, 0deg)) scale(1);
+  }
+  50% {
+    transform: translate3d(var(--pmii-float-x, 6px), -10px, 0) rotate(calc(var(--pmii-rotate, 0deg) + 1deg)) scale(1.025);
+  }
+}
+
+@keyframes pmii-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 18px 48px rgba(245, 202, 15, 0.22), 0 0 0 0 rgba(245, 202, 15, 0.2);
+  }
+  50% {
+    box-shadow: 0 22px 62px rgba(245, 202, 15, 0.38), 0 0 0 10px rgba(245, 202, 15, 0);
+  }
+}

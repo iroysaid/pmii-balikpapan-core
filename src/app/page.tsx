@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -115,7 +116,7 @@ function RotatingStudyButton({ className = "" }: { className?: string }) {
     <Link
       href="/materi"
       aria-label="Mulai belajar di E-Learning Kader"
-      className={`group relative flex h-24 w-24 shrink-0 rotate-6 items-center justify-center rounded-full bg-white text-secondary shadow-2xl ring-4 ring-white/20 transition hover:rotate-0 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent/70 active:scale-95 sm:h-28 sm:w-28 ${className}`}
+      className={`group relative flex h-24 w-24 shrink-0 rotate-6 items-center justify-center rounded-full bg-white text-secondary shadow-2xl ring-4 ring-white/20 transition hover:rotate-0 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-accent/70 active:scale-95 motion-safe:animate-[pmii-float-soft_5.5s_ease-in-out_infinite,pmii-pulse-glow_3.8s_ease-in-out_infinite] sm:h-28 sm:w-28 ${className}`}
     >
       <div className="absolute inset-1 motion-safe:animate-[spin_12s_linear_infinite]">
         <svg viewBox="0 0 100 100" className="h-full w-full">
@@ -163,7 +164,7 @@ function HeroSection() {
                 >
                   PMII
                 </h1>
-                <RotatingStudyButton className="mt-1 h-[4.5rem] w-[4.5rem] sm:mt-0 sm:h-28 sm:w-28" />
+                <RotatingStudyButton className="mt-0 h-[5.25rem] w-[5.25rem] sm:h-32 sm:w-32 md:h-36 md:w-36" />
               </div>
               <h2
                 className="text-[clamp(3rem,12vw,7rem)] font-black uppercase leading-[0.86] tracking-normal"
@@ -204,32 +205,38 @@ function HeroSection() {
               </Link>
             </div>
 
-            <div className="pointer-events-none absolute inset-0 hidden md:block">
-              <div className="absolute -left-8 bottom-[8%] w-44 -rotate-12 rounded-[2rem] border border-white/35 bg-white/15 p-4 shadow-2xl backdrop-blur-md">
-                <div className="relative mb-3 h-20 overflow-hidden rounded-2xl">
+            <div className="pointer-events-none absolute inset-0 z-10">
+              <div
+                className="absolute -left-2 bottom-[4%] w-28 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-75 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_7s_ease-in-out_infinite] sm:w-36 md:-left-8 md:bottom-[8%] md:w-44 md:-rotate-12 md:p-4 md:opacity-100"
+                style={{ "--pmii-rotate": "-8deg", "--pmii-float-x": "5px" } as CSSProperties}
+              >
+                <div className="relative mb-2 h-14 overflow-hidden rounded-xl md:mb-3 md:h-20 md:rounded-2xl">
                   <Image
                     src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=500&auto=format&fit=crop"
                     alt="Kader PMII berdiskusi"
                     fill
-                    sizes="176px"
+                    sizes="(max-width: 768px) 112px, 176px"
                     className="object-cover"
                   />
                 </div>
-                <p className="text-left text-sm font-black">kaderisasi</p>
-                <p className="text-left text-xs text-white/75">ruang belajar bersama</p>
+                <p className="text-left text-[11px] font-black md:text-sm">kaderisasi</p>
+                <p className="text-left text-[9px] text-white/75 md:text-xs">ruang belajar bersama</p>
               </div>
-              <div className="absolute -right-8 top-[8%] w-44 rotate-12 rounded-[2rem] border border-white/35 bg-white/15 p-4 shadow-2xl backdrop-blur-md">
-                <div className="relative mb-3 h-20 overflow-hidden rounded-2xl">
+              <div
+                className="absolute right-0 top-[8%] w-24 rounded-[1.35rem] border border-white/30 bg-white/14 p-2.5 opacity-70 shadow-2xl backdrop-blur-md motion-safe:animate-[pmii-float-soft_8s_ease-in-out_infinite] sm:w-36 md:-right-8 md:w-44 md:rotate-12 md:p-4 md:opacity-100"
+                style={{ "--pmii-rotate": "8deg", "--pmii-float-x": "-6px" } as CSSProperties}
+              >
+                <div className="relative mb-2 h-12 overflow-hidden rounded-xl md:mb-3 md:h-20 md:rounded-2xl">
                   <Image
                     src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=500&auto=format&fit=crop"
                     alt="Forum organisasi mahasiswa"
                     fill
-                    sizes="176px"
+                    sizes="(max-width: 768px) 96px, 176px"
                     className="object-cover"
                   />
                 </div>
-                <p className="text-left text-sm font-black">forum kader</p>
-                <p className="text-left text-xs text-white/75">diskusi dan advokasi</p>
+                <p className="text-left text-[11px] font-black md:text-sm">forum kader</p>
+                <p className="text-left text-[9px] text-white/75 md:text-xs">diskusi dan advokasi</p>
               </div>
             </div>
           </div>

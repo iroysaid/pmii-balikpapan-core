@@ -11,82 +11,89 @@ type MovementCard = {
   icon: "graduation" | "handshake" | "users";
 };
 
-const imagePadding = 12;
 const icons = {
   graduation: GraduationCap,
   handshake: Handshake,
   users: Users,
 };
 
-function MovementPanel({
+function progressRange(index: number, total: number) {
+  const start = index / total;
+  const center = (index + 0.5) / total;
+  const end = (index + 1) / total;
+
+  return {
+    fade: [
+      Math.max(0, start - 0.08),
+      Math.max(0, start + 0.08),
+      Math.min(1, end - 0.08),
+      Math.min(1, end + 0.08),
+    ],
+    center,
+  };
+}
+
+function StoryLayer({
   card,
   index,
   total,
+  progress,
 }: {
   card: MovementCard;
   index: number;
   total: number;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
 }) {
-  const targetRef = useRef<HTMLDivElement>(null);
-  const copyRef = useRef<HTMLDivElement>(null);
   const Icon = icons[card.icon];
-
-  const { scrollYProgress: imageProgress } = useScroll({
-    target: targetRef,
-    offset: ["end end", "end start"],
-  });
-  const { scrollYProgress: copyProgress } = useScroll({
-    target: copyRef,
-    offset: ["start end", "end start"],
-  });
-
-  const scale = useTransform(imageProgress, [0, 1], [1, 0.86]);
-  const imageOpacity = useTransform(imageProgress, [0, 1], [1, 0]);
-  const y = useTransform(copyProgress, [0, 1], [170, -170]);
-  const copyOpacity = useTransform(copyProgress, [0.2, 0.48, 0.82], [0, 1, 0]);
+  const range = progressRange(index, total);
+  const opacity = useTransform(progress, range.fade, [0, 1, 1, 0]);
+  const imageScale = useTransform(
+    progress,
+    [Math.max(0, range.center - 0.18), range.center, Math.min(1, range.center + 0.18)],
+    [1.06, 1, 1.08]
+  );
+  const textY = useTransform(
+    progress,
+    [Math.max(0, range.center - 0.18), range.center, Math.min(1, range.center + 0.18)],
+    [34, 0, -34]
+  );
 
   return (
-    <div className="px-3 md:px-4">
-      <div className="relative h-[145svh]">
-        <motion.div
-          ref={targetRef}
-          style={{
-            backgroundImage: `url(${card.image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            height: `calc(100svh - ${imagePadding * 2}px)`,
-            top: imagePadding,
-            scale,
-          }}
-          className="sticky z-0 overflow-hidden rounded-[2rem] shadow-2xl shadow-secondary/25 md:rounded-[3rem]"
-        >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/70 to-primary/35"
-            style={{ opacity: imageOpacity }}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff18_1px,transparent_1px),linear-gradient(to_bottom,#ffffff18_1px,transparent_1px)] bg-[size:3.5rem_3.5rem]" />
-        </motion.div>
-
-        <motion.div
-          ref={copyRef}
-          style={{ y, opacity: copyOpacity }}
-          className="absolute left-0 top-0 z-10 flex h-screen w-full flex-col items-center justify-center px-5 text-center text-white"
-        >
-          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl md:h-16 md:w-16">
-            <Icon className="h-7 w-7 md:h-8 md:w-8" />
+    <>
+      <motion.div
+        style={{
+          backgroundImage: `url(${card.image})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity,
+          scale: imageScale,
+        }}
+        className="absolute inset-0"
+      />
+      <motion.div
+        style={{ opacity }}
+        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,37,98,0.84)_0%,rgba(18,37,98,0.74)_34%,rgba(38,46,237,0.28)_62%,rgba(38,46,237,0)_100%)]"
+      />
+      <motion.div
+        style={{ opacity, y: textY }}
+        className="absolute inset-0 z-10 flex items-center px-5 py-10 sm:px-8 md:px-12 lg:px-20"
+      >
+        <div className="max-w-[19rem] text-left text-white sm:max-w-md md:max-w-2xl">
+          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl sm:h-12 sm:w-12 md:h-16 md:w-16">
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
           </div>
-          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.24em] text-accent md:text-sm">
+          <p className="mb-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.22em] text-accent sm:text-xs md:text-sm">
             0{index + 1} / 0{total}
           </p>
-          <h2 className="text-[clamp(3.25rem,17vw,11rem)] font-black uppercase leading-[0.84] tracking-normal">
+          <h2 className="text-[clamp(2.35rem,12vw,9rem)] font-black uppercase leading-[0.86] tracking-normal">
             {card.title}
           </h2>
-          <p className="mt-6 max-w-2xl text-2xl font-semibold leading-tight text-white/92 md:text-4xl">
+          <p className="mt-4 max-w-[17rem] text-[clamp(1.05rem,4.8vw,2.8rem)] font-semibold leading-tight text-white/92 sm:max-w-sm md:mt-6 md:max-w-2xl">
             {card.text}
           </p>
-        </motion.div>
-      </div>
-    </div>
+        </div>
+      </motion.div>
+    </>
   );
 }
 
@@ -95,16 +102,31 @@ export default function MovementParallaxSection({
 }: {
   cards: MovementCard[];
 }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: imageProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const frameScale = useTransform(imageProgress, [0, 0.08, 0.92, 1], [0.96, 1, 1, 0.96]);
+
   return (
-    <section className="bg-white py-3 md:py-4">
-      {cards.map((card, index) => (
-        <MovementPanel
-          key={card.title}
-          card={card}
-          index={index}
-          total={cards.length}
-        />
-      ))}
+    <section ref={sectionRef} className="relative h-[320svh] bg-white px-3 py-3 md:px-4 md:py-4">
+      <div className="sticky top-3 h-[calc(100svh-1.5rem)] overflow-hidden md:top-4 md:h-[calc(100svh-2rem)]">
+        <motion.div
+          style={{ scale: frameScale }}
+          className="relative h-full overflow-hidden rounded-[1.75rem] bg-secondary shadow-2xl shadow-secondary/25 md:rounded-[3rem]"
+        >
+          {cards.map((card, index) => (
+            <StoryLayer
+              key={card.title}
+              card={card}
+              index={index}
+              total={cards.length}
+              progress={imageProgress}
+            />
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 }
