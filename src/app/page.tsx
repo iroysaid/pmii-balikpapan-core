@@ -6,16 +6,14 @@ import {
   BookOpen,
   Calendar,
   ChevronRight,
-  GraduationCap,
-  Handshake,
   Images,
   Leaf,
   Sparkles,
-  Users,
 } from "lucide-react";
 import { getServerSession } from "next-auth";
 
 import ActivitySlider from "@/components/ActivitySlider";
+import MovementParallaxSection from "@/components/pmii/MovementParallaxSection";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -85,21 +83,21 @@ const movementCards = [
     text: "Dibangun untuk bertumbuh bersama.",
     image:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
-    icon: GraduationCap,
+    icon: "graduation",
   },
   {
     title: "Gerakan",
     text: "Berpihak pada masyarakat.",
     image:
       "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop",
-    icon: Handshake,
+    icon: "handshake",
   },
   {
     title: "Solidaritas",
     text: "Sahabat dalam satu barisan.",
     image:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop",
-    icon: Users,
+    icon: "users",
   },
 ];
 
@@ -145,18 +143,18 @@ function RotatingStudyButton({ className = "" }: { className?: string }) {
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-primary px-3 pb-5 pt-0 text-white md:px-5 md:pb-8">
+    <section className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-primary text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff18_1px,transparent_1px),linear-gradient(to_bottom,#ffffff18_1px,transparent_1px)] bg-[size:3.25rem_3.25rem]" />
       <div className="absolute -left-20 top-28 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
       <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-secondary/30 blur-3xl" />
 
-      <div className="container relative z-10 mx-auto my-3 flex min-h-[calc(100svh-6.5rem)] flex-col rounded-[2rem] border border-white/15 bg-primary/55 px-4 py-8 shadow-2xl shadow-secondary/20 backdrop-blur-[2px] md:my-5 md:min-h-[calc(100svh-8rem)] md:rounded-[3rem] md:py-12">
+      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] flex-col px-4 py-8 md:py-12">
         <div className="flex flex-1 items-center justify-center py-8">
           <div className="relative w-full max-w-6xl text-center">
             <div className="relative z-20 space-y-2 md:space-y-4">
-              <div className="flex justify-start pl-[8%] md:pl-[18%]">
+              <div className="flex items-start justify-start gap-2 pl-[6%] md:items-center md:gap-5 md:pl-[18%]">
                 <h1
-                  className="text-[clamp(4rem,18vw,10rem)] font-black uppercase leading-[0.83] tracking-normal text-accent"
+                  className="text-[clamp(3.9rem,17vw,10rem)] font-black uppercase leading-[0.83] tracking-normal text-accent"
                   style={{
                     fontFamily: '"Arial Black", Impact, sans-serif',
                     textShadow:
@@ -165,8 +163,8 @@ function HeroSection() {
                 >
                   PMII
                 </h1>
+                <RotatingStudyButton className="mt-1 h-[4.5rem] w-[4.5rem] sm:mt-0 sm:h-28 sm:w-28" />
               </div>
-              <RotatingStudyButton className="absolute right-1 top-0 z-40 h-20 w-20 sm:hidden" />
               <h2
                 className="text-[clamp(3rem,12vw,7rem)] font-black uppercase leading-[0.86] tracking-normal"
                 style={{
@@ -204,7 +202,6 @@ function HeroSection() {
                 Gabung PMII Balikpapan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <RotatingStudyButton className="hidden sm:flex" />
             </div>
 
             <div className="pointer-events-none absolute inset-0 hidden md:block">
@@ -244,7 +241,10 @@ function HeroSection() {
 
 function VisionMissionSection() {
   return (
-    <section id="profil" className="bg-white px-4 py-16 md:py-24">
+    <section
+      id="profil"
+      className="relative z-20 -mt-10 rounded-t-[2.5rem] bg-white px-4 py-16 shadow-[0_-20px_50px_rgba(18,37,98,0.16)] md:-mt-14 md:rounded-t-[3.5rem] md:py-24"
+    >
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
@@ -440,45 +440,6 @@ function DocumentationSection({
   );
 }
 
-function MovementSection() {
-  return (
-    <section className="bg-secondary">
-      {movementCards.map((card, index) => {
-        const Icon = card.icon;
-        return (
-          <article
-            key={card.title}
-            className="relative flex min-h-[100svh] items-end overflow-hidden text-white"
-          >
-            <div
-              className="absolute inset-0 bg-cover bg-center motion-reduce:bg-scroll md:bg-fixed"
-              style={{ backgroundImage: `url(${card.image})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/65 to-primary/20" />
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:3.5rem_3.5rem]" />
-            <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-4 py-12 md:py-20">
-              <div className="max-w-3xl">
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl">
-                  <Icon className="h-7 w-7" />
-                </div>
-                <p className="mb-4 font-mono text-sm font-black uppercase tracking-[0.24em] text-accent">
-                  0{index + 1} / 03
-                </p>
-                <h2 className="text-[clamp(3.5rem,15vw,10rem)] font-black uppercase leading-[0.85] tracking-normal">
-                  {card.title}
-                </h2>
-                <p className="mt-6 max-w-2xl text-2xl font-semibold leading-tight text-white/90 md:text-4xl">
-                  {card.text}
-                </p>
-              </div>
-            </div>
-          </article>
-        );
-      })}
-    </section>
-  );
-}
-
 export default async function Home() {
   const session = await getServerSession(authOptions);
   const [latestPosts, upcomingActivities, pastActivities, galleryItems] =
@@ -509,13 +470,13 @@ export default async function Home() {
   const latestActivities = [...upcomingActivities, ...pastActivities].slice(0, 5);
 
   return (
-    <div className="bg-background">
+    <div className="overflow-x-hidden bg-background">
       <HeroSection />
       <VisionMissionSection />
       <NdpSection />
       <TeamSection />
       <DocumentationSection galleryItems={galleryItems} />
-      <MovementSection />
+      <MovementParallaxSection cards={movementCards} />
 
       <section id="berita" className="bg-white px-4 py-16 md:py-24">
         <div className="mx-auto max-w-6xl">
