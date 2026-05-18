@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { GraduationCap, Handshake, Users } from "lucide-react";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useRef } from "react";
@@ -17,36 +18,42 @@ const icons = {
   users: Users,
 };
 
+const opacityStops = [
+  {
+    input: [0, 0.3, 0.38],
+    output: [1, 1, 0],
+    center: 0.17,
+  },
+  {
+    input: [0.3, 0.38, 0.62, 0.7],
+    output: [0, 1, 1, 0],
+    center: 0.5,
+  },
+  {
+    input: [0.62, 0.7, 1],
+    output: [0, 1, 1],
+    center: 0.84,
+  },
+];
+
 function progressRange(index: number, total: number) {
+  if (total === 3) {
+    return opacityStops[index];
+  }
+
   const start = index / total;
   const center = (index + 0.5) / total;
   const end = (index + 1) / total;
-  const fade = 0.075;
-
-  if (index === 0) {
-    return {
-      opacityInput: [0, Math.max(0.001, end - fade), Math.min(1, end + fade)],
-      opacityOutput: [1, 1, 0],
-      center,
-    };
-  }
-
-  if (index === total - 1) {
-    return {
-      opacityInput: [Math.max(0, start - fade), Math.min(1, start + fade), 1],
-      opacityOutput: [0, 1, 1],
-      center,
-    };
-  }
+  const fade = 0.06;
 
   return {
-    opacityInput: [
+    input: [
       Math.max(0, start - fade),
       Math.min(1, start + fade),
       Math.max(0, end - fade),
       Math.min(1, end + fade),
     ],
-    opacityOutput: [0, 1, 1, 0],
+    output: [index === 0 ? 1 : 0, 1, 1, index === total - 1 ? 1 : 0],
     center,
   };
 }
@@ -64,49 +71,52 @@ function StoryLayer({
 }) {
   const Icon = icons[card.icon];
   const range = progressRange(index, total);
-  const opacity = useTransform(progress, range.opacityInput, range.opacityOutput);
+  const opacity = useTransform(progress, range.input, range.output);
   const imageScale = useTransform(
     progress,
-    [Math.max(0, range.center - 0.18), range.center, Math.min(1, range.center + 0.18)],
-    [1.03, 1, 1.04]
+    [Math.max(0, range.center - 0.2), range.center, Math.min(1, range.center + 0.2)],
+    [1.025, 1, 1.035]
   );
   const textY = useTransform(
     progress,
     [Math.max(0, range.center - 0.18), range.center, Math.min(1, range.center + 0.18)],
-    [34, 0, -34]
+    [22, 0, -22]
   );
 
   return (
     <>
       <motion.div
-        style={{
-          backgroundImage: `url(${card.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity,
-          scale: imageScale,
-        }}
+        style={{ opacity, scale: imageScale }}
         className="absolute inset-0 will-change-transform"
-      />
+      >
+        <Image
+          src={card.image}
+          alt={card.title}
+          fill
+          sizes="100vw"
+          className="h-full w-full object-cover"
+          priority={index === 0}
+        />
+      </motion.div>
       <motion.div
         style={{ opacity }}
-        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(18,37,98,0.8)_0%,rgba(18,37,98,0.7)_34%,rgba(38,46,237,0.22)_64%,rgba(38,46,237,0)_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,40,70,0.86),rgba(0,40,70,0.28)_58%,rgba(0,40,70,0)_100%)] md:bg-[linear-gradient(to_right,rgba(0,40,70,0.8),rgba(0,40,70,0.58)_38%,rgba(0,40,70,0)_100%)]"
       />
       <motion.div
         style={{ opacity, y: textY }}
-        className="absolute inset-0 z-10 flex items-center px-5 py-10 will-change-transform sm:px-8 md:px-12 lg:px-20"
+        className="absolute inset-0 z-10 flex items-end px-6 py-8 will-change-transform sm:px-8 md:items-center md:px-12 md:py-12 lg:px-20"
       >
-        <div className="max-w-[19rem] text-left text-white sm:max-w-md md:max-w-2xl">
-          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl sm:h-12 sm:w-12 md:h-16 md:w-16">
+        <div className="max-w-[19rem] pb-3 text-left text-white sm:max-w-md md:max-w-2xl md:pb-0">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl sm:h-12 sm:w-12 md:mb-5 md:h-16 md:w-16">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
           </div>
           <p className="mb-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.22em] text-accent sm:text-xs md:text-sm">
             0{index + 1} / 0{total}
           </p>
-          <h2 className="text-[clamp(2.1rem,10.5vw,9rem)] font-black uppercase leading-[0.88] tracking-normal">
+          <h2 className="text-[clamp(2rem,9.8vw,8.5rem)] font-black uppercase leading-[0.9] tracking-normal">
             {card.title}
           </h2>
-          <p className="mt-4 max-w-[17rem] text-[clamp(0.98rem,4.2vw,2.8rem)] font-semibold leading-tight text-white/92 sm:max-w-sm md:mt-6 md:max-w-2xl">
+          <p className="mt-4 max-w-[17rem] text-[clamp(0.95rem,4vw,2.65rem)] font-semibold leading-snug text-white/92 sm:max-w-sm md:mt-6 md:max-w-2xl">
             {card.text}
           </p>
         </div>
@@ -129,10 +139,10 @@ export default function MovementParallaxSection({
   return (
     <section
       ref={sectionRef}
-      className="relative h-[400vh] h-[400svh] bg-white px-3 pt-3 md:h-[400vh] md:px-4 md:pt-4"
+      className="relative min-h-[330svh] bg-white"
     >
-      <div className="sticky top-3 h-[calc(100vh-1.5rem)] h-[calc(100svh-1.5rem)] md:top-4 md:h-[calc(100vh-2rem)] md:h-[calc(100svh-2rem)]">
-        <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-secondary shadow-2xl shadow-secondary/25 isolate md:rounded-[3rem]">
+      <div className="sticky top-0 flex h-[100svh] items-center justify-center px-4 py-4 md:px-8">
+        <div className="relative isolate h-[calc(100svh-32px)] w-full overflow-hidden rounded-[2rem] bg-secondary shadow-2xl shadow-secondary/25 md:rounded-[3rem]">
           {cards.map((card, index) => (
             <StoryLayer
               key={card.title}
