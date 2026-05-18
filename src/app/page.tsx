@@ -112,12 +112,12 @@ function excerpt(content: string, limit = 120) {
   return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
 }
 
-function RotatingStudyButton() {
+function RotatingStudyButton({ className = "" }: { className?: string }) {
   return (
     <Link
       href="/materi"
       aria-label="Mulai belajar di E-Learning Kader"
-      className="group relative flex h-24 w-24 shrink-0 rotate-6 items-center justify-center rounded-full bg-white text-secondary shadow-2xl ring-4 ring-white/20 transition hover:rotate-0 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent/70 active:scale-95 sm:h-28 sm:w-28"
+      className={`group relative flex h-24 w-24 shrink-0 rotate-6 items-center justify-center rounded-full bg-white text-secondary shadow-2xl ring-4 ring-white/20 transition hover:rotate-0 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent/70 active:scale-95 sm:h-28 sm:w-28 ${className}`}
     >
       <div className="absolute inset-1 motion-safe:animate-[spin_12s_linear_infinite]">
         <svg viewBox="0 0 100 100" className="h-full w-full">
@@ -145,12 +145,12 @@ function RotatingStudyButton() {
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-primary text-white">
+    <section className="relative overflow-hidden bg-primary px-3 pb-5 pt-0 text-white md:px-5 md:pb-8">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff18_1px,transparent_1px),linear-gradient(to_bottom,#ffffff18_1px,transparent_1px)] bg-[size:3.25rem_3.25rem]" />
       <div className="absolute -left-20 top-28 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
       <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-secondary/30 blur-3xl" />
 
-      <div className="container relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] flex-col px-4 py-8 md:py-12">
+      <div className="container relative z-10 mx-auto my-3 flex min-h-[calc(100svh-6.5rem)] flex-col rounded-[2rem] border border-white/15 bg-primary/55 px-4 py-8 shadow-2xl shadow-secondary/20 backdrop-blur-[2px] md:my-5 md:min-h-[calc(100svh-8rem)] md:rounded-[3rem] md:py-12">
         <div className="flex flex-1 items-center justify-center py-8">
           <div className="relative w-full max-w-6xl text-center">
             <div className="relative z-20 space-y-2 md:space-y-4">
@@ -166,6 +166,7 @@ function HeroSection() {
                   PMII
                 </h1>
               </div>
+              <RotatingStudyButton className="absolute right-1 top-0 z-40 h-20 w-20 sm:hidden" />
               <h2
                 className="text-[clamp(3rem,12vw,7rem)] font-black uppercase leading-[0.86] tracking-normal"
                 style={{
@@ -203,7 +204,7 @@ function HeroSection() {
                 Gabung PMII Balikpapan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <RotatingStudyButton />
+              <RotatingStudyButton className="hidden sm:flex" />
             </div>
 
             <div className="pointer-events-none absolute inset-0 hidden md:block">
@@ -250,7 +251,7 @@ function VisionMissionSection() {
             Profil Organisasi
           </p>
           <h2 className="text-3xl font-black leading-tight text-black md:text-5xl">
-            Visi & Misi PMII Balikpapan
+            Visi Misi
           </h2>
         </div>
         <div className="grid gap-5 md:grid-cols-2">
@@ -441,34 +442,39 @@ function DocumentationSection({
 
 function MovementSection() {
   return (
-    <section className="bg-white px-4 py-16 md:py-24">
-      <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
-        {movementCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <article
-              key={card.title}
-              className="group relative min-h-[22rem] overflow-hidden rounded-[2rem] bg-secondary text-white"
-            >
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover opacity-70 transition duration-700 group-hover:scale-105 motion-reduce:transition-none"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/55 to-transparent" />
-              <div className="relative z-10 flex h-full min-h-[22rem] flex-col justify-end p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-secondary">
-                  <Icon className="h-6 w-6" />
+    <section className="bg-secondary">
+      {movementCards.map((card, index) => {
+        const Icon = card.icon;
+        return (
+          <article
+            key={card.title}
+            className="relative flex min-h-[100svh] items-end overflow-hidden text-white"
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center motion-reduce:bg-scroll md:bg-fixed"
+              style={{ backgroundImage: `url(${card.image})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/65 to-primary/20" />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:3.5rem_3.5rem]" />
+            <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-end px-4 py-12 md:py-20">
+              <div className="max-w-3xl">
+                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-secondary shadow-xl">
+                  <Icon className="h-7 w-7" />
                 </div>
-                <h2 className="text-3xl font-black">{card.title}</h2>
-                <p className="mt-3 text-lg font-semibold text-white/90">{card.text}</p>
+                <p className="mb-4 font-mono text-sm font-black uppercase tracking-[0.24em] text-accent">
+                  0{index + 1} / 03
+                </p>
+                <h2 className="text-[clamp(3.5rem,15vw,10rem)] font-black uppercase leading-[0.85] tracking-normal">
+                  {card.title}
+                </h2>
+                <p className="mt-6 max-w-2xl text-2xl font-semibold leading-tight text-white/90 md:text-4xl">
+                  {card.text}
+                </p>
               </div>
-            </article>
-          );
-        })}
-      </div>
+            </div>
+          </article>
+        );
+      })}
     </section>
   );
 }
@@ -531,49 +537,89 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {latestPosts.length === 0 ? (
-              <div className="rounded-[2rem] border border-dashed border-secondary/20 p-8 text-center text-secondary md:col-span-3">
-                Belum ada berita terbaru.
-              </div>
-            ) : (
-              latestPosts.map((post) => (
-                <article
-                  key={post.id}
-                  className="group overflow-hidden rounded-[1.75rem] border border-secondary/10 bg-white shadow-sm"
-                >
-                  <Link href={`/berita/${post.slug}`} className="block">
-                    <div className="relative aspect-video overflow-hidden bg-secondary/10">
-                      {post.image ? (
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-primary">
-                          PMII
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <div className="mb-3 flex items-center text-xs font-bold uppercase tracking-wider text-secondary/70">
-                        <Calendar className="mr-2 h-4 w-4 text-primary" />
-                        {new Date(post.createdAt).toLocaleDateString("id-ID")}
+          {latestPosts.length === 0 ? (
+            <div className="rounded-[2rem] border border-dashed border-secondary/20 p-8 text-center text-secondary">
+              Belum ada berita terbaru.
+            </div>
+          ) : (
+            <div className="grid gap-5 lg:grid-cols-12">
+              <article className="group overflow-hidden rounded-[2rem] border border-secondary/10 bg-white shadow-sm lg:col-span-7">
+                <Link href={`/berita/${latestPosts[0].slug}`} className="block">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-secondary/10 md:aspect-[16/10]">
+                    {latestPosts[0].image ? (
+                      <img
+                        src={latestPosts[0].image}
+                        alt={latestPosts[0].title}
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-primary text-2xl font-black text-white">
+                        PMII
                       </div>
-                      <h3 className="line-clamp-2 text-xl font-black leading-tight text-black transition group-hover:text-primary">
-                        {post.title}
-                      </h3>
-                      <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-secondary">
-                        {excerpt(post.content)}
-                      </p>
+                    )}
+                    <div className="absolute left-4 top-4 rounded-full bg-accent px-4 py-2 text-xs font-black uppercase tracking-wider text-secondary">
+                      Headline
                     </div>
-                  </Link>
-                </article>
-              ))
-            )}
-          </div>
+                  </div>
+                  <div className="p-6 md:p-8">
+                    <div className="mb-4 flex items-center text-xs font-bold uppercase tracking-wider text-secondary/70">
+                      <Calendar className="mr-2 h-4 w-4 text-primary" />
+                      {new Date(latestPosts[0].createdAt).toLocaleDateString("id-ID")}
+                    </div>
+                    <h3 className="text-3xl font-black leading-tight text-black transition group-hover:text-primary md:text-5xl">
+                      {latestPosts[0].title}
+                    </h3>
+                    <p className="mt-4 text-base leading-relaxed text-secondary md:text-lg">
+                      {excerpt(latestPosts[0].content, 180)}
+                    </p>
+                    <span className="mt-6 inline-flex items-center font-black text-primary">
+                      Baca Headline
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </span>
+                  </div>
+                </Link>
+              </article>
+
+              <div className="grid gap-5 lg:col-span-5">
+                {latestPosts.slice(1, 4).map((post, index) => (
+                  <article
+                    key={post.id}
+                    className="group overflow-hidden rounded-[1.5rem] border border-secondary/10 bg-background shadow-sm transition hover:bg-white"
+                  >
+                    <Link href={`/berita/${post.slug}`} className="grid gap-4 p-4 sm:grid-cols-[9rem_1fr]">
+                      <div className="relative aspect-video overflow-hidden rounded-[1.1rem] bg-secondary/10 sm:aspect-square">
+                        {post.image ? (
+                          <img
+                            src={post.image}
+                            alt={post.title}
+                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-primary">
+                            PMII
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="mb-2 font-mono text-xs font-black uppercase tracking-[0.18em] text-primary">
+                          Populer 0{index + 1}
+                        </p>
+                        <h3 className="line-clamp-2 text-xl font-black leading-tight text-black transition group-hover:text-primary">
+                          {post.title}
+                        </h3>
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-secondary">
+                          {excerpt(post.content, 95)}
+                        </p>
+                      </div>
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </section>
 
