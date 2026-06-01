@@ -9,6 +9,9 @@ function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    const reason = searchParams.get("reason");
+    const showSessionNotice =
+        reason === "session-expired" || callbackUrl.startsWith("/dashboard");
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -54,6 +57,13 @@ function LoginForm() {
                 {error && (
                     <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm text-center">
                         {error}
+                    </div>
+                )}
+
+                {!error && showSessionNotice && (
+                    <div className="mb-6 rounded-lg bg-blue-50 p-3 text-center text-sm font-semibold text-primary">
+                        Silakan masuk untuk melanjutkan. Jika sebelumnya sudah
+                        login, sesi Anda mungkin telah berakhir setelah batas 3 jam.
                     </div>
                 )}
 

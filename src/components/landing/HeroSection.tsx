@@ -41,10 +41,10 @@ export default function HeroSection({ content }: { content: HeroContent }) {
                 />
               </div>
             )}
-            <div className="relative z-20 space-y-0.5 md:space-y-3">
-              <div className="flex items-start justify-start gap-2 pl-[4%] md:items-center md:gap-5 md:pl-[18%]">
+            <div className="relative z-20 space-y-1 md:space-y-3">
+              <div className="flex items-start justify-start gap-1 pl-[4%] min-[390px]:gap-2 md:items-center md:gap-5 md:pl-[18%]">
                 <h1
-                  className="text-[clamp(3.7rem,16vw,10rem)] font-black uppercase leading-[0.82] tracking-normal text-accent"
+                  className="text-[clamp(3rem,14.5vw,10rem)] font-black uppercase leading-[0.82] tracking-normal text-accent sm:text-[clamp(3.7rem,16vw,10rem)]"
                   style={{
                     fontFamily: '"Arial Black", Impact, sans-serif',
                     textShadow:
@@ -55,11 +55,11 @@ export default function HeroSection({ content }: { content: HeroContent }) {
                 </h1>
                 <RotatingStudyButton
                   cta={content.studyCta}
-                  className="mt-0 h-[5rem] w-[5rem] sm:h-32 sm:w-32 md:h-36 md:w-36"
+                  className="mt-0 h-[4.35rem] w-[4.35rem] min-[390px]:h-[4.8rem] min-[390px]:w-[4.8rem] sm:h-32 sm:w-32 md:h-36 md:w-36"
                 />
               </div>
               <h2
-                className="text-[clamp(2.8rem,11.5vw,7rem)] font-black uppercase leading-[0.83] tracking-normal"
+                className="mx-auto max-w-full overflow-hidden text-[clamp(1.7rem,7.2vw,7rem)] font-black uppercase leading-[0.9] tracking-normal min-[390px]:text-[clamp(1.78rem,7.5vw,7rem)] sm:text-[clamp(2.8rem,11.5vw,7rem)]"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
@@ -70,7 +70,7 @@ export default function HeroSection({ content }: { content: HeroContent }) {
               </h2>
               <div className="flex justify-start pl-[14%] md:pl-[30%]">
                 <h2
-                  className="text-[clamp(2.45rem,10.5vw,6rem)] font-black uppercase leading-[0.83] tracking-normal"
+                  className="max-w-full overflow-hidden text-[clamp(1.68rem,7.2vw,6rem)] font-black uppercase leading-[0.9] tracking-normal min-[390px]:text-[clamp(1.78rem,7.5vw,6rem)] sm:text-[clamp(2.45rem,10.5vw,6rem)]"
                   style={{
                     fontFamily: '"Arial Black", Impact, sans-serif',
                     textShadow:

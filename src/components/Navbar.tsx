@@ -1,15 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { NavbarContent } from "@/lib/landing/types";
 
 export default function Navbar({ content }: { content: NavbarContent }) {
-    const [isOpen, setIsOpen] = useState(false);
     const { data: session } = useSession();
     const pathname = usePathname();
     const role = session?.user?.role;
@@ -37,14 +34,14 @@ export default function Navbar({ content }: { content: NavbarContent }) {
         "border border-white/30 bg-white/28 text-white shadow-[0_10px_28px_rgba(18,37,98,0.16),inset_0_1px_0_rgba(255,255,255,0.38)]";
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-white/10 bg-secondary/86 text-white shadow-lg shadow-secondary/15 backdrop-blur-md">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#262EED]/86 text-white shadow-lg shadow-primary/20 backdrop-blur-xl backdrop-saturate-200">
             <div className="container mx-auto px-4">
-                <div className="flex justify-between items-center h-20">
+                <div className="flex h-16 items-center justify-between md:h-20">
                     {/* Logo Area */}
-                    <Link href="/" className="font-bold text-xl flex items-center gap-3">
-                        <div className={`flex items-center space-x-2 rounded-full px-2.5 py-1.5 ${glassShell}`}>
+                    <Link href="/" className="flex items-center gap-2 font-bold md:gap-3 md:text-xl">
+                        <div className={`flex items-center space-x-1.5 rounded-full px-2 py-1.5 md:space-x-2 md:px-2.5 ${glassShell}`}>
                             {content.logos.map((logo) => (
-                                <div key={logo.src} className="relative w-11 h-11">
+                                <div key={logo.src} className="relative h-8 w-8 md:h-11 md:w-11">
                                     <Image
                                         src={logo.src}
                                         alt={logo.alt}
@@ -56,8 +53,8 @@ export default function Navbar({ content }: { content: NavbarContent }) {
                             ))}
                         </div>
                         <div className="flex flex-col leading-tight">
-                            <span className="text-accent text-lg font-extrabold tracking-wide">{content.brandTop}</span>
-                            <span className="text-sm tracking-widest font-semibold text-white">{content.brandBottom}</span>
+                            <span className="text-base font-extrabold tracking-wide text-accent md:text-lg">{content.brandTop}</span>
+                            <span className="text-[11px] font-semibold tracking-widest text-white md:text-sm">{content.brandBottom}</span>
                         </div>
                     </Link>
 
@@ -94,60 +91,25 @@ export default function Navbar({ content }: { content: NavbarContent }) {
                         )}
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <div className="md:hidden">
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            aria-label={isOpen ? "Tutup menu" : "Buka menu"}
-                            className={`rounded-full p-3 text-white transition-all duration-300 hover:scale-[1.03] hover:bg-white/25 focus:outline-none ${glassShell}`}
-                        >
-                            {isOpen ? <X size={24} /> : <Menu size={24} />}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {isOpen && (
-                <div className="md:hidden px-4 pb-4">
-                    <div className={`relative flex flex-col gap-1.5 rounded-[1.75rem] p-2.5 ${glassShell}`}>
-                        <div className="pointer-events-none absolute inset-x-6 top-1 h-px rounded-full bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-                        {links.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                onClick={() => setIsOpen(false)}
-                                className={`rounded-full px-4 py-3 text-sm font-semibold transition-all duration-300 hover:bg-white/24 ${
-                                    isActive(link.href) ? "border border-white/25 bg-white/25 text-white shadow-inner" : "text-white/90"
-                                }`}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
                         {session ? (
                             <Link
                                 href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
-                                onClick={() => setIsOpen(false)}
-                                className="rounded-full border border-accent/50 bg-accent/88 px-4 py-3 text-sm font-black text-secondary transition-all duration-300 hover:bg-white"
+                                className={`inline-flex h-10 items-center rounded-full px-4 text-xs font-black text-white transition active:scale-95 ${glassShell}`}
                             >
-                                {session.user?.name}
+                                Akun
                             </Link>
                         ) : (
                             <Link
                                 href={content.loginLink.href}
-                                onClick={() => setIsOpen(false)}
-                                className={`rounded-full px-4 py-3 text-sm font-black transition-all duration-300 ${
-                                    isActive(content.loginLink.href)
-                                        ? "border border-accent/70 bg-accent text-secondary"
-                                        : "border border-white/25 bg-white/18 text-white hover:bg-accent hover:text-secondary"
-                                }`}
+                                className="inline-flex h-10 items-center rounded-full border border-white/35 bg-white/18 px-4 text-xs font-black text-white shadow-sm backdrop-blur-xl transition active:scale-95"
                             >
                                 {content.loginLink.label}
                             </Link>
                         )}
                     </div>
                 </div>
-            )}
+            </div>
         </nav>
     );
 }

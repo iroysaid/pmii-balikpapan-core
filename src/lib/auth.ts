@@ -2,10 +2,17 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { compare } from "bcryptjs";
+import { SESSION_MAX_AGE_SECONDS } from "@/lib/permissions/defaults";
+import { getPermissionConfig } from "@/lib/permissions/service";
+import { getRolePermissions } from "@/lib/permissions/routes";
 
 export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
+        maxAge: SESSION_MAX_AGE_SECONDS,
+    },
+    jwt: {
+        maxAge: SESSION_MAX_AGE_SECONDS,
     },
     pages: {
         signIn: "/masuk",
@@ -67,20 +74,26 @@ export const authOptions: NextAuthOptions = {
                 session.user.role = token.role as string;
                 session.user.organizationId = token.organizationId as string | null | undefined;
                 session.user.mustChangePassword = token.mustChangePassword as boolean | undefined;
+                session.user.permissions = token.permissions;
             }
             return session;
         },
         async jwt({ token, user }) {
             if (user) {
-                // @ts-ignore
                 token.id = user.id;
-                // @ts-ignore
                 token.role = user.role;
-                // @ts-ignore
                 token.organizationId = user.organizationId;
-                // @ts-ignore
                 token.mustChangePassword = user.mustChangePassword;
             }
+
+            if (token.role) {
+                const permissionConfig = await getPermissionConfig();
+                token.permissions = getRolePermissions(
+                    token.role,
+                    permissionConfig.roles
+                );
+            }
+
             return token;
         },
     },

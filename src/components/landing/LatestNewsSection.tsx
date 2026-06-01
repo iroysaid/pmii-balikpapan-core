@@ -14,7 +14,7 @@ export default function LatestNewsSection({
   return (
     <section id="berita" className="bg-white px-4 pb-16 pt-8 md:pb-24 md:pt-12">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex items-end justify-between gap-4">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-primary">
               {content.eyebrow}
@@ -30,7 +30,7 @@ export default function LatestNewsSection({
           </div>
           <Link
             href={content.cta.href}
-            className="inline-flex shrink-0 items-center font-black text-primary hover:text-secondary"
+            className="inline-flex shrink-0 items-center self-start rounded-full bg-blue-50 px-5 py-3 font-black text-primary transition active:scale-95 hover:text-secondary sm:bg-transparent sm:px-0 sm:py-0"
           >
             {content.cta.label}
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -42,8 +42,8 @@ export default function LatestNewsSection({
             {content.emptyText}
           </div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-12">
-            <article className="group overflow-hidden rounded-[2rem] border border-secondary/10 bg-white shadow-sm lg:col-span-7">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 lg:mx-0 lg:grid lg:grid-cols-12 lg:overflow-visible lg:px-0 lg:pb-0">
+            <article className="group w-[86vw] shrink-0 snap-start overflow-hidden rounded-[2rem] border border-secondary/10 bg-white shadow-sm lg:col-span-7 lg:w-auto lg:shrink">
               <Link href={`/berita/${posts[0].slug}`} className="block">
                 <div className="relative aspect-[4/3] overflow-hidden bg-secondary/10 md:aspect-[16/10]">
                   {posts[0].image ? (
@@ -67,7 +67,7 @@ export default function LatestNewsSection({
                     <Calendar className="mr-2 h-4 w-4 text-primary" />
                     {new Date(posts[0].createdAt).toLocaleDateString("id-ID")}
                   </div>
-                  <h3 className="text-3xl font-black leading-tight text-black transition group-hover:text-primary md:text-5xl">
+                  <h3 className="text-2xl font-black leading-tight text-black transition group-hover:text-primary md:text-5xl">
                     {posts[0].title}
                   </h3>
                   <p className="mt-4 text-base leading-relaxed text-secondary md:text-lg">
@@ -81,11 +81,11 @@ export default function LatestNewsSection({
               </Link>
             </article>
 
-            <div className="grid gap-5 lg:col-span-5">
+            <div className="contents lg:grid lg:gap-5 lg:col-span-5">
               {posts.slice(1, 4).map((post, index) => (
                 <article
                   key={post.id}
-                  className="group overflow-hidden rounded-[1.5rem] border border-secondary/10 bg-background shadow-sm transition hover:bg-white"
+                  className="group w-[78vw] shrink-0 snap-start overflow-hidden rounded-[1.5rem] border border-secondary/10 bg-background shadow-sm transition active:scale-[0.98] hover:bg-white lg:w-auto lg:shrink"
                 >
                   <Link href={`/berita/${post.slug}`} className="grid gap-4 p-4 sm:grid-cols-[9rem_1fr]">
                     <div className="relative aspect-video overflow-hidden rounded-[1.1rem] bg-secondary/10 sm:aspect-square">

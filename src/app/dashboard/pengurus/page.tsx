@@ -24,13 +24,12 @@ export default async function DashboardPengurusPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="mb-2 text-sm font-black uppercase tracking-[0.2em] text-primary">
-            Modul Dinamis
+            CMS Internal
           </p>
           <h1 className="text-2xl font-bold text-primary">Kelola Pengurus</h1>
           <p className="mt-2 max-w-2xl text-secondary">
-            Data pengurus dikelola sebagai modul tersendiri, lalu dapat
-            ditampilkan di homepage dan halaman profil melalui pilihan
-            visibilitas tiap orang.
+            Pengurus adalah bagian dari profilisasi organisasi. Data ini
+            menjadi sumber terpusat untuk homepage dan halaman profil.
           </p>
         </div>
         <Link

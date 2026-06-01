@@ -14,19 +14,18 @@ type Chapter = {
 };
 
 export default function EditMaterialForm({ material }: { material: any }) {
-    // Initialize chapters from material prop
-    const initialChapters = material.chapters && material.chapters.length > 0
-        ? material.chapters.map((c: any) => ({
-            id: c.id,
-            title: c.title,
-            description: c.description,
-            type: c.type,
-            fileUrl: c.fileUrl,
-            youtubeUrl: c.youtubeUrl
-        }))
-        : [{ id: Date.now(), title: "", description: "", type: "DOCUMENT" }];
-
-    const [chapters, setChapters] = useState<Chapter[]>(initialChapters);
+    const [chapters, setChapters] = useState<Chapter[]>(() =>
+        material.chapters && material.chapters.length > 0
+            ? material.chapters.map((c: any) => ({
+                id: c.id,
+                title: c.title,
+                description: c.description,
+                type: c.type,
+                fileUrl: c.fileUrl,
+                youtubeUrl: c.youtubeUrl
+            }))
+            : [{ id: "new-chapter-0", title: "", description: "", type: "DOCUMENT" }]
+    );
 
     const updateMaterialWithId = updateMaterial.bind(null, material.id);
 

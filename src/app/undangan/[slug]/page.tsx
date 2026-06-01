@@ -105,7 +105,7 @@ export default async function InvitationPage({
                            <Info className="w-6 h-6" />
                         </div>
                         <p className="text-lg md:text-xl leading-relaxed opacity-90 italic font-medium">
-                            "{activity.description}"
+                            &ldquo;{activity.description}&rdquo;
                         </p>
                     </div>
 

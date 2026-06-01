@@ -1,14 +1,16 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { canAccessDashboardPath } from "@/lib/permissions/routes";
 
 export default withAuth(
     function middleware(req) {
         const token = req.nextauth.token;
         const path = req.nextUrl.pathname;
         const role = token?.role as string;
+        const permissions = token?.permissions;
         const mustChangePassword = token?.mustChangePassword;
 
-        if (path.startsWith("/dashboard") && role !== "SUPER_ADMIN") {
+        if (!canAccessDashboardPath({ path, role, permissions })) {
             return NextResponse.redirect(new URL("/", req.url));
         }
 

@@ -93,7 +93,7 @@ export default function MovementParallaxSection({
   return (
     <section className="bg-white px-4 py-8 md:px-8 md:py-12">
       <div className="mx-auto max-w-6xl">
-        <div className="relative isolate h-[min(560px,calc(100svh-32px))] min-h-[440px] w-full overflow-hidden rounded-[2rem] bg-secondary shadow-2xl shadow-secondary/25 md:h-[min(680px,calc(100svh-64px))] md:min-h-[560px] md:rounded-[3rem]">
+        <div className="relative isolate h-[min(500px,calc(100svh-104px))] min-h-[380px] w-full overflow-hidden rounded-[2rem] bg-secondary shadow-2xl shadow-secondary/25 md:h-[min(680px,calc(100svh-64px))] md:min-h-[560px] md:rounded-[3rem]">
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <MovementSlide
               key={cards[activeIndex].title}

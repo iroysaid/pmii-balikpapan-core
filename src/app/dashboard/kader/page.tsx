@@ -67,7 +67,7 @@ export default async function KaderPage({
 
     // Grouping Logic
     const isGrouped = params.groupBy === "komisariat";
-    let groupedKaders: Record<string, any[]> = {};
+    const groupedKaders: Record<string, any[]> = {};
     
     if (isGrouped) {
         const order = ["Komisariat Nusantara", "Komisariat Uniba", "Komisariat Mulia", "Komisariat Staiba", "Komisariat Stitba"];

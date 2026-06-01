@@ -68,7 +68,7 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
     <div className="relative bg-white rounded-3xl shadow-xl overflow-hidden group">
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* Image Section */}
-        <div className="relative h-[300px] lg:h-[450px] overflow-hidden">
+        <div className="relative h-[260px] overflow-hidden sm:h-[320px] lg:h-[450px]">
           {active.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -91,7 +91,7 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
         </div>
 
         {/* Content Section */}
-        <div className="p-8 lg:p-12 flex flex-col justify-center bg-white relative">
+        <div className="relative flex flex-col justify-center bg-white p-6 pb-24 sm:p-8 sm:pb-24 lg:p-12">
           <div className="animate-in fade-in slide-in-from-right-4 duration-500" key={active.id}>
             <div className="flex flex-wrap items-center text-primary/60 mb-4 font-medium gap-4">
                 <div className="flex items-center">
@@ -106,13 +106,13 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
                 )}
             </div>
             
-            <h3 className="text-3xl lg:text-4xl font-black text-primary mb-6 leading-tight line-clamp-2">
+            <h3 className="mb-4 line-clamp-2 text-2xl font-black leading-tight text-primary sm:text-3xl lg:mb-6 lg:text-4xl">
               <Link href={`/kegiatan/${active.slug}`} className="hover:text-accent transition">
                 {active.title}
               </Link>
             </h3>
             
-            <p className="text-lg text-secondary leading-relaxed mb-8 line-clamp-3">
+            <p className="mb-6 line-clamp-3 text-base leading-relaxed text-secondary sm:text-lg lg:mb-8">
               {active.description}
             </p>
             
@@ -123,7 +123,7 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
           </div>
 
           {/* Navigation Controls */}
-          <div className="absolute bottom-8 right-8 flex gap-3">
+          <div className="absolute bottom-6 right-6 flex gap-3 lg:bottom-8 lg:right-8">
             <button 
               onClick={prevSlide}
               className="w-12 h-12 rounded-full border-2 border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition shadow-sm"
@@ -139,7 +139,7 @@ export default function ActivitySlider({ kegiatan }: { kegiatan: Activity[] }) {
           </div>
           
           {/* Indicators */}
-          <div className="absolute bottom-12 left-12 flex gap-2">
+          <div className="absolute bottom-10 left-6 flex gap-2 lg:bottom-12 lg:left-12">
             {kegiatan.map((_, idx) => (
               <button 
                 key={idx}

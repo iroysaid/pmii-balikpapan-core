@@ -12,71 +12,54 @@ import {
     Images,
     LayoutDashboard,
     LogOut,
-    Menu,
     Newspaper,
     Settings,
     Users,
-    X,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { hasAccess } from "@/lib/permissions/defaults";
+import { getRolePermissions } from "@/lib/permissions/routes";
+import type { DashboardPermissionKey } from "@/lib/permissions/types";
 
 const cmsMenuItems = [
-    { name: "Homepage", href: "/dashboard/landing", icon: Globe },
-    { name: "Profil", href: "/dashboard/profil", icon: FileText },
+    { name: "Homepage", href: "/dashboard/landing", icon: Globe, permission: "cmsHomepage" },
+    { name: "Profil", href: "/dashboard/profil", icon: FileText, permission: "cmsProfil" },
+    { name: "Pengurus", href: "/dashboard/pengurus", icon: Users, permission: "cmsPengurus" },
 ];
 
 const dashboardMenuItems = [
-    { name: "Agenda", href: "/dashboard/kegiatan", icon: Globe },
-    { name: "Berita", href: "/dashboard/berita", icon: Newspaper },
-    { name: "Galeri", href: "/dashboard/galeri", icon: Images },
-    { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen },
-    { name: "Pengurus", href: "/dashboard/pengurus", icon: Users },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Agenda", href: "/dashboard/kegiatan", icon: Globe, permission: "agenda" },
+    { name: "Berita", href: "/dashboard/berita", icon: Newspaper, permission: "berita" },
+    { name: "Galeri", href: "/dashboard/galeri", icon: Images, permission: "galeri" },
+    { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen, permission: "elearning" },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings, permission: "settings" },
 ];
 
 export default function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const [isOpen, setIsOpen] = useState(false);
+    const rolePermissions = getRolePermissions(session?.user?.role);
+    const permissions = session?.user?.permissions || rolePermissions;
+    const canAccess = (permission: DashboardPermissionKey) =>
+        hasAccess(permissions[permission], permission === "settings" ? "full" : "view");
+    const visibleCmsItems = cmsMenuItems.filter((item) =>
+        canAccess(item.permission as DashboardPermissionKey)
+    );
+    const visibleDashboardItems = dashboardMenuItems.filter((item) =>
+        item.permission === "settings"
+            ? session?.user?.role === "SUPER_ADMIN"
+            : canAccess(item.permission as DashboardPermissionKey)
+    );
     const isCmsActive = cmsMenuItems.some((item) => pathname === item.href.split("?")[0]);
     const [isCmsManuallyOpen, setIsCmsManuallyOpen] = useState(false);
     const isCmsOpen = isCmsActive || isCmsManuallyOpen;
 
-    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
-
-    const closeMobile = () => setIsOpen(false);
+    const canSeeDashboardMenu = canAccess("dashboard");
 
     return (
-        <>
-            <div className="fixed top-0 z-40 flex h-16 w-full items-center justify-between border-b border-gray-100 bg-white px-4 md:hidden">
-                <Link href="/" className="flex items-center space-x-2" onClick={closeMobile}>
-                    <Image
-                        src="/PMII_BPP.png"
-                        alt="Logo PMII"
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 object-contain"
-                    />
-                    <span className="text-sm font-bold leading-tight text-primary">
-                        PMII<br />
-                        <span className="text-[10px] uppercase tracking-widest text-secondary/60">Balikpapan</span>
-                    </span>
-                </Link>
-                <button onClick={() => setIsOpen(true)} className="rounded-lg p-2 text-secondary hover:bg-gray-50">
-                    <Menu className="h-6 w-6" />
-                </button>
-            </div>
-
-            {isOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
-                    onClick={closeMobile}
-                />
-            )}
-
-            <aside className={`fixed z-50 flex h-full min-h-screen w-64 flex-col border-r border-gray-200 bg-white transition-transform duration-300 md:w-56 md:translate-x-0 lg:w-64 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            <aside className="fixed z-50 hidden h-full min-h-screen w-64 flex-col border-r border-gray-200 bg-white transition-transform duration-300 md:flex md:w-56 lg:w-64">
                 <div className="flex items-center justify-between border-b border-gray-100 p-5 lg:p-6">
-                    <Link href="/" className="flex items-center space-x-3" onClick={closeMobile}>
+                    <Link href="/" className="flex items-center space-x-3">
                         <Image
                             src="/PMII_BPP.png"
                             alt="Logo PMII"
@@ -89,15 +72,11 @@ export default function Sidebar() {
                             <span className="text-[11px] uppercase tracking-widest text-secondary/60 lg:text-xs">Balikpapan</span>
                         </span>
                     </Link>
-                    <button onClick={closeMobile} className="rounded-lg p-2 text-secondary hover:bg-gray-50 md:hidden">
-                        <X className="h-6 w-6" />
-                    </button>
                 </div>
 
                 <nav className="flex-1 space-y-2 overflow-y-auto p-3 lg:p-4">
                     <Link
                         href="/dashboard"
-                        onClick={closeMobile}
                         className={`flex items-center space-x-3 rounded-xl px-3 py-3 text-sm font-medium transition lg:px-4 ${
                             pathname === "/dashboard"
                                 ? "bg-blue-50 font-bold text-primary"
@@ -108,8 +87,9 @@ export default function Sidebar() {
                         <span>Dashboard</span>
                     </Link>
 
-                    {isSuperAdmin && (
+                    {canSeeDashboardMenu && (
                         <>
+                            {visibleCmsItems.length > 0 && (
                             <div className="rounded-2xl border border-gray-100 bg-gray-50/70 p-1">
                                 <button
                                     type="button"
@@ -127,7 +107,7 @@ export default function Sidebar() {
 
                                 {isCmsOpen && (
                                     <div className="mt-1 space-y-1 p-1">
-                                        {cmsMenuItems.map((item) => {
+                                        {visibleCmsItems.map((item) => {
                                             const Icon = item.icon;
                                             const itemPath = item.href.split("?")[0];
                                             const isActive = pathname === itemPath;
@@ -136,7 +116,6 @@ export default function Sidebar() {
                                                 <Link
                                                     key={item.href}
                                                     href={item.href}
-                                                    onClick={closeMobile}
                                                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
                                                         isActive
                                                             ? "bg-white font-black text-primary shadow-sm"
@@ -151,8 +130,9 @@ export default function Sidebar() {
                                     </div>
                                 )}
                             </div>
+                            )}
 
-                            {dashboardMenuItems.map((item) => {
+                            {visibleDashboardItems.map((item) => {
                                 const Icon = item.icon;
                                 const itemPath = item.href.split("?")[0];
                                 const isActive = pathname === itemPath;
@@ -161,7 +141,6 @@ export default function Sidebar() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        onClick={closeMobile}
                                         className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition lg:px-4 ${
                                             isActive
                                                 ? "bg-blue-50 font-bold text-primary"
@@ -180,7 +159,6 @@ export default function Sidebar() {
                 <div className="space-y-1 border-t border-gray-100 p-3 lg:p-4">
                     <Link
                         href="/"
-                        onClick={closeMobile}
                         className="flex w-full items-center space-x-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-secondary transition hover:bg-gray-50 hover:text-primary lg:px-4"
                     >
                         <Globe className="h-5 w-5 shrink-0 text-gray-400" />
@@ -195,6 +173,5 @@ export default function Sidebar() {
                     </button>
                 </div>
             </aside>
-        </>
     );
 }

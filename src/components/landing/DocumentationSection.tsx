@@ -59,13 +59,13 @@ export default function DocumentationSection({
         </div>
 
         {tiles.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-6 md:gap-4">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-6 md:overflow-visible md:px-0 md:pb-0 md:gap-4">
             {tiles.map((photo, index) => (
               <Link
                 key={photo.id}
                 href={photo.slug.startsWith("/") ? photo.slug : `/galeri/${photo.slug}`}
-                className={`group relative overflow-hidden rounded-[1.5rem] bg-secondary/10 ${
-                  index === 0 ? "col-span-2 row-span-2 aspect-square md:col-span-2" : "aspect-square"
+                className={`group relative h-56 w-[76vw] shrink-0 snap-start overflow-hidden rounded-[1.5rem] bg-secondary/10 transition active:scale-[0.98] md:h-auto md:w-auto md:shrink md:snap-start ${
+                  index === 0 ? "md:col-span-2 md:row-span-2 md:aspect-square" : "md:aspect-square"
                 }`}
               >
                 <img

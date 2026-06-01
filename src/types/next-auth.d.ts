@@ -1,4 +1,10 @@
 import "next-auth";
+import type {
+  AccessLevel,
+  DashboardPermissionKey,
+} from "@/lib/permissions/types";
+
+type DashboardPermissions = Partial<Record<DashboardPermissionKey, AccessLevel>>;
 
 declare module "next-auth" {
   interface Session {
@@ -10,6 +16,7 @@ declare module "next-auth" {
       role?: string;
       organizationId?: string | null;
       mustChangePassword?: boolean;
+      permissions?: DashboardPermissions;
     };
   }
 
@@ -17,6 +24,7 @@ declare module "next-auth" {
     role?: string;
     organizationId?: string | null;
     mustChangePassword?: boolean;
+    permissions?: DashboardPermissions;
   }
 }
 
@@ -26,5 +34,6 @@ declare module "next-auth/jwt" {
     role?: string;
     organizationId?: string | null;
     mustChangePassword?: boolean;
+    permissions?: DashboardPermissions;
   }
 }
