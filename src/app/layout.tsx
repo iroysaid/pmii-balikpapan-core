@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"; // Using Inter as requested (Design Sy
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import Providers from "@/components/Providers";
+import { getLandingContent } from "@/lib/landing/service";
 import clsx from "clsx";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -15,16 +16,23 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const landingContent = await getLandingContent();
+
   return (
     <html lang="id">
       <body className={clsx(inter.variable, "font-sans flex flex-col min-h-screen")}>
         <Providers>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <LayoutWrapper
+            footer={landingContent.footer}
+            navbar={landingContent.navbar}
+          >
+            {children}
+          </LayoutWrapper>
         </Providers>
       </body>
     </html>

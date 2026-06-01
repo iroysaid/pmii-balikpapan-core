@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function LearningDashboard({
     searchParams,
 }: {
-    searchParams: Promise<{ q?: string; status?: string; sort?: string }>;
+    searchParams: Promise<{ q?: string; status?: string; visibility?: string; sort?: string }>;
 }) {
     const session = await getServerSession(authOptions);
     const userRole = session?.user?.role;
@@ -31,6 +31,8 @@ export default async function LearningDashboard({
     }
     if (params.status === "draft") whereClause.isPublished = false;
     if (params.status === "published") whereClause.isPublished = true;
+    if (params.visibility === "public") whereClause.visibility = "PUBLIC";
+    if (params.visibility === "private") whereClause.visibility = "PRIVATE";
 
     let orderBy: Prisma.MaterialOrderByWithRelationInput = { createdAt: "desc" };
     if (params.sort === "date-asc") orderBy = { createdAt: "asc" };
@@ -46,6 +48,7 @@ export default async function LearningDashboard({
         Judul: item.title,
         Bab: item.chapters.length,
         Status: item.isPublished ? "Published" : "Draft",
+        Akses: item.visibility === "PRIVATE" ? "Private" : "Public",
         Tanggal: new Date(item.updatedAt).toLocaleDateString("id-ID"),
     })) : [];
 
@@ -84,6 +87,14 @@ export default async function LearningDashboard({
                             { label: "Published", value: "published" },
                         ],
                     },
+                    {
+                        key: "visibility",
+                        label: "Akses",
+                        options: [
+                            { label: "Public", value: "public" },
+                            { label: "Private", value: "private" },
+                        ],
+                    },
                 ]}
                 dataForExport={materialsForExport}
                 exportFilename={`Data-Materi-${new Date().toISOString().split('T')[0]}`}
@@ -96,6 +107,7 @@ export default async function LearningDashboard({
                             <th className="p-4">Judul Materi</th>
                             <th className="p-4">Bab</th>
                             <th className="p-4">Status</th>
+                            <th className="p-4">Akses</th>
                             <th className="p-4">Tanggal</th>
                             <th className="p-4 text-right">Aksi</th>
                         </tr>
@@ -144,6 +156,13 @@ export default async function LearningDashboard({
                                         <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">Draft</span>
                                     )}
                                 </td>
+                                <td className="p-4">
+                                    {item.visibility === "PRIVATE" ? (
+                                        <span className="bg-slate-900 text-white px-2 py-1 rounded text-xs font-bold">Private</span>
+                                    ) : (
+                                        <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold">Public</span>
+                                    )}
+                                </td>
                                 <td className="p-4 text-sm text-gray-500">
                                     {new Date(item.updatedAt).toLocaleDateString('id-ID')}
                                 </td>
@@ -169,7 +188,7 @@ export default async function LearningDashboard({
                         ))}
                         {materials.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-gray-400">Belum ada data materi.</td>
+                                <td colSpan={6} className="p-8 text-center text-gray-400">Belum ada data materi.</td>
                             </tr>
                         )}
                     </tbody>

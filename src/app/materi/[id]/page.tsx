@@ -29,11 +29,16 @@ export default async function MaterialDetailPage({ params }: { params: Promise<{
         redirect("/materi"); // Redirect to public catalog instead of dashboard
     }
 
+    if (material.visibility === "PRIVATE" && !session?.user) {
+        redirect(`/masuk?callbackUrl=/materi/${material.id}`);
+    }
+
     // Fetch other recent materials for the Sidebar
     const otherMaterials = await prisma.material.findMany({
         where: {
             isPublished: true,
-            id: { not: id } // Exclude current material
+            id: { not: id }, // Exclude current material
+            ...(session?.user ? {} : { visibility: "PUBLIC" }),
         },
         orderBy: { createdAt: 'desc' },
         take: 5,

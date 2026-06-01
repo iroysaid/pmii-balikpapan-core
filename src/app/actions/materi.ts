@@ -24,6 +24,8 @@ export async function createMaterial(formData: FormData) {
 
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
+        const visibilityValue = formData.get("visibility") as string;
+        const visibility = visibilityValue === "PRIVATE" ? "PRIVATE" : "PUBLIC";
         const isPublished = formData.get("isPublished") === "true";
 
         console.log("[MATERI DEBUG] Creating material:", title);
@@ -83,6 +85,7 @@ export async function createMaterial(formData: FormData) {
             data: {
                 title,
                 description,
+                visibility,
                 isPublished,
                 featuredImage,
                 chapters: {
@@ -119,6 +122,8 @@ export async function updateMaterial(id: string, formData: FormData) {
     await checkSuperAdmin();
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
+    const visibilityValue = formData.get("visibility") as string;
+    const visibility = visibilityValue === "PRIVATE" ? "PRIVATE" : "PUBLIC";
     const isPublished = formData.get("isPublished") === "true";
 
     // Re-calculating chapters is complex. Simplest valid approach:
@@ -188,6 +193,7 @@ export async function updateMaterial(id: string, formData: FormData) {
             data: {
                 title,
                 description,
+                visibility,
                 isPublished,
                 featuredImage, // Update featured image based on new chapters
                 chapters: {
@@ -207,4 +213,3 @@ export async function updateMaterial(id: string, formData: FormData) {
     revalidatePath("/dashboard/materi");
     redirect("/dashboard/materi");
 }
-

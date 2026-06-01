@@ -62,6 +62,20 @@ export default function EditMaterialForm({ material }: { material: MaterialWithC
                     <textarea name="description" defaultValue={material.description || ""} rows={3} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Penjelasan singkat..."></textarea>
                 </div>
                 <div>
+                    <label className="block text-sm font-bold text-primary mb-2">Akses Materi</label>
+                    <select
+                        name="visibility"
+                        defaultValue={material.visibility || "PUBLIC"}
+                        className="w-full px-4 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-accent"
+                    >
+                        <option value="PUBLIC">Public - bisa diakses tanpa login</option>
+                        <option value="PRIVATE">Private - khusus kader yang sudah login</option>
+                    </select>
+                    <p className="text-[11px] text-gray-400 mt-1">
+                        Public tampil langsung di /materi. Private tetap terlihat untuk kader setelah login.
+                    </p>
+                </div>
+                <div>
                     <label className="block text-sm font-bold text-primary mb-2">Featured Image (Sampul Materi)</label>
                     <input type="hidden" name="existingFeaturedImage" value={material.featuredImage || ""} />
                     {material.featuredImage && (

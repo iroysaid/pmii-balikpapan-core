@@ -122,6 +122,7 @@ model Material {
   description   String?
   featuredImage String?
   isPublished   Boolean  @default(true)
+  visibility    String   @default("PUBLIC") // PUBLIC, PRIVATE
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   

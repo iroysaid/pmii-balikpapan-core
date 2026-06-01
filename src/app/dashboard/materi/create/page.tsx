@@ -52,6 +52,20 @@ export default function CreateMaterialPage() {
                         <textarea name="description" rows={3} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Penjelasan singkat..."></textarea>
                     </div>
                     <div>
+                        <label className="block text-sm font-bold text-primary mb-2">Akses Materi</label>
+                        <select
+                            name="visibility"
+                            defaultValue="PUBLIC"
+                            className="w-full px-4 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-accent"
+                        >
+                            <option value="PUBLIC">Public - bisa diakses tanpa login</option>
+                            <option value="PRIVATE">Private - khusus kader yang sudah login</option>
+                        </select>
+                        <p className="text-[11px] text-gray-400 mt-1">
+                            Materi public tampil langsung di halaman /materi. Materi private hanya terbuka setelah kader masuk.
+                        </p>
+                    </div>
+                    <div>
                         <label className="block text-sm font-bold text-primary mb-2">Featured Image (Sampul Materi)</label>
                         <input type="file" name="featuredImage" accept="image/*" className="block w-full text-sm text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-primary hover:file:bg-blue-100 transition" />
                         <p className="text-[10px] text-gray-400 mt-1">*Akan dikonversi ke WebP. Jika dikosongkan, thumbnail akan diambil otomatis dari YouTube (jika ada).</p>

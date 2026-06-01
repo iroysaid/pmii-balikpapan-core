@@ -8,6 +8,10 @@ export default withAuth(
         const role = token?.role as string;
         const mustChangePassword = token?.mustChangePassword;
 
+        if (path.startsWith("/dashboard") && role !== "SUPER_ADMIN") {
+            return NextResponse.redirect(new URL("/", req.url));
+        }
+
         // Force password change on first login
         if (mustChangePassword && path !== "/ganti-password") {
             return NextResponse.redirect(new URL("/ganti-password", req.url));
@@ -18,23 +22,14 @@ export default withAuth(
             return NextResponse.redirect(new URL("/dashboard", req.url));
         }
 
-        // Kader Access Control
-        if (role === "KADER") {
-            // Block admin routes
-            const blockedPrefixes = ["/dashboard/kader", "/dashboard/surat", "/dashboard/keuangan/manage", "/admin"];
-            const isBlocked = blockedPrefixes.some(prefix => path.startsWith(prefix)) || path === "/dashboard";
-
-            if (isBlocked) {
-                return NextResponse.redirect(new URL("/dashboard/anggota", req.url));
-            }
-        }
-
-        // PUBLIC Access Control
-        if (role === "PUBLIC" && path.startsWith("/dashboard")) {
+        if (path.startsWith("/admin") && role !== "SUPER_ADMIN") {
             return NextResponse.redirect(new URL("/", req.url));
         }
     },
     {
+        pages: {
+            signIn: "/masuk",
+        },
         callbacks: {
             authorized: ({ token }) => !!token,
         },

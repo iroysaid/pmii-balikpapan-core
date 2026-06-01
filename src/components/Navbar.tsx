@@ -6,21 +6,15 @@ import { Menu, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import type { NavbarContent } from "@/lib/landing/types";
 
-export default function Navbar() {
+export default function Navbar({ content }: { content: NavbarContent }) {
     const [isOpen, setIsOpen] = useState(false);
     const { data: session } = useSession();
     const pathname = usePathname();
     const role = session?.user?.role;
 
-    // Base links for Everyone (Public)
-    const links = [
-        { name: "Beranda", href: "/" },
-        { name: "Profil", href: "/profil" },
-        { name: "Agenda", href: "/kegiatan" },
-        { name: "Berita", href: "/berita" },
-        { name: "Galeri", href: "/galeri" },
-    ];
+    const links = [...content.links];
 
     const isPengurus = ["PENGURUS_KOMISARIAT", "PENGURUS_CABANG", "ADMIN_CABANG", "SUPER_ADMIN"].includes(role as string);
 
@@ -49,28 +43,21 @@ export default function Navbar() {
                     {/* Logo Area */}
                     <Link href="/" className="font-bold text-xl flex items-center gap-3">
                         <div className={`flex items-center space-x-2 rounded-full px-2.5 py-1.5 ${glassShell}`}>
-                            <div className="relative w-11 h-11">
-                                <Image
-                                    src="/PB_PMII.png"
-                                    alt="Logo PMII"
-                                    fill
-                                    sizes="44px"
-                                    className="object-contain"
-                                />
-                            </div>
-                            <div className="relative w-11 h-11">
-                                <Image
-                                    src="/PMII_BPP.png"
-                                    alt="Logo PMII Balikpapan"
-                                    fill
-                                    sizes="44px"
-                                    className="object-contain"
-                                />
-                            </div>
+                            {content.logos.map((logo) => (
+                                <div key={logo.src} className="relative w-11 h-11">
+                                    <Image
+                                        src={logo.src}
+                                        alt={logo.alt}
+                                        fill
+                                        sizes="44px"
+                                        className="object-contain"
+                                    />
+                                </div>
+                            ))}
                         </div>
                         <div className="flex flex-col leading-tight">
-                            <span className="text-accent text-lg font-extrabold tracking-wide">PC PMII</span>
-                            <span className="text-sm tracking-widest font-semibold text-white">BALIKPAPAN</span>
+                            <span className="text-accent text-lg font-extrabold tracking-wide">{content.brandTop}</span>
+                            <span className="text-sm tracking-widest font-semibold text-white">{content.brandBottom}</span>
                         </div>
                     </Link>
 
@@ -95,14 +82,14 @@ export default function Navbar() {
                             </Link>
                         ) : (
                             <Link
-                                href="/masuk"
+                                href={content.loginLink.href}
                                 className={`rounded-full px-4 py-2 text-sm font-black transition-all duration-300 hover:scale-[1.02] ${
-                                    isActive("/masuk")
+                                    isActive(content.loginLink.href)
                                         ? "border border-accent/70 bg-accent text-secondary shadow-[0_10px_28px_rgba(245,202,15,0.24)]"
                                         : "border border-white/25 bg-white/18 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.26)] hover:bg-accent hover:text-secondary"
                                 }`}
                             >
-                                Login
+                                {content.loginLink.label}
                             </Link>
                         )}
                     </div>
@@ -147,15 +134,15 @@ export default function Navbar() {
                             </Link>
                         ) : (
                             <Link
-                                href="/masuk"
+                                href={content.loginLink.href}
                                 onClick={() => setIsOpen(false)}
                                 className={`rounded-full px-4 py-3 text-sm font-black transition-all duration-300 ${
-                                    isActive("/masuk")
+                                    isActive(content.loginLink.href)
                                         ? "border border-accent/70 bg-accent text-secondary"
                                         : "border border-white/25 bg-white/18 text-white hover:bg-accent hover:text-secondary"
                                 }`}
                             >
-                                Login
+                                {content.loginLink.label}
                             </Link>
                         )}
                     </div>
