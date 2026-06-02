@@ -15,7 +15,7 @@ export default function ContentImageUploader() {
         formData.append("file", file);
 
         try {
-            const res = await fetch("/api/upload", {
+            const res = await fetch("/api/upload?folder=posts/content", {
                 method: "POST",
                 body: formData,
             });

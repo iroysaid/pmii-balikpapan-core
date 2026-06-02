@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { uploadFile } from "@/lib/upload";
+import { requireDashboardPermission } from "@/lib/permissions/guards";
 
 export async function updateMemberProfile(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -360,12 +361,7 @@ export async function submitLearningAssignment(formData: FormData) {
 }
 
 export async function reviewLearningAssignment(formData: FormData) {
-  const session = await getServerSession(authOptions);
-  const role = session?.user?.role;
-
-  if (!role || role === "KADER" || role === "PUBLIC") {
-    throw new Error("Unauthorized");
-  }
+  await requireDashboardPermission("elearning", "edit");
 
   const submissionId = formData.get("submissionId") as string;
   const status = formData.get("status") as string;

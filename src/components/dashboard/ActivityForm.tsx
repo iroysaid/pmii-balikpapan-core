@@ -50,7 +50,7 @@ export default function ActivityForm({ initialData }: ActivityFormProps) {
         formData.append("file", files[i]);
 
         try {
-            const res = await fetch("/api/upload", {
+            const res = await fetch("/api/upload?folder=kegiatan", {
                 method: "POST",
                 body: formData,
             });

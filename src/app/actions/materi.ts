@@ -5,22 +5,16 @@ import { uploadFile } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { getYouTubeID } from "@/lib/youtube";
+import { requireDashboardPermission } from "@/lib/permissions/guards";
 
-async function checkSuperAdmin() {
-    const session = await getServerSession(authOptions);
-    // Allow SUPER_ADMIN and PENGURUS (if we want Pengurus to manage learning, but UI hides it. 
-    // Safest is SUPER_ADMIN only for now as per dashboard logic).
-    if (session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized: Only Super Admin can perform this action.");
-    }
+async function checkLearningPermission() {
+    await requireDashboardPermission("elearning", "edit");
 }
 
 export async function createMaterial(formData: FormData) {
     try {
-        await checkSuperAdmin();
+        await checkLearningPermission();
 
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
@@ -146,13 +140,13 @@ export async function createMaterial(formData: FormData) {
 }
 
 export async function deleteMaterial(id: string) {
-    await checkSuperAdmin();
+    await checkLearningPermission();
     await prisma.material.delete({ where: { id } });
     revalidatePath("/dashboard/materi");
 }
 
 export async function updateMaterial(id: string, formData: FormData) {
-    await checkSuperAdmin();
+    await checkLearningPermission();
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const visibilityValue = formData.get("visibility") as string;

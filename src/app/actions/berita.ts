@@ -4,14 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { uploadFile } from "@/lib/upload";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireDashboardPermission } from "@/lib/permissions/guards";
 
-async function checkSuperAdmin() {
-    const session = await getServerSession(authOptions);
-    if (session?.user?.role !== "SUPER_ADMIN") {
-        throw new Error("Unauthorized: Only Super Admin can perform this action.");
-    }
+async function checkBeritaPermission() {
+    await requireDashboardPermission("berita", "edit");
 }
 
 // ——— Tag processing helper ———
@@ -46,7 +42,7 @@ async function processTags(tagsJson: string): Promise<string[]> {
 }
 
 export async function createPost(formData: FormData) {
-    await checkSuperAdmin();
+    await checkBeritaPermission();
 
     const title = formData.get("title") as string;
     const content = formData.get("content") as string;
@@ -89,7 +85,7 @@ export async function createPost(formData: FormData) {
 }
 
 export async function deletePost(id: string) {
-    await checkSuperAdmin();
+    await checkBeritaPermission();
 
     await prisma.post.delete({
         where: { id },
@@ -99,7 +95,7 @@ export async function deletePost(id: string) {
 }
 
 export async function updatePost(id: string, formData: FormData) {
-    await checkSuperAdmin();
+    await checkBeritaPermission();
 
     const title = formData.get("title") as string;
     const content = formData.get("content") as string;
