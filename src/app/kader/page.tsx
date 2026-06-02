@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { ArrowRight, Award, BookOpen, CalendarDays, Sparkles } from "lucide-react";
 
 import MemberCard from "@/components/kader/MemberCard";
+import KaderPage from "@/components/kader/KaderPage";
 import SectionCard from "@/components/kader/SectionCard";
 import { authOptions } from "@/lib/auth";
 import { ensureMemberCard, getMemberDashboardData } from "@/lib/member/service";
@@ -14,39 +15,25 @@ export default async function KaderHomePage() {
   const verificationUrl = `/verifikasi/kartu/${memberCard.id}`;
 
   return (
-    <div className="space-y-6">
-      <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2rem] bg-primary p-6 text-white shadow-[0_28px_90px_rgba(38,46,237,0.24)] md:p-8">
+    <KaderPage
+      eyebrow="Beranda Kader"
+      title={`Selamat berproses, Sahabat ${data.user?.name?.split(" ")[0] || "PMII"}.`}
+      description="Portal personal untuk identitas kader, learning journey, agenda, sertifikat, portofolio, dan riwayat organisasi."
+    >
+      <section className="grid min-w-0 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="min-w-0 rounded-[1.5rem] bg-primary p-5 text-white shadow-[0_24px_70px_rgba(38,46,237,0.22)] md:rounded-[2rem] md:p-7">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[#F5CA0F]">Beranda Kader</p>
-          <h1 className="mt-3 text-3xl font-black leading-tight md:text-5xl">
-            Selamat berproses, Sahabat {data.user?.name?.split(" ")[0] || "PMII"}.
-          </h1>
-          <p className="mt-4 max-w-2xl text-white/78">
-            Portal personal untuk identitas kader, learning journey, agenda, sertifikat,
-            portofolio, dan riwayat organisasi kader PMII Balikpapan.
+          <h2 className="mt-3 text-2xl font-black leading-tight md:text-4xl">
+            Ruang tumbuh kader PMII Balikpapan
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/78 md:text-base">
+            Pantau agenda, perjalanan belajar, sertifikat, dan portofolio personal dari satu dashboard yang ringan.
           </p>
-          <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-            {data.quickActions.map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className={`rounded-2xl px-4 py-3 text-center text-sm font-black transition active:scale-95 ${
-                  action.tone === "primary"
-                    ? "bg-white text-primary"
-                    : action.tone === "accent"
-                      ? "bg-[#F5CA0F] text-secondary"
-                      : "bg-white/12 text-white"
-                }`}
-              >
-                {action.label}
-              </Link>
-            ))}
-          </div>
         </div>
         <MemberCard user={data.user} verificationUrl={verificationUrl} compact />
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: "Status", value: data.profile?.status === "VERIFIED" ? "Aktif" : "Pending", icon: Sparkles },
           { label: "Progress Kaderisasi", value: `${data.progress.kaderisasi}%`, icon: Award },
@@ -55,7 +42,7 @@ export default async function KaderHomePage() {
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.label} className="rounded-[1.5rem] border border-white/70 bg-white/82 p-5 shadow-sm">
+            <div key={stat.label} className="min-w-0 rounded-[1.5rem] border border-white/70 bg-white/82 p-4 shadow-sm md:p-5">
               <Icon className="mb-4 h-6 w-6 text-primary" />
               <p className="text-xs font-black uppercase tracking-[0.14em] text-secondary/55">{stat.label}</p>
               <p className="mt-1 text-2xl font-black text-[#122562]">{stat.value}</p>
@@ -64,7 +51,7 @@ export default async function KaderHomePage() {
         })}
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
         <SectionCard title="Learning Journey" description="Jalur kaderisasi formal dan modul belajar yang sedang berjalan.">
           <div className="space-y-3">
             {data.learningPath.map((item) => (
@@ -102,6 +89,50 @@ export default async function KaderHomePage() {
           </div>
         </SectionCard>
       </div>
-    </div>
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+        <SectionCard title="Sertifikat Terbaru" description="Arsip sertifikat terakhir yang tersimpan di dashboard kader.">
+          <div className="space-y-3">
+            {data.certificates.slice(0, 3).map((certificate) => (
+              <Link key={certificate.id || certificate.title} href="/kader/sertifikat" className="block rounded-2xl bg-blue-50 p-4 transition hover:bg-blue-100">
+                <p className="font-black text-primary">{certificate.title}</p>
+                <p className="mt-1 text-sm text-secondary/70">{certificate.category} · {certificate.status}</p>
+              </Link>
+            ))}
+            {data.certificates.length === 0 && <p className="text-sm text-secondary/60">Belum ada sertifikat.</p>}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Portofolio Terbaru" description="Karya, pengalaman, atau dokumen personal kader yang terakhir ditambahkan.">
+          <div className="space-y-3">
+            {data.portfolios.slice(0, 3).map((item) => (
+              <Link key={item.id || item.title} href="/kader/portofolio" className="block rounded-2xl bg-blue-50 p-4 transition hover:bg-blue-100">
+                <p className="font-black text-primary">{item.title}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-secondary/70">{item.type} · {item.description}</p>
+              </Link>
+            ))}
+            {data.portfolios.length === 0 && <p className="text-sm text-secondary/60">Belum ada portofolio.</p>}
+          </div>
+        </SectionCard>
+      </div>
+      <SectionCard title="Aksi Cepat" description="Akses cepat untuk aktivitas yang paling sering dipakai kader.">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {data.quickActions.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className={`rounded-2xl px-4 py-3 text-center text-sm font-black transition active:scale-95 ${
+                action.tone === "primary"
+                  ? "bg-primary text-white"
+                  : action.tone === "accent"
+                    ? "bg-[#F5CA0F] text-secondary"
+                    : "bg-blue-50 text-primary"
+              }`}
+            >
+              {action.label}
+            </Link>
+          ))}
+        </div>
+      </SectionCard>
+    </KaderPage>
   );
 }

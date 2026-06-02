@@ -27,7 +27,7 @@ export default function KaderBottomNav() {
   return (
     <>
       {isMoreOpen && (
-        <div className="fixed inset-x-3 bottom-24 z-50 rounded-[2rem] border border-white/50 bg-white/90 p-3 shadow-[0_24px_80px_rgba(18,37,98,0.26)] backdrop-blur-2xl backdrop-saturate-200 md:hidden">
+        <div className="fixed inset-x-3 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-50 rounded-[2rem] border border-white/50 bg-white/90 p-3 shadow-[0_24px_80px_rgba(18,37,98,0.26)] backdrop-blur-2xl backdrop-saturate-200 md:hidden">
           <div className="grid grid-cols-2 gap-2">
             {moreItems.map((item) => {
               const Icon = item.icon;
@@ -50,7 +50,7 @@ export default function KaderBottomNav() {
         </div>
       )}
 
-      <nav className="fixed bottom-3 left-2 right-2 z-50 md:hidden">
+      <nav className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-2 right-2 z-50 md:hidden">
       <div className="mx-auto grid max-w-md grid-cols-5 rounded-full border border-white/50 bg-[#262EED]/24 p-1 shadow-[0_20px_60px_rgba(18,37,98,0.32)] backdrop-blur-2xl backdrop-saturate-200 [-webkit-backdrop-filter:blur(18px)_saturate(190%)]">
         {items.map((item) => {
           const Icon = item.icon;

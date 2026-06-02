@@ -10,8 +10,8 @@ export default function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[2rem] border border-white/70 bg-white/82 p-5 shadow-[0_24px_80px_rgba(18,37,98,0.09)] backdrop-blur-xl md:p-7">
-      <div className="mb-5">
+    <section className="w-full min-w-0 rounded-[1.5rem] border border-white/70 bg-white/82 p-4 shadow-[0_20px_60px_rgba(18,37,98,0.08)] backdrop-blur-xl md:rounded-[2rem] md:p-6">
+      <div className="mb-4 md:mb-5">
         <h2 className="text-xl font-black text-[#122562]">{title}</h2>
         {description && <p className="mt-1 text-sm leading-relaxed text-secondary/70">{description}</p>}
       </div>
@@ -19,4 +19,3 @@ export default function SectionCard({
     </section>
   );
 }
-

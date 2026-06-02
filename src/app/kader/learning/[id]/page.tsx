@@ -8,6 +8,7 @@ import {
   submitLearningAssignment,
   submitLearningQuiz,
 } from "@/app/actions/member";
+import KaderPage from "@/components/kader/KaderPage";
 import SectionCard from "@/components/kader/SectionCard";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -70,18 +71,24 @@ export default async function KaderLearningDetailPage({
 
   if (!isRequiredPathCompleted) {
     return (
-      <div className="space-y-6">
-        <Link href="/kader/learning" className="inline-flex items-center gap-2 text-sm font-black text-primary">
-          <ArrowLeft className="h-4 w-4" />
-          Kembali ke Learning Journey
-        </Link>
+      <KaderPage
+        eyebrow="Learning Journey"
+        title="Modul terkunci"
+        description={`${material.title} belum bisa diakses sampai path sebelumnya selesai.`}
+        action={
+          <Link href="/kader/learning" className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-primary">
+            <ArrowLeft className="h-4 w-4" />
+            Kembali
+          </Link>
+        }
+      >
         <SectionCard title="Modul Terkunci" description={`${material.title} belum bisa diakses.`}>
           <div className="rounded-2xl bg-amber-50 p-5 text-amber-800">
             <p className="font-black">Selesaikan path {material.requiredPath} terlebih dahulu.</p>
             <p className="mt-2 text-sm">Setelah syarat selesai, modul ini otomatis terbuka di dashboard kader.</p>
           </div>
         </SectionCard>
-      </div>
+      </KaderPage>
     );
   }
 
@@ -90,17 +97,23 @@ export default async function KaderLearningDetailPage({
   const latestSubmission = material.assignmentSubmissions[0];
 
   return (
-    <div className="space-y-6">
-      <Link href="/kader/learning" className="inline-flex items-center gap-2 text-sm font-black text-primary">
-        <ArrowLeft className="h-4 w-4" />
-        Kembali ke Learning Journey
-      </Link>
+    <KaderPage
+      eyebrow="Modul Kader"
+      title={material.title}
+      description={material.description || "Materi pembelajaran kader PMII Balikpapan."}
+      action={
+        <Link href="/kader/learning" className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-black text-primary">
+          <ArrowLeft className="h-4 w-4" />
+          Kembali
+        </Link>
+      }
+    >
 
-      <section className="overflow-hidden rounded-[2rem] bg-[#122562] p-6 text-white shadow-[0_24px_80px_rgba(18,37,98,0.22)] md:p-8">
+      <section className="min-w-0 overflow-hidden rounded-[1.5rem] bg-[#122562] p-5 text-white shadow-[0_24px_80px_rgba(18,37,98,0.22)] md:rounded-[2rem] md:p-7">
         <p className="text-xs font-black uppercase tracking-[0.22em] text-[#F5CA0F]">
           Modul Kader
         </p>
-        <h1 className="mt-3 text-3xl font-black md:text-5xl">{material.title}</h1>
+        <h2 className="mt-3 text-2xl font-black md:text-4xl">{material.title}</h2>
         <p className="mt-4 max-w-3xl text-white/75">
           {material.description || "Materi pembelajaran kader PMII Balikpapan."}
         </p>
@@ -112,14 +125,14 @@ export default async function KaderLearningDetailPage({
         </p>
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.42fr]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)]">
         <SectionCard title="Lesson / Materi" description="Ikuti chapter secara bertahap lalu tandai progress belajar.">
           <div className="space-y-3">
             {material.chapters.length === 0 ? (
               <p className="text-sm text-secondary/60">Belum ada lesson pada modul ini.</p>
             ) : (
               material.chapters.map((chapter, index) => (
-                <div key={chapter.id} className="rounded-2xl bg-blue-50 p-4">
+                <div key={chapter.id} className="min-w-0 rounded-2xl bg-blue-50 p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-sm font-black text-white">
                       {index + 1}
@@ -205,9 +218,9 @@ export default async function KaderLearningDetailPage({
                         </legend>
                         <div className="grid gap-2">
                           {options.map((option) => (
-                            <label key={option} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-secondary">
+                            <label key={option} className="flex min-w-0 items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-secondary">
                               <input required type="radio" name={`question_${question.id}`} value={option} />
-                              {option}
+                              <span className="min-w-0 break-words">{option}</span>
                             </label>
                           ))}
                         </div>
@@ -246,7 +259,7 @@ export default async function KaderLearningDetailPage({
           </div>
         </SectionCard>
       </div>
-    </div>
+    </KaderPage>
   );
 }
 

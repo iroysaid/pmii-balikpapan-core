@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { ExternalLink, Plus, Trash2 } from "lucide-react";
 
 import { createMemberPortfolio, deleteMemberPortfolio } from "@/app/actions/member";
+import KaderPage from "@/components/kader/KaderPage";
 import SectionCard from "@/components/kader/SectionCard";
 import { authOptions } from "@/lib/auth";
 import { getMemberDashboardData } from "@/lib/member/service";
@@ -12,15 +13,11 @@ export default async function PortfolioPage() {
   const portfolios = data.portfolios.slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Portofolio</p>
-        <h1 className="mt-2 text-3xl font-black text-[#122562]">Ruang karya kader</h1>
-        <p className="mt-2 max-w-2xl text-sm text-secondary/70">
-          Simpan karya tulis, proposal, dokumentasi kegiatan, pengalaman organisasi, dan link karya.
-        </p>
-      </div>
-
+    <KaderPage
+      eyebrow="Portofolio"
+      title="Ruang karya kader"
+      description="Simpan karya tulis, proposal, dokumentasi kegiatan, pengalaman organisasi, dan link karya."
+    >
       <SectionCard title="Portofolio Terbaru" description="Menampilkan maksimal 3 item terbaru agar mudah dipindai.">
         <details className="mb-4 rounded-2xl border border-dashed border-primary/25 bg-blue-50/70 p-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-primary">
@@ -78,6 +75,6 @@ export default async function PortfolioPage() {
           ))}
         </div>
       </SectionCard>
-    </div>
+    </KaderPage>
   );
 }

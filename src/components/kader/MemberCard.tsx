@@ -25,7 +25,7 @@ export default function MemberCard({
   const profile = user?.kaderProfile;
 
   return (
-    <div className={`relative overflow-hidden rounded-[2rem] bg-[#122562] p-5 text-white shadow-[0_28px_90px_rgba(18,37,98,0.34)] ${compact ? "" : "md:p-7"}`}>
+    <div className={`relative w-full min-w-0 overflow-hidden rounded-[1.5rem] bg-[#122562] p-5 text-white shadow-[0_28px_90px_rgba(18,37,98,0.34)] md:rounded-[2rem] ${compact ? "" : "md:p-7"}`}>
       <div className="absolute -right-14 -top-14 h-40 w-40 rounded-full bg-[#F5CA0F]/25 blur-2xl" />
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(38,46,237,0.42),transparent_55%)]" />
       <div className="relative z-10">

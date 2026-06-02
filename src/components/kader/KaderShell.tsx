@@ -110,8 +110,10 @@ export default function KaderShell({
         </div>
       </header>
 
-      <main className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-28 pt-24 md:ml-56 md:px-6 md:pb-10 lg:ml-64 lg:px-8">
-        {children}
+      <main className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 md:ml-56 md:px-6 md:pb-10 lg:ml-64 lg:px-8">
+        <div className="mx-auto w-full max-w-6xl min-w-0">
+          {children}
+        </div>
       </main>
       <KaderBottomNav />
     </div>

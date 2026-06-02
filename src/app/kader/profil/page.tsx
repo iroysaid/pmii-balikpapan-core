@@ -5,6 +5,7 @@ import { ShieldCheck } from "lucide-react";
 import MemberCard from "@/components/kader/MemberCard";
 import MemberCardActions from "@/components/kader/MemberCardActions";
 import KaderProfileForm from "@/components/kader/KaderProfileForm";
+import KaderPage from "@/components/kader/KaderPage";
 import { authOptions } from "@/lib/auth";
 import { ensureMemberCard } from "@/lib/member/service";
 import { prisma } from "@/lib/prisma";
@@ -23,16 +24,11 @@ export default async function KaderProfilePage() {
   const cardStatus = user?.kaderProfile?.status === "VERIFIED" ? "Aktif Terverifikasi" : "Menunggu Verifikasi";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Profil Kader</p>
-        <h1 className="mt-2 text-3xl font-black text-[#122562]">Identitas dan data personal</h1>
-        <p className="mt-2 max-w-2xl text-secondary/70">
-          Kartu anggota digital dan data diri kader berada di satu tempat. Lengkapi profil agar learning journey,
-          agenda, sertifikat, dan portofolio lebih akurat.
-        </p>
-      </div>
-
+    <KaderPage
+      eyebrow="Profil Kader"
+      title="Identitas dan data personal"
+      description="Kartu anggota digital dan data diri kader berada di satu tempat. Lengkapi profil agar learning journey, agenda, sertifikat, dan portofolio lebih akurat."
+    >
       {user && (
         <div className="grid min-w-0 gap-5 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="min-w-0 space-y-4">
@@ -67,6 +63,6 @@ export default async function KaderProfilePage() {
           </div>
         </div>
       )}
-    </div>
+    </KaderPage>
   );
 }

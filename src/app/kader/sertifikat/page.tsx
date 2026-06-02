@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { ExternalLink, Plus, Trash2, Upload } from "lucide-react";
 
 import { createMemberCertificate, deleteMemberCertificate } from "@/app/actions/member";
+import KaderPage from "@/components/kader/KaderPage";
 import SectionCard from "@/components/kader/SectionCard";
 import { authOptions } from "@/lib/auth";
 import { getMemberDashboardData } from "@/lib/member/service";
@@ -12,15 +13,11 @@ export default async function CertificatesPage() {
   const certificates = data.certificates.slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Sertifikat</p>
-        <h1 className="mt-2 text-3xl font-black text-[#122562]">Arsip sertifikat saya</h1>
-        <p className="mt-2 max-w-2xl text-sm text-secondary/70">
-          Simpan sertifikat kaderisasi, agenda, learning, dan dokumen pendukung lain secara rapi.
-        </p>
-      </div>
-
+    <KaderPage
+      eyebrow="Sertifikat"
+      title="Arsip sertifikat saya"
+      description="Simpan sertifikat kaderisasi, agenda, learning, dan dokumen pendukung lain secara rapi."
+    >
       <SectionCard title="Sertifikat Terbaru" description="Menampilkan maksimal 3 sertifikat terbaru agar halaman tetap ringan.">
         <details className="mb-4 rounded-2xl border border-dashed border-primary/25 bg-blue-50/70 p-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-primary">
@@ -82,6 +79,6 @@ export default async function CertificatesPage() {
           ))}
         </div>
       </SectionCard>
-    </div>
+    </KaderPage>
   );
 }
