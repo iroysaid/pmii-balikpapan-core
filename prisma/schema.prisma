@@ -124,6 +124,36 @@ model GalleryItem {
   createdAt   DateTime @default(now())
 }
 
+model CmsPageContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String
+  content   String
+  status    String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key, status])
+}
+
+model Officer {
+  id             String   @id @default(cuid())
+  name           String
+  role           String
+  department     String?
+  image          String
+  imageAlt       String?
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  showOnHomepage Boolean  @default(true)
+  showOnProfile  Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([showOnHomepage, showOnProfile])
+}
+
 model Material {
   id            String   @id @default(cuid())
   title         String

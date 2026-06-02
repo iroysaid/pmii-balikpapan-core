@@ -19,7 +19,7 @@ export type MemberAgendaItem = {
   title: string;
   date: string;
   location?: string | null;
-  status: "AVAILABLE" | "REGISTERED" | "PENDING" | "ACCEPTED" | "DONE";
+  status: "AVAILABLE" | "REGISTERED" | "PENDING" | "ACCEPTED" | "PRESENT" | "DONE" | "REJECTED";
   href: string;
 };
 

@@ -156,3 +156,78 @@ export async function deleteActivity(id: string) {
   revalidatePath("/kegiatan");
   revalidatePath("/");
 }
+
+const agendaRegistrationStatuses = [
+  "REGISTERED",
+  "PENDING",
+  "ACCEPTED",
+  "PRESENT",
+  "DONE",
+  "REJECTED",
+] as const;
+
+export async function updateAgendaRegistrationStatus(formData: FormData) {
+  await getAuthorizedSession();
+
+  const registrationId = formData.get("registrationId") as string;
+  const status = formData.get("status") as string;
+  const note = formData.get("note") as string;
+
+  if (!registrationId || !agendaRegistrationStatuses.includes(status as never)) {
+    throw new Error("Status peserta tidak valid.");
+  }
+
+  const existing = await prisma.agendaRegistration.findUnique({
+    where: { id: registrationId },
+    include: {
+      activity: true,
+      user: true,
+    },
+  });
+
+  if (!existing) {
+    throw new Error("Pendaftaran peserta tidak ditemukan.");
+  }
+
+  const now = new Date();
+
+  await prisma.agendaRegistration.update({
+    where: { id: registrationId },
+    data: {
+      status,
+      note: note || null,
+      verifiedAt: status === "ACCEPTED" ? now : existing.verifiedAt,
+      attendedAt: status === "PRESENT" ? now : existing.attendedAt,
+      completedAt: status === "DONE" ? now : existing.completedAt,
+    },
+  });
+
+  if (status === "DONE") {
+    const existingCertificate = await prisma.memberCertificate.findFirst({
+      where: {
+        userId: existing.userId,
+        category: "Agenda",
+        title: `Sertifikat ${existing.activity.title}`,
+      },
+    });
+
+    if (!existingCertificate) {
+      await prisma.memberCertificate.create({
+        data: {
+          userId: existing.userId,
+          title: `Sertifikat ${existing.activity.title}`,
+          issuer: existing.activity.organizer || "PMII Balikpapan",
+          category: "Agenda",
+          status: "VERIFIED",
+          issuedAt: now,
+        },
+      });
+    }
+  }
+
+  revalidatePath(`/dashboard/kegiatan/${existing.activityId}/rsvp`);
+  revalidatePath("/dashboard/kegiatan");
+  revalidatePath("/kader");
+  revalidatePath("/kader/agenda");
+  revalidatePath("/kader/sertifikat");
+}

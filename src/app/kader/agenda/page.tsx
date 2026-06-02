@@ -23,14 +23,14 @@ export default async function MyAgendaPage() {
                 <p className="text-sm text-secondary/70">{new Date(agenda.date).toLocaleString("id-ID")} · {agenda.location || "Lokasi menyusul"}</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-black text-primary">
-                  {agenda.status === "AVAILABLE" ? "Agenda tersedia" : agenda.status}
+                <span className={`w-fit rounded-full px-3 py-1 text-xs font-black ${getStatusClassName(agenda.status)}`}>
+                  {getStatusLabel(agenda.status)}
                 </span>
                 {agenda.status === "AVAILABLE" && agenda.id && (
                   <form action={registerMemberAgenda}>
                     <input type="hidden" name="activityId" value={agenda.id} />
                     <button className="rounded-full bg-primary px-4 py-2 text-xs font-black text-white" type="submit">
-                      Ikuti
+                      Daftar
                     </button>
                   </form>
                 )}
@@ -42,4 +42,27 @@ export default async function MyAgendaPage() {
       </div>
     </SectionCard>
   );
+}
+
+function getStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    AVAILABLE: "Agenda tersedia",
+    REGISTERED: "Terdaftar",
+    PENDING: "Menunggu verifikasi",
+    ACCEPTED: "Diterima",
+    PRESENT: "Hadir",
+    DONE: "Selesai",
+    REJECTED: "Ditolak",
+  };
+
+  return labels[status] || status;
+}
+
+function getStatusClassName(status: string) {
+  if (status === "AVAILABLE") return "bg-white text-primary";
+  if (status === "PENDING") return "bg-amber-50 text-amber-700";
+  if (status === "ACCEPTED") return "bg-blue-100 text-primary";
+  if (status === "PRESENT" || status === "DONE") return "bg-green-50 text-green-700";
+  if (status === "REJECTED") return "bg-red-50 text-red-600";
+  return "bg-white text-secondary";
 }

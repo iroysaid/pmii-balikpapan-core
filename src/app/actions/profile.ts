@@ -4,18 +4,29 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 
 import { authOptions } from "@/lib/auth";
+import { hasAccess } from "@/lib/permissions/defaults";
+import { getRolePermissions } from "@/lib/permissions/routes";
 import { saveProfileContent } from "@/lib/profile/service";
 import type { ProfileContent } from "@/lib/profile/types";
 
-async function checkSuperAdmin() {
+async function checkProfileCmsPermission() {
   const session = await getServerSession(authOptions);
-  if (session?.user?.role !== "SUPER_ADMIN") {
-    throw new Error("Unauthorized: Only Super Admin can edit profile content.");
+  if (!session?.user?.role) {
+    throw new Error("Unauthorized.");
+  }
+
+  if (session.user.role === "SUPER_ADMIN") {
+    return;
+  }
+
+  const permissions = session.user.permissions || getRolePermissions(session.user.role);
+  if (!hasAccess(permissions.cmsProfil, "edit")) {
+    throw new Error("Unauthorized: insufficient CMS profile permission.");
   }
 }
 
 export async function updateProfileContent(formData: FormData) {
-  await checkSuperAdmin();
+  await checkProfileCmsPermission();
 
   const raw = formData.get("content") as string;
   if (!raw) {

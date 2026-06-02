@@ -258,22 +258,24 @@ export async function registerMemberAgenda(formData: FormData) {
 
   if (!activityId) return;
 
-  await prisma.agendaRegistration.upsert({
+  const existing = await prisma.agendaRegistration.findUnique({
     where: {
       userId_activityId: {
         userId: session.user.id,
         activityId,
       },
     },
-    create: {
-      userId: session.user.id,
-      activityId,
-      status: "REGISTERED",
-    },
-    update: {
-      status: "REGISTERED",
-    },
   });
+
+  if (!existing) {
+    await prisma.agendaRegistration.create({
+      data: {
+        userId: session.user.id,
+        activityId,
+        status: "PENDING",
+      },
+    });
+  }
 
   revalidatePath("/kader");
   revalidatePath("/kader/agenda");

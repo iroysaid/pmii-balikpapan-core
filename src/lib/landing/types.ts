@@ -56,8 +56,11 @@ export type NdpContent = {
 
 export type TeamMember = {
   image: string;
+  alt?: string;
   name: string;
   role: string;
+  department?: string;
+  isActive?: boolean;
   showOnHomepage?: boolean;
   showOnProfile?: boolean;
   sortOrder?: number;

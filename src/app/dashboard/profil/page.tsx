@@ -16,10 +16,6 @@ export default async function DashboardProfilPage() {
     redirect("/masuk?callbackUrl=/dashboard/profil");
   }
 
-  if (session.user?.role !== "SUPER_ADMIN") {
-    redirect("/");
-  }
-
   const content = await getProfileContent();
 
   return (

@@ -14,7 +14,10 @@ type TeamMembersEditorProps = {
 const emptyMember: TeamMember = {
   name: "",
   role: "",
+  department: "",
   image: "/PMII_BPP.png",
+  alt: "",
+  isActive: true,
   showOnHomepage: true,
   showOnProfile: true,
 };
@@ -22,6 +25,7 @@ const emptyMember: TeamMember = {
 export default function TeamMembersEditor({
   initialMembers,
 }: TeamMembersEditorProps) {
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const [members, setMembers] = useState<TeamMember[]>(
     initialMembers.map((member, index) => ({
       showOnHomepage: true,
@@ -57,6 +61,33 @@ export default function TeamMembersEditor({
 
   const removeMember = (index: number) => {
     setMembers((current) => current.filter((_, itemIndex) => itemIndex !== index));
+  };
+
+  const uploadMemberPhoto = async (index: number, file: File | null) => {
+    if (!file) return;
+
+    setUploadingIndex(index);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "Upload gagal.");
+      }
+
+      setMembers((current) =>
+        current.map((member, memberIndex) =>
+          memberIndex === index ? { ...member, image: result.url || member.image } : member
+        )
+      );
+    } finally {
+      setUploadingIndex(null);
+    }
   };
 
   return (
@@ -125,6 +156,19 @@ export default function TeamMembersEditor({
               </label>
               <label className="space-y-1 md:col-span-2">
                 <span className="text-xs font-black uppercase tracking-wider text-primary">
+                  Bidang / Departemen
+                </span>
+                <input
+                  value={member.department || ""}
+                  onChange={(event) =>
+                    updateMember(index, { ...member, department: event.target.value })
+                  }
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-primary"
+                  placeholder="Contoh: Kaderisasi, Gerakan, Bendahara"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs font-black uppercase tracking-wider text-primary">
                   URL Foto
                 </span>
                 <input
@@ -136,7 +180,47 @@ export default function TeamMembersEditor({
                   placeholder="/uploads/kegiatan/foto.webp atau https://..."
                 />
               </label>
+              <label className="space-y-1">
+                <span className="text-xs font-black uppercase tracking-wider text-primary">
+                  Upload Foto
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => uploadMemberPhoto(index, event.target.files?.[0] || null)}
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary"
+                />
+                {uploadingIndex === index && (
+                  <span className="text-xs font-bold text-primary">Mengupload dan mengonversi ke WebP...</span>
+                )}
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs font-black uppercase tracking-wider text-primary">
+                  Alt Text Foto
+                </span>
+                <input
+                  value={member.alt || ""}
+                  onChange={(event) =>
+                    updateMember(index, { ...member, alt: event.target.value })
+                  }
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-primary"
+                  placeholder="Deskripsi foto untuk aksesibilitas"
+                />
+              </label>
               <div className="flex flex-wrap gap-4 md:col-span-2">
+                <label className="inline-flex items-center gap-2 text-sm font-semibold text-secondary">
+                  <input
+                    type="checkbox"
+                    checked={member.isActive !== false}
+                    onChange={(event) =>
+                      updateMember(index, {
+                        ...member,
+                        isActive: event.target.checked,
+                      })
+                    }
+                  />
+                  Aktif
+                </label>
                 <label className="inline-flex items-center gap-2 text-sm font-semibold text-secondary">
                   <input
                     type="checkbox"

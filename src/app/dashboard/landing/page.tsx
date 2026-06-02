@@ -60,10 +60,6 @@ export default async function DashboardLandingPage({
     redirect("/masuk?callbackUrl=/dashboard/landing");
   }
 
-  if (session.user?.role !== "SUPER_ADMIN") {
-    redirect("/");
-  }
-
   const params = await searchParams;
   const content = await getLandingContent();
   const activeSection = editableSections.find(

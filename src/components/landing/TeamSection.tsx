@@ -31,7 +31,7 @@ export default function TeamSection({ content }: { content: TeamContent }) {
               <div className="relative h-80 overflow-hidden bg-secondary/5 md:h-72">
                 <Image
                   src={member.image}
-                  alt={member.name}
+                  alt={member.alt || member.name}
                   fill
                   sizes="(max-width: 768px) 72vw, 180px"
                   className="object-cover grayscale transition duration-500 group-hover:grayscale-0 group-focus:grayscale-0 group-active:grayscale-0"
@@ -40,6 +40,11 @@ export default function TeamSection({ content }: { content: TeamContent }) {
               <div className="p-4">
                 <h3 className="text-lg font-black text-black">{member.name}</h3>
                 <p className="mt-1 text-sm text-secondary">{member.role}</p>
+                {member.department && (
+                  <p className="mt-2 inline-flex rounded-full bg-primary/8 px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-primary">
+                    {member.department}
+                  </p>
+                )}
               </div>
             </article>
           ))}

@@ -238,7 +238,9 @@ export async function getMemberDashboardData(userId: string) {
 function mapAgendaRegistrationStatus(status: string): MemberAgendaItem["status"] {
   if (status === "PENDING") return "PENDING";
   if (status === "ACCEPTED") return "ACCEPTED";
-  if (status === "PRESENT" || status === "DONE") return "DONE";
+  if (status === "PRESENT") return "PRESENT";
+  if (status === "DONE") return "DONE";
+  if (status === "REJECTED") return "REJECTED";
   return "REGISTERED";
 }
 

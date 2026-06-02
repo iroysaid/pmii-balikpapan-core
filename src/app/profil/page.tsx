@@ -2,6 +2,7 @@ import Image from "next/image";
 import { MapPin, Milestone, Target, Users } from "lucide-react";
 
 import { getLandingContent } from "@/lib/landing/service";
+import { getOfficerTeamMembers } from "@/lib/officers/service";
 import { getProfileContent } from "@/lib/profile/service";
 
 export default async function ProfilPage() {
@@ -9,9 +10,10 @@ export default async function ProfilPage() {
     getProfileContent(),
     getLandingContent(),
   ]);
-  const profileMembers = landingContent.team.members
-    .filter((member) => member.showOnProfile !== false)
-    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const profileMembers = await getOfficerTeamMembers({
+    placement: "profile",
+    fallback: landingContent.team.members,
+  });
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -103,7 +105,7 @@ export default async function ProfilPage() {
                   <div className="relative h-80 overflow-hidden bg-secondary/5 md:h-72">
                     <Image
                       src={member.image}
-                      alt={member.name}
+                      alt={member.alt || member.name}
                       fill
                       sizes="(max-width: 768px) 72vw, 220px"
                       className="object-cover grayscale transition duration-500 group-hover:grayscale-0 group-focus:grayscale-0 group-active:grayscale-0"
@@ -112,6 +114,11 @@ export default async function ProfilPage() {
                   <div className="p-4">
                     <h3 className="text-lg font-black text-black">{member.name}</h3>
                     <p className="mt-1 text-sm text-secondary">{member.role}</p>
+                    {member.department && (
+                      <p className="mt-2 inline-flex rounded-full bg-primary/8 px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-primary">
+                        {member.department}
+                      </p>
+                    )}
                   </div>
                 </article>
               ))}

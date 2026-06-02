@@ -49,7 +49,7 @@ export default async function ActivitiesPage({
         orderBy: orderBy,
         include: {
             _count: {
-                select: { rsvps: true }
+                select: { rsvps: true, memberRegistrations: true }
             }
         }
     });
@@ -177,18 +177,16 @@ export default async function ActivitiesPage({
                                     {isSuperAdmin && (
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end space-x-2">
-                                                {activity.isInvitation && (
-                                                    <Link 
-                                                        href={`/dashboard/kegiatan/${activity.id}/rsvp`} 
-                                                        className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg flex items-center group relative"
-                                                        title="Lihat Konfirmasi Kehadiran"
-                                                    >
-                                                        <Users className="w-4 h-4" />
-                                                        <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-[8px] font-bold px-1 rounded-full">
-                                                            {activity._count.rsvps}
-                                                        </span>
-                                                    </Link>
-                                                )}
+                                                <Link 
+                                                    href={`/dashboard/kegiatan/${activity.id}/rsvp`} 
+                                                    className="p-2 text-pink-600 hover:bg-pink-50 rounded-lg flex items-center group relative"
+                                                    title="Lihat Peserta & RSVP"
+                                                >
+                                                    <Users className="w-4 h-4" />
+                                                    <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-[8px] font-bold px-1 rounded-full">
+                                                        {activity._count.rsvps + activity._count.memberRegistrations}
+                                                    </span>
+                                                </Link>
                                                 <Link href={`/dashboard/kegiatan/${activity.id}/edit`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
                                                     <Edit className="w-4 h-4" />
                                                 </Link>

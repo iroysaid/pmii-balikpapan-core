@@ -6,6 +6,7 @@ import { Eye } from "lucide-react";
 import TeamMembersEditor from "@/components/dashboard/TeamMembersEditor";
 import { authOptions } from "@/lib/auth";
 import { getLandingContent } from "@/lib/landing/service";
+import { getOfficerTeamMembers } from "@/lib/officers/service";
 
 export default async function DashboardPengurusPage() {
   const session = await getServerSession(authOptions);
@@ -13,11 +14,11 @@ export default async function DashboardPengurusPage() {
     redirect("/masuk?callbackUrl=/dashboard/pengurus");
   }
 
-  if (session.user?.role !== "SUPER_ADMIN") {
-    redirect("/");
-  }
-
   const content = await getLandingContent();
+  const members = await getOfficerTeamMembers({
+    placement: "all",
+    fallback: content.team.members,
+  });
 
   return (
     <div className="space-y-8">
@@ -41,7 +42,7 @@ export default async function DashboardPengurusPage() {
         </Link>
       </div>
 
-      <TeamMembersEditor initialMembers={content.team.members} />
+      <TeamMembersEditor initialMembers={members} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import VisionMissionSection from "@/components/landing/VisionMissionSection";
 import MovementParallaxSection from "@/components/pmii/MovementParallaxSection";
 import { authOptions } from "@/lib/auth";
 import { getLandingContent } from "@/lib/landing/service";
+import { getOfficerTeamMembers } from "@/lib/officers/service";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function Home() {
   const content = await getLandingContent();
   const selectedPostSlugs = content.news.selectedSlugs.filter(Boolean);
   const selectedActivitySlugs = content.agenda.selectedSlugs.filter(Boolean);
-  const [latestPosts, upcomingActivities, pastActivities, galleryItems] =
+  const [latestPosts, upcomingActivities, pastActivities, galleryItems, teamMembers] =
     await Promise.all([
       prisma.post.findMany({
         where: {
@@ -56,6 +57,10 @@ export default async function Home() {
         orderBy: { startDate: "desc" },
         take: 4,
       }),
+      getOfficerTeamMembers({
+        placement: "homepage",
+        fallback: content.team.members,
+      }),
     ]);
 
   const orderedPosts =
@@ -77,7 +82,7 @@ export default async function Home() {
       <HeroSection content={content.hero} />
       <VisionMissionSection content={content.visionMission} />
       <NdpSection content={content.ndp} />
-      <TeamSection content={content.team} />
+      <TeamSection content={{ ...content.team, members: teamMembers }} />
       <DocumentationSection
         content={content.documentation}
         galleryItems={galleryItems}

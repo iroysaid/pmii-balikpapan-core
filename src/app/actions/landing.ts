@@ -6,16 +6,29 @@ import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { getLandingContent, saveLandingContent } from "@/lib/landing/service";
 import type { LandingContent, TeamMember } from "@/lib/landing/types";
+import { replaceOfficersFromTeamMembers } from "@/lib/officers/service";
+import { hasAccess } from "@/lib/permissions/defaults";
+import { getRolePermissions } from "@/lib/permissions/routes";
+import type { DashboardPermissionKey } from "@/lib/permissions/types";
 
-async function checkSuperAdmin() {
+async function checkCmsPermission(permission: DashboardPermissionKey) {
   const session = await getServerSession(authOptions);
-  if (session?.user?.role !== "SUPER_ADMIN") {
-    throw new Error("Unauthorized: Only Super Admin can edit landing content.");
+  if (!session?.user?.role) {
+    throw new Error("Unauthorized.");
+  }
+
+  if (session.user.role === "SUPER_ADMIN") {
+    return;
+  }
+
+  const permissions = session.user.permissions || getRolePermissions(session.user.role);
+  if (!hasAccess(permissions[permission], "edit")) {
+    throw new Error("Unauthorized: insufficient CMS permission.");
   }
 }
 
 export async function updateLandingContent(formData: FormData) {
-  await checkSuperAdmin();
+  await checkCmsPermission("cmsHomepage");
 
   const raw = formData.get("content") as string;
   if (!raw) {
@@ -35,7 +48,7 @@ export async function updateLandingContent(formData: FormData) {
 }
 
 export async function updateTeamMembers(formData: FormData) {
-  await checkSuperAdmin();
+  await checkCmsPermission("cmsPengurus");
 
   const raw = formData.get("members") as string;
   if (!raw) {
@@ -50,16 +63,20 @@ export async function updateTeamMembers(formData: FormData) {
   }
 
   const content = await getLandingContent();
+  const normalizedMembers = members.map((member, index) => ({
+    ...member,
+    sortOrder: member.sortOrder ?? index + 1,
+    isActive: member.isActive ?? true,
+    showOnHomepage: member.showOnHomepage ?? true,
+    showOnProfile: member.showOnProfile ?? true,
+  }));
+
+  await replaceOfficersFromTeamMembers(normalizedMembers);
   await saveLandingContent({
     ...content,
     team: {
       ...content.team,
-      members: members.map((member, index) => ({
-        ...member,
-        sortOrder: member.sortOrder ?? index + 1,
-        showOnHomepage: member.showOnHomepage ?? true,
-        showOnProfile: member.showOnProfile ?? true,
-      })),
+      members: normalizedMembers,
     },
   });
 
