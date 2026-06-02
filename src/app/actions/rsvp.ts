@@ -14,7 +14,7 @@ export async function submitRSVP(formData: FormData) {
     }
 
     try {
-        await prisma.rsvp.create({
+        await prisma.rSVP.create({
             data: {
                 activityId,
                 name,

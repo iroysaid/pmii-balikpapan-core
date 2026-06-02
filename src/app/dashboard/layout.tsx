@@ -5,6 +5,7 @@ import DashboardFloatingActionMenu from "@/components/dashboard/DashboardFloatin
 import DashboardMobileNav from "@/components/dashboard/DashboardMobileNav";
 import { getRolePermissions } from "@/lib/permissions/routes";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function DashboardLayout({
     children,
@@ -13,6 +14,8 @@ export default async function DashboardLayout({
 }) {
     const session = await getServerSession(authOptions);
     const permissions = session?.user?.permissions || getRolePermissions(session?.user?.role);
+    const canSwitchToKader =
+        session?.user?.role === "SUPER_ADMIN" || Boolean(session?.user?.hasKaderProfile);
     const canUseFloatingMenu = Object.values(permissions).some(
         (level) => level === "edit" || level === "full"
     );
@@ -41,8 +44,18 @@ export default async function DashboardLayout({
                                 </h1>
                             </div>
                         </div>
-                        <div className="max-w-[9rem] truncate rounded-full border border-white/45 bg-white/40 px-3 py-1 text-xs font-black text-primary">
-                            {session?.user?.name || "Pengguna"}
+                        <div className="flex items-center gap-2">
+                            {canSwitchToKader && (
+                                <Link
+                                    href="/kader"
+                                    className="rounded-full border border-white/45 bg-white/45 px-3 py-1 text-xs font-black text-primary active:scale-95"
+                                >
+                                    Kader
+                                </Link>
+                            )}
+                            <div className="max-w-[9rem] truncate rounded-full border border-white/45 bg-white/40 px-3 py-1 text-xs font-black text-primary">
+                                {session?.user?.name || "Pengguna"}
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -59,8 +72,18 @@ export default async function DashboardLayout({
                                 CMS Internal Organisasi
                             </h1>
                         </div>
-                        <div className="relative z-10 rounded-full border border-white/45 bg-white/35 px-4 py-2 text-sm font-bold text-primary shadow-sm backdrop-blur-xl">
-                            {session?.user?.name || "Pengguna"} · {session?.user?.role || "PUBLIC"}
+                        <div className="relative z-10 flex flex-wrap items-center gap-2">
+                            {canSwitchToKader && (
+                                <Link
+                                    href="/kader"
+                                    className="rounded-full border border-white/45 bg-white/45 px-4 py-2 text-sm font-black text-primary shadow-sm backdrop-blur-xl transition hover:bg-white"
+                                >
+                                    Switch Mode Kader
+                                </Link>
+                            )}
+                            <div className="rounded-full border border-white/45 bg-white/35 px-4 py-2 text-sm font-bold text-primary shadow-sm backdrop-blur-xl">
+                                {session?.user?.name || "Pengguna"} · {session?.user?.role || "PUBLIC"}
+                            </div>
                         </div>
                     </div>
                 </header>

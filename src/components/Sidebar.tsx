@@ -28,10 +28,11 @@ const cmsMenuItems = [
 ];
 
 const dashboardMenuItems = [
+    { name: "User & Role", href: "/dashboard/kader", icon: Users, permission: "userRole" },
     { name: "Agenda", href: "/dashboard/kegiatan", icon: Globe, permission: "agenda" },
     { name: "Berita", href: "/dashboard/berita", icon: Newspaper, permission: "berita" },
     { name: "Galeri", href: "/dashboard/galeri", icon: Images, permission: "galeri" },
-    { name: "E-Learning", href: "/dashboard/materi", icon: BookOpen, permission: "elearning" },
+    { name: "Learning Management", href: "/dashboard/materi", icon: BookOpen, permission: "elearning" },
     { name: "Settings", href: "/dashboard/settings", icon: Settings, permission: "settings" },
 ];
 

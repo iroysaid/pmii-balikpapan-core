@@ -70,7 +70,7 @@ export default function DocumentationSection({
               >
                 <img
                   src={photo.url}
-                  alt={"alt" in photo ? photo.alt : photo.title}
+                  alt={String("alt" in photo ? photo.alt : photo.title)}
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   loading="lazy"
                 />

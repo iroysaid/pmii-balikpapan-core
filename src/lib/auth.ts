@@ -58,7 +58,8 @@ export const authOptions: NextAuthOptions = {
                         name: user.name,
                         role: user.role,
                         organizationId: user.organizationId,
-                        mustChangePassword: user.mustChangePassword
+                        mustChangePassword: user.mustChangePassword,
+                        hasKaderProfile: Boolean(user.kaderProfile),
                     };
                 } catch (error) {
                     console.error("[AUTH DEBUG] Error in authorize callback:", error);
@@ -74,6 +75,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.role = token.role as string;
                 session.user.organizationId = token.organizationId as string | null | undefined;
                 session.user.mustChangePassword = token.mustChangePassword as boolean | undefined;
+                session.user.hasKaderProfile = token.hasKaderProfile as boolean | undefined;
                 session.user.permissions = token.permissions;
             }
             return session;
@@ -84,6 +86,7 @@ export const authOptions: NextAuthOptions = {
                 token.role = user.role;
                 token.organizationId = user.organizationId;
                 token.mustChangePassword = user.mustChangePassword;
+                token.hasKaderProfile = user.hasKaderProfile;
             }
 
             if (token.role) {

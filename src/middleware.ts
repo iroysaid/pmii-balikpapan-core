@@ -1,6 +1,7 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 import { canAccessDashboardPath } from "@/lib/permissions/routes";
+import { isAdminWorkspaceRole, isKaderRole } from "@/lib/workspaces";
 
 export default withAuth(
     function middleware(req) {
@@ -9,9 +10,19 @@ export default withAuth(
         const role = token?.role as string;
         const permissions = token?.permissions;
         const mustChangePassword = token?.mustChangePassword;
+        const hasKaderProfile = Boolean(token?.hasKaderProfile);
 
-        if (!canAccessDashboardPath({ path, role, permissions })) {
-            return NextResponse.redirect(new URL("/", req.url));
+        if (path.startsWith("/dashboard") && !canAccessDashboardPath({ path, role, permissions })) {
+            return NextResponse.redirect(new URL(isKaderRole(role) ? "/kader" : "/", req.url));
+        }
+
+        if (path.startsWith("/kader")) {
+            const canUseKaderWorkspace =
+                role === "SUPER_ADMIN" || isKaderRole(role) || hasKaderProfile;
+
+            if (!canUseKaderWorkspace) {
+                return NextResponse.redirect(new URL(isAdminWorkspaceRole(role) ? "/dashboard" : "/", req.url));
+            }
         }
 
         // Force password change on first login
@@ -21,7 +32,7 @@ export default withAuth(
 
         // Allow passing /ganti-password if they don't need to change it?
         if (!mustChangePassword && path === "/ganti-password") {
-            return NextResponse.redirect(new URL("/dashboard", req.url));
+            return NextResponse.redirect(new URL(isAdminWorkspaceRole(role) ? "/dashboard" : "/kader", req.url));
         }
 
         if (path.startsWith("/admin") && role !== "SUPER_ADMIN") {
@@ -39,5 +50,5 @@ export default withAuth(
 );
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/admin/:path*", "/ganti-password"],
+    matcher: ["/dashboard/:path*", "/kader/:path*", "/admin/:path*", "/ganti-password"],
 };

@@ -2,9 +2,12 @@ import "next-auth";
 import type {
   AccessLevel,
   DashboardPermissionKey,
+  KaderPermissionKey,
 } from "@/lib/permissions/types";
 
-type DashboardPermissions = Partial<Record<DashboardPermissionKey, AccessLevel>>;
+type DashboardPermissions = Partial<
+  Record<DashboardPermissionKey | KaderPermissionKey, AccessLevel>
+>;
 
 declare module "next-auth" {
   interface Session {
@@ -16,6 +19,7 @@ declare module "next-auth" {
       role?: string;
       organizationId?: string | null;
       mustChangePassword?: boolean;
+      hasKaderProfile?: boolean;
       permissions?: DashboardPermissions;
     };
   }
@@ -24,6 +28,7 @@ declare module "next-auth" {
     role?: string;
     organizationId?: string | null;
     mustChangePassword?: boolean;
+    hasKaderProfile?: boolean;
     permissions?: DashboardPermissions;
   }
 }
@@ -34,6 +39,7 @@ declare module "next-auth/jwt" {
     role?: string;
     organizationId?: string | null;
     mustChangePassword?: boolean;
+    hasKaderProfile?: boolean;
     permissions?: DashboardPermissions;
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -8,7 +8,8 @@ import Image from "next/image";
 function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    const callbackParam = searchParams.get("callbackUrl");
+    const callbackUrl = callbackParam || "/kader";
     const reason = searchParams.get("reason");
     const showSessionNotice =
         reason === "session-expired" || callbackUrl.startsWith("/dashboard");
@@ -33,7 +34,19 @@ function LoginForm() {
             setError("Username/No. Induk atau sandi salah.");
             setLoading(false);
         } else {
-            router.push(result?.url || callbackUrl);
+            const nextSession = await getSession();
+            const role = nextSession?.user?.role;
+            const adminRoles = [
+                "SUPER_ADMIN",
+                "ADMIN",
+                "ADMIN_CABANG",
+                "PENGURUS_CABANG",
+                "PENGURUS_KOMISARIAT",
+                "EDITOR",
+                "CONTRIBUTOR",
+            ];
+            const defaultDestination = role && adminRoles.includes(role) ? "/dashboard" : "/kader";
+            router.push(callbackParam ? result?.url || callbackUrl : defaultDestination);
             router.refresh();
         }
     };

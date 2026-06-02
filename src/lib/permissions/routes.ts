@@ -4,6 +4,7 @@ import type {
   DashboardPermissionKey,
   RolePermissionMatrix,
 } from "./types";
+import { isAdminWorkspaceRole } from "@/lib/workspaces";
 
 export const dashboardRoutePermissions: {
   match: (path: string) => boolean;
@@ -13,6 +14,11 @@ export const dashboardRoutePermissions: {
   {
     match: (path) => path === "/dashboard",
     permission: "dashboard",
+  },
+  {
+    match: (path) => path.startsWith("/dashboard/kader"),
+    permission: "userRole",
+    minimum: "view",
   },
   {
     match: (path) => path.startsWith("/dashboard/landing"),
@@ -73,6 +79,12 @@ export function canAccessDashboardPath({
   permissions?: Partial<Record<DashboardPermissionKey, AccessLevel>> | null;
 }) {
   if (!path.startsWith("/dashboard")) return true;
+
+  if (!isAdminWorkspaceRole(role)) return false;
+
+  if (path === "/dashboard") {
+    return hasAccess(permissions?.dashboard || getRolePermissions(role).dashboard);
+  }
 
   if (path.startsWith("/dashboard/settings") && role !== "SUPER_ADMIN") {
     return false;

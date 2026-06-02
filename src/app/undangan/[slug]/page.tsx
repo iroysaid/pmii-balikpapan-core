@@ -25,7 +25,7 @@ export default async function InvitationPage({
         return notFound();
     }
 
-    const eventDateStr = new Date(activity.eventDate).toLocaleDateString("id-ID", {
+    const eventDateStr = new Date(activity.startDate).toLocaleDateString("id-ID", {
         weekday: "long",
         day: "numeric",
         month: "long",
@@ -95,7 +95,7 @@ export default async function InvitationPage({
                 {/* Countdown */}
                 <div className="space-y-4 text-center">
                     <h3 className="text-xl font-bold opacity-70">Acara Akan Dimulai Dalam</h3>
-                    <Countdown targetDate={activity.eventDate} />
+                    <Countdown targetDate={activity.startDate} />
                 </div>
 
                 {/* Event Details */}
@@ -142,7 +142,7 @@ export default async function InvitationPage({
 
                     <div className="pt-4">
                         <a 
-                            href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity.title)}&dates=${new Date(activity.eventDate).toISOString().replace(/-|:|\.\d\d\d/g, "")}/${new Date(activity.eventDate).toISOString().replace(/-|:|\.\d\d\d/g, "")}&details=${encodeURIComponent(activity.description)}&location=${encodeURIComponent(activity.locationName || "")}`}
+                            href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(activity.title)}&dates=${new Date(activity.startDate).toISOString().replace(/-|:|\.\d\d\d/g, "")}/${new Date(activity.startDate).toISOString().replace(/-|:|\.\d\d\d/g, "")}&details=${encodeURIComponent(activity.description)}&location=${encodeURIComponent(activity.locationName || "")}`}
                             target="_blank"
                             className="w-full flex items-center justify-center bg-white text-primary py-4 rounded-2xl font-black hover:bg-white/90 transition shadow-lg shadow-white/10"
                         >

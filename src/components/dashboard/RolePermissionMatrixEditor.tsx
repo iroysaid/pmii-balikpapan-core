@@ -7,19 +7,22 @@ import { updatePermissionConfig } from "@/app/actions/permissions";
 import SubmitButton from "@/components/dashboard/SubmitButton";
 import {
   accessLabels,
+  kaderPermissionLabels,
   permissionLabels,
   roleLabels,
 } from "@/lib/permissions/defaults";
 import type {
   AccessLevel,
   DashboardPermissionKey,
+  KaderPermissionKey,
   PermissionConfig,
   RoleKey,
 } from "@/lib/permissions/types";
 
 const roleOrder: RoleKey[] = ["SUPER_ADMIN", "ADMIN", "EDITOR", "CONTRIBUTOR"];
-const permissionOrder: DashboardPermissionKey[] = [
+const permissionOrder: (DashboardPermissionKey | KaderPermissionKey)[] = [
   "dashboard",
+  "dashboardKader",
   "cmsHomepage",
   "cmsProfil",
   "cmsPengurus",
@@ -27,9 +30,20 @@ const permissionOrder: DashboardPermissionKey[] = [
   "berita",
   "galeri",
   "elearning",
+  "userRole",
+  "sertifikat",
+  "portofolio",
+  "riwayatOrganisasi",
   "settings",
 ];
 const accessOrder: AccessLevel[] = ["none", "view", "edit", "full"];
+
+function getPermissionLabel(permission: DashboardPermissionKey | KaderPermissionKey) {
+  return (
+    permissionLabels[permission as DashboardPermissionKey] ||
+    kaderPermissionLabels[permission as KaderPermissionKey]
+  );
+}
 
 export default function RolePermissionMatrixEditor({
   initialConfig,
@@ -40,7 +54,7 @@ export default function RolePermissionMatrixEditor({
 
   const updateAccess = (
     role: RoleKey,
-    permission: DashboardPermissionKey,
+    permission: DashboardPermissionKey | KaderPermissionKey,
     access: AccessLevel
   ) => {
     if (role === "SUPER_ADMIN" || permission === "settings") return;
@@ -89,7 +103,7 @@ export default function RolePermissionMatrixEditor({
                       index === permissionOrder.length - 1 ? "rounded-r-2xl" : ""
                     }`}
                   >
-                    {permissionLabels[permission]}
+                    {getPermissionLabel(permission)}
                   </th>
                 ))}
               </tr>

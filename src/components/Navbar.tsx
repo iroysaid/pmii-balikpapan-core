@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { NavbarContent } from "@/lib/landing/types";
+import { isAdminWorkspaceRole } from "@/lib/workspaces";
 
 export default function Navbar({ content }: { content: NavbarContent }) {
     const { data: session } = useSession();
@@ -13,7 +14,7 @@ export default function Navbar({ content }: { content: NavbarContent }) {
 
     const links = [...content.links];
 
-    const isPengurus = ["PENGURUS_KOMISARIAT", "PENGURUS_CABANG", "ADMIN_CABANG", "SUPER_ADMIN"].includes(role as string);
+    const accountHref = isAdminWorkspaceRole(role) ? "/dashboard" : "/kader";
 
     // Role-Based Additions
     if (session) {
@@ -72,7 +73,7 @@ export default function Navbar({ content }: { content: NavbarContent }) {
                         ))}
                         {session ? (
                             <Link
-                                href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
+                                href={accountHref}
                                 className="rounded-full border border-accent/45 bg-accent/88 px-4 py-2 text-sm font-black text-secondary shadow-[0_10px_28px_rgba(245,202,15,0.22)] transition-all duration-300 hover:scale-[1.02] hover:bg-white"
                             >
                                 {session.user?.name?.split(' ')[0] || "Akun"}
@@ -94,7 +95,7 @@ export default function Navbar({ content }: { content: NavbarContent }) {
                     <div className="md:hidden">
                         {session ? (
                             <Link
-                                href={isPengurus ? "/dashboard" : "/dashboard/anggota"}
+                                href={accountHref}
                                 className={`inline-flex h-10 items-center rounded-full px-4 text-xs font-black text-white transition active:scale-95 ${glassShell}`}
                             >
                                 Akun

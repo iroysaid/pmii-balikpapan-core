@@ -70,7 +70,7 @@ export default function DashboardFloatingActionMenu({
           show: can("galeri"),
         },
         {
-          label: "Tambah Materi E-Learning",
+          label: "Tambah Materi Learning",
           Icon: <BookOpen className="h-4 w-4" />,
           onClick: () => router.push("/dashboard/materi/create"),
           show: can("elearning"),

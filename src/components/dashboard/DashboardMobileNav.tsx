@@ -35,8 +35,9 @@ const cmsItems = [
 ] as const;
 
 const moreItems = [
+  { label: "User & Role", href: "/dashboard/kader", icon: Users, permission: "userRole" },
   { label: "Galeri", href: "/dashboard/galeri", icon: Images, permission: "galeri" },
-  { label: "E-Learning", href: "/dashboard/materi", icon: BookOpen, permission: "elearning" },
+  { label: "Learning", href: "/dashboard/materi", icon: BookOpen, permission: "elearning" },
   { label: "Settings", href: "/dashboard/settings", icon: Settings, permission: "settings" },
 ] as const;
 
@@ -59,7 +60,7 @@ export default function DashboardMobileNav({
     { label: "CMS", action: () => setSheet("cms"), icon: Globe, active: pathname.startsWith("/dashboard/landing") || pathname.startsWith("/dashboard/profil") || pathname.startsWith("/dashboard/pengurus"), hidden: visibleCmsItems.length === 0 },
     { label: "Berita", href: "/dashboard/berita", icon: Newspaper, active: pathname.startsWith("/dashboard/berita"), hidden: !can("berita") },
     { label: "Agenda", href: "/dashboard/kegiatan", icon: CalendarDays, active: pathname.startsWith("/dashboard/kegiatan"), hidden: !can("agenda") },
-    { label: "Lainnya", action: () => setSheet("more"), icon: ChevronDown, active: pathname.startsWith("/dashboard/galeri") || pathname.startsWith("/dashboard/materi") || pathname.startsWith("/dashboard/settings"), hidden: visibleMoreItems.length === 0 },
+    { label: "Lainnya", action: () => setSheet("more"), icon: ChevronDown, active: pathname.startsWith("/dashboard/kader") || pathname.startsWith("/dashboard/galeri") || pathname.startsWith("/dashboard/materi") || pathname.startsWith("/dashboard/settings"), hidden: visibleMoreItems.length === 0 },
   ].filter((item) => !item.hidden);
 
   const sheetItems = sheet === "cms" ? visibleCmsItems : visibleMoreItems;

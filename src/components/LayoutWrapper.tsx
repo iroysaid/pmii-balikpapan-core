@@ -17,16 +17,17 @@ export default function LayoutWrapper({
 }) {
     const pathname = usePathname();
     const isDashboard = pathname.startsWith("/dashboard");
+    const isKaderDashboard = pathname.startsWith("/kader");
     const isStandaloneLanding = pathname.startsWith("/pmii");
 
     return (
         <>
-            {!isDashboard && !isStandaloneLanding && <Navbar content={navbar} />}
-            <main className={`flex-grow ${!isDashboard ? "pb-24 md:pb-0" : ""}`}>
+            {!isDashboard && !isKaderDashboard && !isStandaloneLanding && <Navbar content={navbar} />}
+            <main className={`flex-grow ${!isDashboard && !isKaderDashboard ? "pb-24 md:pb-0" : ""}`}>
                 {children}
             </main>
-            {!isDashboard && <Footer content={footer} />}
-            {!isDashboard && !isStandaloneLanding && <MobileBottomNav />}
+            {!isDashboard && !isKaderDashboard && <Footer content={footer} />}
+            {!isDashboard && !isKaderDashboard && !isStandaloneLanding && <MobileBottomNav />}
         </>
     );
 }

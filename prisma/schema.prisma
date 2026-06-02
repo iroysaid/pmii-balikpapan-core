@@ -11,83 +11,91 @@ datasource db {
 // Models
 
 model Organization {
-  id          String   @id @default(cuid())
-  name        String
-  type        String   @default("KOMISARIAT") // KOMISARIAT, CABANG
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  type      String   @default("KOMISARIAT") // KOMISARIAT, CABANG
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  users       User[]
-  letters     Letter[]
+  users        User[]
+  letters      Letter[]
   transactions Transaction[]
-  posts       Post[]
-  activities  Activity[]
+  posts        Post[]
+  activities   Activity[]
 }
 
 model User {
-  id                 String    @id @default(cuid())
+  id                 String   @id @default(cuid())
   name               String
-  username           String?   @unique
-  email              String?   // Removed @unique
+  username           String?  @unique
+  email              String? // Removed @unique
   password           String
-  mustChangePassword Boolean   @default(true)
-  role               String    @default("KADER") // PUBLIC, KADER, PENGURUS_KOMISARIAT, PENGURUS_CABANG, ADMIN_CABANG, SUPER_ADMIN
+  mustChangePassword Boolean  @default(true)
+  role               String   @default("KADER") // PUBLIC, KADER, PENGURUS_KOMISARIAT, PENGURUS_CABANG, ADMIN_CABANG, SUPER_ADMIN
   image              String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  
-  organizationId     String?
-  organization       Organization? @relation(fields: [organizationId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  kaderProfile       KaderProfile?
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  kaderProfile          KaderProfile?
+  memberCard            MemberCard?
+  organizationHistories MemberOrganizationHistory[]
+  learningProgress      MemberLearningProgress[]
+  agendaRegistrations   AgendaRegistration[]
+  certificates          MemberCertificate[]
+  achievements          MemberAchievement[]
+  badges                MemberBadge[]
+  portfolios            MemberPortfolio[]
 }
 
 model KaderProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  rayon       String?
-  komisariat  String?
-  mapabaYear  String?
-  pkdYear     String?
-  pkdLocation String?
-  pkdOrganizer String?
-  pklYear     String?
-  pklLocation String?
-  pklOrganizer String?
-  pknYear     String?
-  pknLocation String?
-  pknOrganizer String?
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  rayon         String?
+  komisariat    String?
+  mapabaYear    String?
+  pkdYear       String?
+  pkdLocation   String?
+  pkdOrganizer  String?
+  pklYear       String?
+  pklLocation   String?
+  pklOrganizer  String?
+  pknYear       String?
+  pknLocation   String?
+  pknOrganizer  String?
   otherTraining String? // Stores JSON stringified array of other trainings
-  
+
   // New Fields
-  campus         String?
-  campusAddress  String?
-  faculty        String?
-  major          String? // Prodi / Jurusan
-  address        String?
-  noInduk     String?  @unique
-  birthPlace  String?
-  birthDate   DateTime?
-  phone       String?
-  
+  campus        String?
+  campusAddress String?
+  faculty       String?
+  major         String? // Prodi / Jurusan
+  address       String?
+  noInduk       String?   @unique
+  birthPlace    String?
+  birthDate     DateTime?
+  phone         String?
+
   // Verification Queue
-  status      String    @default("PENDING") // PENDING, VERIFIED
+  status String @default("PENDING") // PENDING, VERIFIED
 }
 
 model Post {
-  id        String    @id @default(cuid())
-  slug      String    @unique
+  id        String   @id @default(cuid())
+  slug      String   @unique
   title     String
   content   String
   image     String?
-  published Boolean   @default(false)
+  published Boolean  @default(false)
   author    String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  tags      PostTag[]
+  tags           PostTag[]
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
 }
@@ -125,34 +133,35 @@ model Material {
   visibility    String   @default("PUBLIC") // PUBLIC, PRIVATE
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
-  chapters      MaterialChapter[]
+
+  chapters         MaterialChapter[]
+  learningProgress MemberLearningProgress[]
 }
 
 model MaterialChapter {
-  id          String   @id @default(cuid())
-  title       String?  // Bab Title
+  id          String  @id @default(cuid())
+  title       String? // Bab Title
   description String?
-  type        String   @default("DOCUMENT") // DOCUMENT, YOUTUBE
+  type        String  @default("DOCUMENT") // DOCUMENT, YOUTUBE
   fileUrl     String?
   youtubeUrl  String?
-  sortOrder   Int      @default(0)
-  
-  materialId  String
-  material    Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  sortOrder   Int     @default(0)
+
+  materialId String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 }
 
 model Letter {
-  id          String   @id @default(cuid())
-  number      String
-  type        String   @default("MASUK") // MASUK, KELUAR
-  date        DateTime @default(now())
-  sender      String?
-  receiver    String?
-  subject     String?
-  fileUrl     String?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  number    String
+  type      String   @default("MASUK") // MASUK, KELUAR
+  date      DateTime @default(now())
+  sender    String?
+  receiver  String?
+  subject   String?
+  fileUrl   String?
+  createdAt DateTime @default(now())
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -172,44 +181,45 @@ model Transaction {
 }
 
 model Activity {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String    @id @default(cuid())
+  slug        String    @unique
   title       String
   description String
   startDate   DateTime
   endDate     DateTime?
   location    String?
   organizer   String?
-  scope       String   @default("PUBLIC") // CABANG, KOMISARIAT, PUBLIC
-  published   Boolean  @default(false)
-  image       String?  // Main Banner (Hero)
-  
+  scope       String    @default("PUBLIC") // CABANG, KOMISARIAT, PUBLIC
+  published   Boolean   @default(false)
+  image       String? // Main Banner (Hero)
+
   // Invitation Fields
-  isInvitation Boolean  @default(false)
-  theme        String   @default("modern-blue")
+  isInvitation Boolean @default(false)
+  theme        String  @default("modern-blue")
   musicUrl     String?
   locationUrl  String?
   locationName String?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  photos      ActivityImage[]
-  rsvps       RSVP[]
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  pendaftar      Pendaftar[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos              ActivityImage[]
+  rsvps               RSVP[]
+  memberRegistrations AgendaRegistration[]
+  organizationId      String?
+  organization        Organization?        @relation(fields: [organizationId], references: [id])
+  pendaftar           Pendaftar[]
 }
 
 model RSVP {
-  id          String   @id @default(cuid())
-  name        String
-  attendance  String   @default("HADIR") // HADIR, TIDAK_HADIR
-  message     String?
-  createdAt   DateTime @default(now())
-  
-  activityId  String
-  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  name       String
+  attendance String   @default("HADIR") // HADIR, TIDAK_HADIR
+  message    String?
+  createdAt  DateTime @default(now())
+
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
 }
 
 model Pendaftar {
@@ -221,15 +231,138 @@ model Pendaftar {
   kehadiran      Boolean  @default(false)
   createdAt      DateTime @default(now())
 
-  activityId     String
-  activity       Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
 }
 
 model ActivityImage {
+  id        String   @id @default(cuid())
+  url       String
+  createdAt DateTime @default(now())
+
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model MemberCard {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qrPayload String?
+  status    String   @default("ACTIVE") // ACTIVE, INACTIVE, REVOKED
+  issuedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MemberOrganizationHistory {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year             String
+  level            String
+  organizationName String?
+  role             String
+  activity         String?
+  description      String?
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId, year])
+}
+
+model MemberLearningProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materialId  String?
+  material    Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  path        String // MAPABA, PKD, PKL, PKN, or custom module key
+  status      String    @default("NOT_STARTED") // LOCKED, NOT_STARTED, IN_PROGRESS, DONE
+  progress    Int       @default(0)
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, path])
+  @@index([userId, path])
+  @@index([materialId])
+}
+
+model AgendaRegistration {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityId   String
+  activity     Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  status       String    @default("REGISTERED") // REGISTERED, PENDING, ACCEPTED, PRESENT, DONE
+  note         String?
+  registeredAt DateTime  @default(now())
+  verifiedAt   DateTime?
+  attendedAt   DateTime?
+  completedAt  DateTime?
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, activityId])
+  @@index([activityId, status])
+}
+
+model MemberCertificate {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  issuer     String?
+  category   String    @default("Umum")
+  fileUrl    String?
+  previewUrl String?
+  status     String    @default("PENDING") // VERIFIED, PENDING, DRAFT, REJECTED
+  issuedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+
+model MemberAchievement {
   id          String   @id @default(cuid())
-  url         String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  level       String?
+  badgeKey    String?
   createdAt   DateTime @default(now())
-  
-  activityId  String
-  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model MemberBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String
+  description String?
+  icon        String?
+  tone        String?
+  awardedAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model MemberPortfolio {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  type        String    @default("Portfolio")
+  description String?
+  fileUrl     String?
+  externalUrl String?
+  issuedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, type])
 }

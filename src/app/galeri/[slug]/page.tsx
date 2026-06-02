@@ -39,7 +39,7 @@ export default async function AlbumDetailPage({
             <div className="flex flex-wrap items-center gap-6 mb-6 text-sm text-secondary">
               <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-primary/5">
                 <Calendar className="w-4 h-4 mr-2 text-accent" />
-                {new Date(album.eventDate).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
+                {new Date(album.startDate).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
               <div className="flex items-center bg-white px-4 py-2 rounded-full shadow-sm border border-primary/5">
                 <User className="w-4 h-4 mr-2 text-primary" />
