@@ -59,7 +59,12 @@ export async function getMemberDashboardData(userId: string) {
       where: { isPublished: true },
       orderBy: { createdAt: "desc" },
       take: 6,
-      include: { chapters: { orderBy: { sortOrder: "asc" }, take: 1 } },
+      include: {
+        chapters: { orderBy: { sortOrder: "asc" }, take: 1 },
+        learningProgress: {
+          where: { userId },
+        },
+      },
     }),
     prisma.activity.findMany({
       where: { published: true },
@@ -78,34 +83,45 @@ export async function getMemberDashboardData(userId: string) {
     profile?.pklYear && { title: "PKL", year: profile.pklYear },
     profile?.pknYear && { title: "PKN", year: profile.pknYear },
   ].filter(Boolean) as { title: string; year: string }[];
+  const completedPathFromMaterials = new Set(
+    materials
+      .filter((material) => material.learningProgress.some((progress) => progress.status === "DONE"))
+      .map((material) => material.pathKey)
+  );
+  const hasCompletedPath = (path: string) =>
+    completedPathFromMaterials.has(path) ||
+    (path === "MAPABA" && Boolean(profile?.mapabaYear)) ||
+    (path === "PKD" && Boolean(profile?.pkdYear)) ||
+    (path === "PKL" && Boolean(profile?.pklYear)) ||
+    (path === "PKN" && Boolean(profile?.pknYear));
 
   const learningPath: MemberLearningItem[] = [
     {
       title: "MAPABA",
       path: "Modul Dasar",
-      status: getLearningStatus(progressByPath.get("MAPABA")?.status, profile?.mapabaYear ? "DONE" : "IN_PROGRESS"),
-      progress: progressByPath.get("MAPABA")?.progress ?? (profile?.mapabaYear ? 100 : 35),
+      status: getLearningStatus(progressByPath.get("MAPABA")?.status, hasCompletedPath("MAPABA") ? "DONE" : "IN_PROGRESS"),
+      progress: progressByPath.get("MAPABA")?.progress ?? (hasCompletedPath("MAPABA") ? 100 : 35),
       description: "Pengenalan PMII, Aswaja, NDP, dan tradisi pergerakan.",
     },
     {
       title: "PKD",
       path: "Modul Menengah",
-      status: getLearningStatus(progressByPath.get("PKD")?.status, profile?.mapabaYear ? (profile?.pkdYear ? "DONE" : "NOT_STARTED") : "LOCKED"),
-      progress: progressByPath.get("PKD")?.progress ?? (profile?.pkdYear ? 100 : 0),
+      status: getLearningStatus(progressByPath.get("PKD")?.status, hasCompletedPath("MAPABA") ? (hasCompletedPath("PKD") ? "DONE" : "NOT_STARTED") : "LOCKED"),
+      progress: progressByPath.get("PKD")?.progress ?? (hasCompletedPath("PKD") ? 100 : 0),
       description: "Pendalaman ideologi, analisis sosial, dan kecakapan kader.",
     },
     {
       title: "PKL",
       path: "Modul Lanjutan",
-      status: getLearningStatus(progressByPath.get("PKL")?.status, profile?.pkdYear ? (profile?.pklYear ? "DONE" : "NOT_STARTED") : "LOCKED"),
-      progress: progressByPath.get("PKL")?.progress ?? (profile?.pklYear ? 100 : 0),
+      status: getLearningStatus(progressByPath.get("PKL")?.status, hasCompletedPath("PKD") ? (hasCompletedPath("PKL") ? "DONE" : "NOT_STARTED") : "LOCKED"),
+      progress: progressByPath.get("PKL")?.progress ?? (hasCompletedPath("PKL") ? 100 : 0),
       description: "Kepemimpinan strategis dan desain gerakan organisasi.",
     },
     {
       title: "PKN",
       path: "Modul Nasional",
-      status: getLearningStatus(progressByPath.get("PKN")?.status, profile?.pklYear ? (profile?.pknYear ? "DONE" : "NOT_STARTED") : "LOCKED"),
-      progress: progressByPath.get("PKN")?.progress ?? (profile?.pknYear ? 100 : 0),
+      status: getLearningStatus(progressByPath.get("PKN")?.status, hasCompletedPath("PKL") ? (hasCompletedPath("PKN") ? "DONE" : "NOT_STARTED") : "LOCKED"),
+      progress: progressByPath.get("PKN")?.progress ?? (hasCompletedPath("PKN") ? 100 : 0),
       description: "Kaderisasi tingkat nasional dan pengabdian strategis.",
     },
   ];
@@ -230,7 +246,11 @@ export async function getMemberDashboardData(userId: string) {
       kaderisasi: Math.round(
         learningPath.reduce((total, item) => total + item.progress, 0) / learningPath.length
       ),
-      learning: materials.length > 0 ? 20 : 0,
+      learning: materials.length > 0
+        ? Math.round(
+            materials.reduce((total, material) => total + (material.learningProgress[0]?.progress || 0), 0) / materials.length
+          )
+        : 0,
     },
   };
 }

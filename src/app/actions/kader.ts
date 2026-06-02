@@ -13,6 +13,35 @@ async function checkSuperAdmin() {
     if (!session || !["SUPER_ADMIN", "ADMIN_CABANG"].includes(session.user?.role as string)) {
         throw new Error("Unauthorized: Insufficient permissions.");
     }
+    return session;
+}
+
+const editableRoles = [
+    "KADER",
+    "PENGURUS_KOMISARIAT",
+    "PENGURUS_CABANG",
+    "ADMIN_CABANG",
+    "SUPER_ADMIN",
+] as const;
+
+async function assertCanDemoteOrDeactivate(userId: string, nextRole?: string) {
+    const target = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true, isActive: true },
+    });
+
+    if (!target) {
+        throw new Error("User tidak ditemukan.");
+    }
+
+    if (target.role === "SUPER_ADMIN" && nextRole !== "SUPER_ADMIN") {
+        const activeSuperAdminCount = await prisma.user.count({
+            where: { role: "SUPER_ADMIN", isActive: true },
+        });
+        if (activeSuperAdminCount <= 1) {
+            throw new Error("Minimal harus ada satu Super Admin aktif.");
+        }
+    }
 }
 
 function generatePassword() {
@@ -157,6 +186,71 @@ export async function verifyKader(userId: string) {
         data: { status: "VERIFIED" },
     });
     revalidatePath("/dashboard/kader");
+}
+
+export async function rejectKader(userId: string) {
+    await checkSuperAdmin();
+
+    await prisma.kaderProfile.update({
+        where: { userId },
+        data: { status: "REJECTED" },
+    });
+    revalidatePath("/dashboard/kader");
+}
+
+export async function updateKaderRole(userId: string, formData: FormData) {
+    await checkSuperAdmin();
+
+    const role = formData.get("role") as string;
+    if (!editableRoles.includes(role as (typeof editableRoles)[number])) {
+        throw new Error("Role tidak valid.");
+    }
+
+    await assertCanDemoteOrDeactivate(userId, role);
+    await prisma.user.update({
+        where: { id: userId },
+        data: { role },
+    });
+
+    revalidatePath("/dashboard/kader");
+    revalidatePath("/dashboard/settings");
+}
+
+export async function setKaderActiveStatus(userId: string, isActive: boolean) {
+    const session = await checkSuperAdmin();
+
+    if (session.user?.id === userId && !isActive) {
+        throw new Error("Anda tidak bisa menonaktifkan akun sendiri.");
+    }
+
+    if (!isActive) {
+        await assertCanDemoteOrDeactivate(userId);
+    }
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: { isActive },
+    });
+
+    revalidatePath("/dashboard/kader");
+}
+
+export async function resetKaderPassword(userId: string) {
+    await checkSuperAdmin();
+
+    const generatedPassword = generatePassword();
+    const hashedPassword = await hash(generatedPassword, 12);
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: {
+            password: hashedPassword,
+            mustChangePassword: true,
+        },
+    });
+
+    revalidatePath("/dashboard/kader");
+    return { success: true, generatedPassword };
 }
 
 export async function deleteKader(userId: string) {

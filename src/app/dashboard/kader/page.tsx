@@ -2,7 +2,13 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, CheckCircle, AlertCircle } from "lucide-react";
-import { verifyKader, deleteKader } from "@/app/actions/kader";
+import {
+    deleteKader,
+    rejectKader,
+    setKaderActiveStatus,
+    updateKaderRole,
+    verifyKader,
+} from "@/app/actions/kader";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import DataToolbar from "@/components/dashboard/DataToolbar";
@@ -90,7 +96,8 @@ export default async function KaderPage({
         Angkatan: k.kaderProfile?.mapabaYear || "-",
         NIA: k.kaderProfile?.noInduk || "-",
         HP: k.kaderProfile?.phone || "-",
-        Status: "Aktif"
+        Status: k.isActive ? "Aktif" : "Nonaktif",
+        Verifikasi: k.kaderProfile?.status || "-"
     })) : [];
 
     const renderKaderRow = (kader: any) => (
@@ -130,16 +137,66 @@ export default async function KaderPage({
                 </div>
             </td>
             <td className="px-6 py-4">
-                <span className={`px-2 py-1 rounded text-[10px] font-bold ${kader.role.includes('ADMIN') || kader.role === 'SUPER_ADMIN' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
-                    {kader.role.replace(/_/g, ' ')}
-                </span>
+                <div className="flex flex-col items-start gap-2">
+                    <span className={`px-2 py-1 rounded text-[10px] font-bold ${kader.role.includes('ADMIN') || kader.role === 'SUPER_ADMIN' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                        {kader.role.replace(/_/g, ' ')}
+                    </span>
+                    <span className={`px-2 py-1 rounded text-[10px] font-bold ${kader.isActive ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}>
+                        {kader.isActive ? "AKTIF" : "NONAKTIF"}
+                    </span>
+                    <span className={`px-2 py-1 rounded text-[10px] font-bold ${
+                        kader.kaderProfile?.status === "VERIFIED"
+                            ? "bg-blue-100 text-blue-700"
+                            : kader.kaderProfile?.status === "REJECTED"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-orange-100 text-orange-700"
+                    }`}>
+                        {kader.kaderProfile?.status || "PENDING"}
+                    </span>
+                </div>
             </td>
             {isSuperAdmin && (
-                <td className="px-6 py-4 text-right space-x-2">
-                    <Link href={`/dashboard/kader/${kader.id}/edit`} className="text-blue-600 hover:text-blue-800 font-medium text-xs">Edit</Link>
-                    <form action={deleteKader.bind(null, kader.id)} className="inline">
-                        <button className="text-red-600 hover:text-red-800 font-medium text-xs">Hapus</button>
-                    </form>
+                <td className="px-6 py-4">
+                    <div className="flex min-w-56 flex-col items-end gap-2">
+                        <form action={updateKaderRole.bind(null, kader.id)} className="flex items-center gap-2">
+                            <select
+                                name="role"
+                                defaultValue={kader.role}
+                                className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs font-bold text-primary"
+                            >
+                                <option value="KADER">Kader</option>
+                                <option value="PENGURUS_KOMISARIAT">Pengurus Komisariat</option>
+                                <option value="PENGURUS_CABANG">Pengurus Cabang</option>
+                                <option value="ADMIN_CABANG">Admin Website</option>
+                                <option value="SUPER_ADMIN">Super Admin</option>
+                            </select>
+                            <button className="rounded-lg bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700 hover:bg-blue-100">
+                                Simpan
+                            </button>
+                        </form>
+                        <div className="flex flex-wrap justify-end gap-2">
+                            <Link href={`/dashboard/kader/${kader.id}/edit`} className="rounded-lg bg-gray-100 px-3 py-1 text-xs font-bold text-gray-700 hover:bg-gray-200">Edit</Link>
+                            <form action={setKaderActiveStatus.bind(null, kader.id, !kader.isActive)} className="inline">
+                                <button className={`rounded-lg px-3 py-1 text-xs font-bold ${
+                                    kader.isActive
+                                        ? "bg-orange-50 text-orange-700 hover:bg-orange-100"
+                                        : "bg-green-50 text-green-700 hover:bg-green-100"
+                                }`}>
+                                    {kader.isActive ? "Nonaktifkan" : "Aktifkan"}
+                                </button>
+                            </form>
+                            {kader.kaderProfile?.status !== "VERIFIED" && (
+                                <form action={verifyKader.bind(null, kader.id)} className="inline">
+                                    <button className="rounded-lg bg-green-600 px-3 py-1 text-xs font-bold text-white hover:bg-green-700">
+                                        Verifikasi
+                                    </button>
+                                </form>
+                            )}
+                            <form action={deleteKader.bind(null, kader.id)} className="inline">
+                                <button className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700 hover:bg-red-100">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
                 </td>
             )}
         </tr>
@@ -150,7 +207,7 @@ export default async function KaderPage({
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-primary">Database Kader</h1>
-                    <p className="text-secondary text-sm">Kelola data anggota dan pengurus.</p>
+                    <p className="text-secondary text-sm">Kelola database kader, status akun, role aplikasi, dan verifikasi profil.</p>
                 </div>
                 {isSuperAdmin && (
                     <Link href="/dashboard/kader/create" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-primary/90 transition">
@@ -170,7 +227,7 @@ export default async function KaderPage({
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="font-bold text-primary flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Data Kader (Terverifikasi)
+                        <CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Database Kader
                     </h2>
                     <span className="text-xs bg-white border px-2 py-1 rounded text-secondary">{activeKaders.length} Anggota</span>
                 </div>
@@ -260,7 +317,7 @@ export default async function KaderPage({
                                         {new Date(kader.createdAt).toLocaleDateString("id-ID")}
                                     </td>
                                     <td className="px-6 py-4 text-right flex justify-end space-x-2">
-                                        <form action={deleteKader.bind(null, kader.id)}>
+                                        <form action={rejectKader.bind(null, kader.id)}>
                                             <button className="bg-red-50 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-100">Tolak</button>
                                         </form>
                                         <form action={verifyKader.bind(null, kader.id)}>

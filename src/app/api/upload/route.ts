@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-import sharp from "sharp"; // Using sharp for WebP conversion
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/auth";
+import { uploadFile } from "@/lib/upload";
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
@@ -13,25 +18,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${uuidv4()}.webp`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "kegiatan");
-    
-    // Ensure directory exists (redundant but safe)
-    await mkdir(uploadDir, { recursive: true });
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json({ error: "Only image uploads are allowed here" }, { status: 400 });
+    }
 
-    const filePath = path.join(uploadDir, fileName);
-
-    // AUTO CONVERT TO WEBP using SHARP
-    await sharp(buffer)
-      .webp({ quality: 80 }) // 80% quality is a good balance
-      .toFile(filePath);
-
-    const relativeUrl = `/uploads/kegiatan/${fileName}`;
+    const requestedFolder = req.nextUrl.searchParams.get("folder") || "kegiatan";
+    const relativeUrl = await uploadFile(file, requestedFolder);
 
     return NextResponse.json({ url: relativeUrl });
   } catch (error) {
     console.error("Upload Error:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Upload failed" },
+      { status: 500 }
+    );
   }
 }

@@ -2,21 +2,70 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
+
+const allowedImageMimeTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/heic",
+    "image/heif",
+]);
+
+const allowedDocumentMimeTypes = new Set([
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
+const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic", ".heif"]);
+const allowedDocumentExtensions = new Set([".pdf", ".doc", ".docx", ".ppt", ".pptx"]);
+
+function sanitizeFolder(folder: string) {
+    const cleaned = folder
+        .split("/")
+        .map((part) => part.replace(/[^a-zA-Z0-9-_]/g, ""))
+        .filter(Boolean)
+        .join("/");
+
+    if (!cleaned || cleaned.includes("..")) {
+        throw new Error("Folder upload tidak valid.");
+    }
+
+    return cleaned;
+}
+
+function validateFile(file: File) {
+    const originalExtension = path.extname(file.name || "").toLowerCase();
+    const isImage = allowedImageMimeTypes.has(file.type) && allowedImageExtensions.has(originalExtension);
+    const isDocument = allowedDocumentMimeTypes.has(file.type) && allowedDocumentExtensions.has(originalExtension);
+
+    if (!isImage && !isDocument) {
+        throw new Error("Tipe file tidak diizinkan. Gunakan gambar, PDF, DOC/DOCX, atau PPT/PPTX.");
+    }
+
+    const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_DOCUMENT_SIZE;
+    if (file.size > maxSize) {
+        throw new Error(`Ukuran file terlalu besar. Maksimal ${isImage ? "5MB" : "20MB"}.`);
+    }
+
+    return { isImage, originalExtension };
+}
+
 export async function uploadFile(file: File, folder: string = "general"): Promise<string> {
+    const safeFolder = sanitizeFolder(folder);
+    const { isImage, originalExtension } = validateFile(file);
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    const originalExtension = path.extname(file.name || "").toLowerCase();
-    
-    // Support common image formats for conversion
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".heic", ".heif", ".bmp", ".tiff"];
-    const isImage = imageExtensions.includes(originalExtension) || file.type.startsWith("image/");
-    
     const extension = isImage ? ".webp" : originalExtension || ".bin";
     const filename = `${uuidv4()}${extension}`;
 
     // Ensure directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+    const uploadDir = path.join(process.cwd(), "public", "uploads", safeFolder);
     await mkdir(uploadDir, { recursive: true });
 
     // proper path for saving
@@ -30,9 +79,8 @@ export async function uploadFile(file: File, folder: string = "general"): Promis
                 .webp({ quality: 80 })
                 .toFile(filepath);
         } catch (error) {
-            console.error("Sharp optimization failed, falling back to direct write:", error);
-            // If sharp fails or is not supported for this format (like HEIC without proper libs), fallback
-            await writeFile(filepath, buffer);
+            console.error("Sharp optimization failed:", error);
+            throw new Error("Gagal mengoptimasi gambar. Coba gunakan JPG, PNG, atau WebP.");
         }
     } else {
         // For non-images (PDF, etc.), just write the file
@@ -40,5 +88,5 @@ export async function uploadFile(file: File, folder: string = "general"): Promis
     }
 
     // Return public URL
-    return `/uploads/${folder}/${filename}`;
+    return `/uploads/${safeFolder}/${filename}`;
 }

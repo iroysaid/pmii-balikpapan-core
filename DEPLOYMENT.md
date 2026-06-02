@@ -69,6 +69,74 @@ docker-compose down
 
 ---
 
+## 🧱 Database Migration & Seed
+Untuk production, gunakan migration resmi Prisma, bukan hanya `db push`.
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
+Catatan:
+- Migration baseline tersedia di `prisma/migrations`.
+- Pastikan `DATABASE_URL` production mengarah ke database yang benar.
+- Seed awal membuat role, permission, akun awal, dan konten minimal sesuai konfigurasi project.
+
+---
+
+## 💾 Backup & Restore Sederhana
+Sebelum update besar, backup database dan file upload.
+
+```bash
+mkdir -p backups
+cp prisma/dev.db backups/dev-$(date +%Y%m%d-%H%M%S).db
+tar -czf backups/uploads-$(date +%Y%m%d-%H%M%S).tar.gz public/uploads
+```
+
+Restore:
+
+```bash
+cp backups/dev-YYYYMMDD-HHMMSS.db prisma/dev.db
+tar -xzf backups/uploads-YYYYMMDD-HHMMSS.tar.gz -C .
+```
+
+Jika memakai database production selain SQLite, gunakan fitur backup bawaan provider database.
+
+---
+
+## ✅ Smoke Test Production
+Setelah deploy, cek route publik:
+- `/`
+- `/profil`
+- `/berita`
+- `/agenda`
+- `/galeri`
+- `/materi`
+
+Cek route privat:
+- `/dashboard`
+- `/dashboard/landing`
+- `/dashboard/profil`
+- `/dashboard/pengurus`
+- `/dashboard/kader`
+- `/dashboard/materi`
+- `/dashboard/materi/progress`
+- `/dashboard/settings`
+- `/kader`
+- `/kader/learning`
+- `/kader/agenda`
+- `/kader/sertifikat`
+- `/kader/portofolio`
+
+Pastikan:
+- user publik tidak bisa akses dashboard
+- kader tidak bisa akses admin route
+- akun nonaktif tidak bisa login
+- Settings hanya Super Admin
+- session berakhir maksimal 3 jam
+
+---
+
 ## 🛡️ Hak Akses (Troubleshooting)
 Sistem ini menggunakan *Node Debian-Slim*. Jika terdapat pesan *error* "Permission Denied" pada saat Anda meng-upload galeri melalui website yang sudah live, jalankan perintah ini di OS Ubuntu/Server Anda untuk memberi izin pada folder unggahan:
 

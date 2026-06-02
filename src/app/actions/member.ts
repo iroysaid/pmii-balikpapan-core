@@ -252,6 +252,240 @@ export async function updateLearningPathProgress(formData: FormData) {
   revalidatePath("/kader/learning");
 }
 
+export async function completeMemberLesson(formData: FormData) {
+  const session = await requireMemberSession();
+  const chapterId = formData.get("chapterId") as string;
+  const materialId = formData.get("materialId") as string;
+
+  if (!chapterId || !materialId) return;
+
+  await prisma.memberLessonProgress.upsert({
+    where: {
+      userId_chapterId: {
+        userId: session.user.id,
+        chapterId,
+      },
+    },
+    create: {
+      userId: session.user.id,
+      chapterId,
+      status: "DONE",
+      completedAt: new Date(),
+    },
+    update: {
+      status: "DONE",
+      completedAt: new Date(),
+    },
+  });
+
+  await refreshMaterialLearningProgress(session.user.id, materialId);
+  revalidateLearningRoutes(materialId);
+}
+
+export async function submitLearningQuiz(formData: FormData) {
+  const session = await requireMemberSession();
+  const quizId = formData.get("quizId") as string;
+  const materialId = formData.get("materialId") as string;
+
+  if (!quizId || !materialId) return;
+
+  const quiz = await prisma.learningQuiz.findUnique({
+    where: { id: quizId },
+    include: { questions: true },
+  });
+
+  if (!quiz) return;
+
+  let correctCount = 0;
+  const answers: Record<string, string> = {};
+
+  for (const question of quiz.questions) {
+    const answer = formData.get(`question_${question.id}`) as string;
+    answers[question.id] = answer;
+    if (answer === question.correctAnswer) {
+      correctCount += 1;
+    }
+  }
+
+  const score = quiz.questions.length > 0
+    ? Math.round((correctCount / quiz.questions.length) * 100)
+    : 0;
+
+  await prisma.learningQuizAttempt.create({
+    data: {
+      userId: session.user.id,
+      quizId,
+      score,
+      passed: score >= quiz.passingGrade,
+      answersJson: JSON.stringify(answers),
+    },
+  });
+
+  await refreshMaterialLearningProgress(session.user.id, materialId);
+  revalidateLearningRoutes(materialId);
+}
+
+export async function submitLearningAssignment(formData: FormData) {
+  const session = await requireMemberSession();
+  const materialId = formData.get("materialId") as string;
+  const note = formData.get("note") as string;
+  const externalUrl = formData.get("externalUrl") as string;
+  const file = formData.get("file") as File | null;
+
+  if (!materialId) return;
+
+  let fileUrl: string | undefined;
+  if (file && file.size > 0) {
+    fileUrl = await uploadFile(file, "kader/assignments");
+  }
+
+  await prisma.learningAssignmentSubmission.create({
+    data: {
+      userId: session.user.id,
+      materialId,
+      note: note || null,
+      externalUrl: externalUrl || null,
+      fileUrl,
+      status: "SUBMITTED",
+    },
+  });
+
+  await refreshMaterialLearningProgress(session.user.id, materialId);
+  revalidateLearningRoutes(materialId);
+}
+
+export async function reviewLearningAssignment(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
+
+  if (!role || role === "KADER" || role === "PUBLIC") {
+    throw new Error("Unauthorized");
+  }
+
+  const submissionId = formData.get("submissionId") as string;
+  const status = formData.get("status") as string;
+  const reviewerNote = formData.get("reviewerNote") as string;
+
+  if (!submissionId || !["APPROVED", "REJECTED"].includes(status)) return;
+
+  const submission = await prisma.learningAssignmentSubmission.update({
+    where: { id: submissionId },
+    data: {
+      status,
+      reviewerNote: reviewerNote || null,
+      reviewedAt: new Date(),
+    },
+  });
+
+  await refreshMaterialLearningProgress(submission.userId, submission.materialId);
+  revalidatePath("/dashboard/materi/progress");
+  revalidatePath("/dashboard/materi");
+}
+
+async function refreshMaterialLearningProgress(userId: string, materialId: string) {
+  const material = await prisma.material.findUnique({
+    where: { id: materialId },
+    include: {
+      chapters: true,
+      quiz: {
+        include: {
+          attempts: {
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      },
+      assignmentSubmissions: {
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+
+  if (!material) return;
+
+  const completedLessons = await prisma.memberLessonProgress.count({
+    where: {
+      userId,
+      chapter: { materialId },
+      status: "DONE",
+    },
+  });
+
+  const lessonTotal = material.chapters.length;
+  const lessonPercent = lessonTotal > 0 ? completedLessons / lessonTotal : 1;
+  const latestQuizAttempt = material.quiz?.attempts[0];
+  const quizPassed = material.quiz ? Boolean(latestQuizAttempt?.passed) : true;
+  const latestSubmission = material.assignmentSubmissions[0];
+  const assignmentPassed = material.requiresAssignment
+    ? latestSubmission?.status === "APPROVED"
+    : true;
+
+  const parts = [
+    lessonPercent,
+    material.quiz ? (quizPassed ? 1 : 0) : null,
+    material.requiresAssignment ? (assignmentPassed ? 1 : 0) : null,
+  ].filter((part): part is number => part !== null);
+  const progress = Math.round(
+    (parts.reduce((total, part) => total + part, 0) / Math.max(parts.length, 1)) * 100
+  );
+  const isDone = progress >= 100 && quizPassed && assignmentPassed;
+
+  await prisma.memberLearningProgress.upsert({
+    where: {
+      userId_path: {
+        userId,
+        path: `MATERIAL:${materialId}`,
+      },
+    },
+    create: {
+      userId,
+      materialId,
+      path: `MATERIAL:${materialId}`,
+      progress,
+      status: isDone ? "DONE" : progress > 0 ? "IN_PROGRESS" : "NOT_STARTED",
+      completedAt: isDone ? new Date() : null,
+    },
+    update: {
+      materialId,
+      progress,
+      status: isDone ? "DONE" : progress > 0 ? "IN_PROGRESS" : "NOT_STARTED",
+      completedAt: isDone ? new Date() : null,
+    },
+  });
+
+  if (isDone) {
+    const title = `Sertifikat Learning ${material.title}`;
+    const existingCertificate = await prisma.memberCertificate.findFirst({
+      where: {
+        userId,
+        title,
+        category: "Learning",
+      },
+    });
+
+    if (!existingCertificate) {
+      await prisma.memberCertificate.create({
+        data: {
+          userId,
+          title,
+          issuer: "PMII Balikpapan",
+          category: "Learning",
+          status: "VERIFIED",
+          issuedAt: new Date(),
+        },
+      });
+    }
+  }
+}
+
+function revalidateLearningRoutes(materialId: string) {
+  revalidatePath("/kader");
+  revalidatePath("/kader/learning");
+  revalidatePath(`/kader/learning/${materialId}`);
+  revalidatePath("/kader/sertifikat");
+}
+
 export async function registerMemberAgenda(formData: FormData) {
   const session = await requireMemberSession();
   const activityId = formData.get("activityId") as string;

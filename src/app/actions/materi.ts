@@ -27,6 +27,11 @@ export async function createMaterial(formData: FormData) {
         const visibilityValue = formData.get("visibility") as string;
         const visibility = visibilityValue === "PRIVATE" ? "PRIVATE" : "PUBLIC";
         const isPublished = formData.get("isPublished") === "true";
+        const pathKey = (formData.get("pathKey") as string) || "MAPABA";
+        const requiredPath = (formData.get("requiredPath") as string) || null;
+        const passingGrade = Number(formData.get("passingGrade") || 70);
+        const requiresAssignment = formData.get("requiresAssignment") === "on";
+        const assignmentPrompt = (formData.get("assignmentPrompt") as string) || null;
 
         console.log("[MATERI DEBUG] Creating material:", title);
 
@@ -36,6 +41,9 @@ export async function createMaterial(formData: FormData) {
             const chapterTitle = formData.get(`chapters[${i}][title]`) as string;
             const chapterDesc = formData.get(`chapters[${i}][description]`) as string;
             const type = formData.get(`chapters[${i}][type]`) as string;
+            const article = formData.get(`chapters[${i}][article]`) as string;
+            const slideUrl = formData.get(`chapters[${i}][slideUrl]`) as string;
+            const durationMin = Number(formData.get(`chapters[${i}][durationMin]`) || 0);
 
             let fileUrl = null;
             let youtubeUrl = null;
@@ -56,6 +64,9 @@ export async function createMaterial(formData: FormData) {
                 type,
                 fileUrl,
                 youtubeUrl,
+                article: article || null,
+                slideUrl: slideUrl || null,
+                durationMin: durationMin > 0 ? durationMin : null,
                 sortOrder: i
             });
             i++;
@@ -81,12 +92,19 @@ export async function createMaterial(formData: FormData) {
 
         console.log("[MATERI DEBUG] Saving to database with chapters count:", chapters.length);
 
+        const quizQuestions = parseQuizQuestions(formData);
+
         await prisma.material.create({
             data: {
                 title,
                 description,
                 visibility,
                 isPublished,
+                pathKey,
+                requiredPath,
+                passingGrade: Number.isNaN(passingGrade) ? 70 : passingGrade,
+                requiresAssignment,
+                assignmentPrompt,
                 featuredImage,
                 chapters: {
                     create: chapters.map(c => ({
@@ -95,9 +113,24 @@ export async function createMaterial(formData: FormData) {
                         type: c.type,
                         fileUrl: c.fileUrl,
                         youtubeUrl: c.youtubeUrl,
+                        article: c.article,
+                        slideUrl: c.slideUrl,
+                        durationMin: c.durationMin,
                         sortOrder: c.sortOrder
                     }))
-                }
+                },
+                ...(quizQuestions.length > 0 ? {
+                    quiz: {
+                        create: {
+                            title: (formData.get("quizTitle") as string) || `Quiz ${title}`,
+                            passingGrade: Number.isNaN(passingGrade) ? 70 : passingGrade,
+                            isActive: true,
+                            questions: {
+                                create: quizQuestions,
+                            },
+                        },
+                    },
+                } : {}),
             },
         });
 
@@ -125,6 +158,11 @@ export async function updateMaterial(id: string, formData: FormData) {
     const visibilityValue = formData.get("visibility") as string;
     const visibility = visibilityValue === "PRIVATE" ? "PRIVATE" : "PUBLIC";
     const isPublished = formData.get("isPublished") === "true";
+    const pathKey = (formData.get("pathKey") as string) || "MAPABA";
+    const requiredPath = (formData.get("requiredPath") as string) || null;
+    const passingGrade = Number(formData.get("passingGrade") || 70);
+    const requiresAssignment = formData.get("requiresAssignment") === "on";
+    const assignmentPrompt = (formData.get("assignmentPrompt") as string) || null;
 
     // Re-calculating chapters is complex. Simplest valid approach:
     // Delete all existing chapters and recreate them (nuclear option, but ensures order and consistency without complex diffing).
@@ -141,6 +179,9 @@ export async function updateMaterial(id: string, formData: FormData) {
         const chapterDesc = formData.get(`chapters[${i}][description]`) as string;
         const type = formData.get(`chapters[${i}][type]`) as string;
         const existingFileUrl = formData.get(`chapters[${i}][existingFileUrl]`) as string;
+        const article = formData.get(`chapters[${i}][article]`) as string;
+        const slideUrl = formData.get(`chapters[${i}][slideUrl]`) as string;
+        const durationMin = Number(formData.get(`chapters[${i}][durationMin]`) || 0);
 
         let fileUrl = existingFileUrl || null;
         let youtubeUrl = null;
@@ -160,6 +201,9 @@ export async function updateMaterial(id: string, formData: FormData) {
             type,
             fileUrl,
             youtubeUrl,
+            article: article || null,
+            slideUrl: slideUrl || null,
+            durationMin: durationMin > 0 ? durationMin : null,
             sortOrder: i
         });
         i++;
@@ -188,6 +232,7 @@ export async function updateMaterial(id: string, formData: FormData) {
     // Transaction to update
     await prisma.$transaction([
         prisma.materialChapter.deleteMany({ where: { materialId: id } }),
+        prisma.learningQuiz.deleteMany({ where: { materialId: id } }),
         prisma.material.update({
             where: { id },
             data: {
@@ -195,6 +240,11 @@ export async function updateMaterial(id: string, formData: FormData) {
                 description,
                 visibility,
                 isPublished,
+                pathKey,
+                requiredPath,
+                passingGrade: Number.isNaN(passingGrade) ? 70 : passingGrade,
+                requiresAssignment,
+                assignmentPrompt,
                 featuredImage, // Update featured image based on new chapters
                 chapters: {
                     create: chapters.map(c => ({
@@ -203,13 +253,56 @@ export async function updateMaterial(id: string, formData: FormData) {
                         type: c.type,
                         fileUrl: c.fileUrl,
                         youtubeUrl: c.youtubeUrl,
+                        article: c.article,
+                        slideUrl: c.slideUrl,
+                        durationMin: c.durationMin,
                         sortOrder: c.sortOrder
                     }))
-                }
+                },
+                ...(parseQuizQuestions(formData).length > 0 ? {
+                    quiz: {
+                        create: {
+                            title: (formData.get("quizTitle") as string) || `Quiz ${title}`,
+                            passingGrade: Number.isNaN(passingGrade) ? 70 : passingGrade,
+                            isActive: true,
+                            questions: {
+                                create: parseQuizQuestions(formData),
+                            },
+                        },
+                    },
+                } : {}),
             }
         })
     ]);
 
     revalidatePath("/dashboard/materi");
     redirect("/dashboard/materi");
+}
+
+function parseQuizQuestions(formData: FormData) {
+    const questions = [];
+    let i = 0;
+
+    while (formData.has(`quiz[${i}][question]`)) {
+        const question = (formData.get(`quiz[${i}][question]`) as string)?.trim();
+        const optionsRaw = (formData.get(`quiz[${i}][options]`) as string) || "";
+        const correctAnswer = (formData.get(`quiz[${i}][correctAnswer]`) as string)?.trim();
+        const options = optionsRaw
+            .split("\n")
+            .map((option) => option.trim())
+            .filter(Boolean);
+
+        if (question && options.length > 0 && correctAnswer) {
+            questions.push({
+                question,
+                optionsJson: JSON.stringify(options),
+                correctAnswer,
+                sortOrder: i,
+            });
+        }
+
+        i++;
+    }
+
+    return questions;
 }

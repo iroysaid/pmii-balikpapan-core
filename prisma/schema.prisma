@@ -32,6 +32,7 @@ model User {
   password           String
   mustChangePassword Boolean  @default(true)
   role               String   @default("KADER") // PUBLIC, KADER, PENGURUS_KOMISARIAT, PENGURUS_CABANG, ADMIN_CABANG, SUPER_ADMIN
+  isActive           Boolean  @default(true)
   image              String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -43,11 +44,16 @@ model User {
   memberCard            MemberCard?
   organizationHistories MemberOrganizationHistory[]
   learningProgress      MemberLearningProgress[]
+  lessonProgress        MemberLessonProgress[]
+  quizAttempts          LearningQuizAttempt[]
+  assignmentSubmissions LearningAssignmentSubmission[]
   agendaRegistrations   AgendaRegistration[]
   certificates          MemberCertificate[]
   achievements          MemberAchievement[]
   badges                MemberBadge[]
   portfolios            MemberPortfolio[]
+
+  @@index([role, isActive])
 }
 
 model KaderProfile {
@@ -155,17 +161,26 @@ model Officer {
 }
 
 model Material {
-  id            String   @id @default(cuid())
-  title         String
-  description   String?
-  featuredImage String?
-  isPublished   Boolean  @default(true)
-  visibility    String   @default("PUBLIC") // PUBLIC, PRIVATE
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  title              String
+  description        String?
+  featuredImage      String?
+  isPublished        Boolean  @default(true)
+  visibility         String   @default("PUBLIC") // PUBLIC, PRIVATE
+  pathKey            String   @default("MAPABA") // MAPABA, PKD, PKL, PKN
+  requiredPath       String?
+  passingGrade       Int      @default(70)
+  requiresAssignment Boolean  @default(false)
+  assignmentPrompt   String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  chapters         MaterialChapter[]
-  learningProgress MemberLearningProgress[]
+  chapters              MaterialChapter[]
+  quiz                  LearningQuiz?
+  learningProgress      MemberLearningProgress[]
+  assignmentSubmissions LearningAssignmentSubmission[]
+
+  @@index([pathKey, isPublished])
 }
 
 model MaterialChapter {
@@ -175,11 +190,92 @@ model MaterialChapter {
   type        String  @default("DOCUMENT") // DOCUMENT, YOUTUBE
   fileUrl     String?
   youtubeUrl  String?
+  article     String?
+  slideUrl    String?
+  durationMin Int?
   sortOrder   Int     @default(0)
 
-  materialId String
-  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
+  materialId     String
+  material       Material               @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  lessonProgress MemberLessonProgress[]
+  createdAt      DateTime               @default(now())
+
+  @@index([materialId, sortOrder])
+}
+
+model LearningQuiz {
+  id           String   @id @default(cuid())
+  materialId   String   @unique
+  material     Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  passingGrade Int      @default(70)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  questions LearningQuizQuestion[]
+  attempts  LearningQuizAttempt[]
+}
+
+model LearningQuizQuestion {
+  id            String       @id @default(cuid())
+  quizId        String
+  quiz          LearningQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question      String
+  optionsJson   String
+  correctAnswer String
+  sortOrder     Int          @default(0)
+
+  @@index([quizId, sortOrder])
+}
+
+model LearningQuizAttempt {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        LearningQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score       Int          @default(0)
+  passed      Boolean      @default(false)
+  answersJson String?
+  createdAt   DateTime     @default(now())
+
+  @@index([userId, quizId])
+}
+
+model MemberLessonProgress {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapterId   String
+  chapter     MaterialChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  status      String          @default("NOT_STARTED") // NOT_STARTED, DONE
+  completedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+}
+
+model LearningAssignmentSubmission {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materialId   String
+  material     Material  @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  note         String?
+  fileUrl      String?
+  externalUrl  String?
+  status       String    @default("SUBMITTED") // SUBMITTED, APPROVED, REJECTED
+  reviewerNote String?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId, materialId])
+  @@index([status])
 }
 
 model Letter {

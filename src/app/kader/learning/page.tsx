@@ -10,6 +10,7 @@ import { getMemberDashboardData } from "@/lib/member/service";
 export default async function LearningJourneyPage() {
   const session = await getServerSession(authOptions);
   const data = await getMemberDashboardData(session!.user.id);
+  const pathStatus = new Map(data.learningPath.map((item) => [item.title, item.status]));
 
   return (
     <div className="space-y-6">
@@ -60,12 +61,34 @@ export default async function LearningJourneyPage() {
 
       <SectionCard title="Modul tersedia" description="Materi publik dan private yang sudah dipublish admin learning management.">
         <div className="grid gap-3 md:grid-cols-2">
-          {data.materials.map((material) => (
-            <Link key={material.id} href={`/kader/learning/${material.id}`} className="rounded-2xl bg-blue-50 p-4 transition hover:bg-blue-100">
-              <p className="font-black text-primary">{material.title}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-secondary/70">{material.description || "Materi pembelajaran kader."}</p>
-            </Link>
-          ))}
+          {data.materials.map((material) => {
+            const isLocked = pathStatus.get(material.pathKey) === "LOCKED";
+            const progress = material.learningProgress[0]?.progress || 0;
+
+            if (isLocked) {
+              return (
+                <div key={material.id} className="rounded-2xl bg-gray-50 p-4 opacity-70">
+                  <p className="flex items-center gap-2 font-black text-secondary">
+                    <Lock className="h-4 w-4" />
+                    {material.title}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-sm text-secondary/60">Terkunci sampai path sebelumnya selesai.</p>
+                </div>
+              );
+            }
+
+            return (
+              <Link key={material.id} href={`/kader/learning/${material.id}`} className="rounded-2xl bg-blue-50 p-4 transition hover:bg-blue-100">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-black text-primary">{material.title}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-secondary/70">{material.description || "Materi pembelajaran kader."}</p>
+                  </div>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-primary">{progress}%</span>
+                </div>
+              </Link>
+            );
+          })}
           {data.materials.length === 0 && <p className="text-sm text-secondary/60">Belum ada modul yang dipublish.</p>}
         </div>
       </SectionCard>

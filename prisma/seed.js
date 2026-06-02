@@ -41,6 +41,7 @@ async function main() {
             password,
             mustChangePassword: false,
             role: 'SUPER_ADMIN',
+            isActive: true,
         },
     });
 
@@ -62,6 +63,7 @@ async function main() {
                 password,
                 mustChangePassword: false,
                 role: 'KADER',
+                isActive: true,
                 organizationId: orgId,
                 kaderProfile: {
                     create: {
@@ -103,20 +105,103 @@ async function main() {
         });
     }
 
-    // 5. CREATE DUMMY E-LEARNING (MATERIALS)
-    const material1 = await prisma.material.create({
-        data: {
-            title: 'Modul MAPABA Dasar',
-            description: 'Materi dasar pengetahuan keorganisasian PMII untuk calon anggota baru.',
-            chapters: {
-                create: [
-                    { title: 'Sejarah Pergerakan', type: 'DOCUMENT', sortOrder: 1 },
-                    { title: 'Nilai Dasar Pergerakan (NDP)', type: 'DOCUMENT', sortOrder: 2 },
-                    { title: 'Video Profil Organisasi', type: 'YOUTUBE', youtubeUrl: 'https://youtube.com/watch?v=123', sortOrder: 3 }
+    // 5. CREATE BASE LEARNING JOURNEY (MAPABA -> PKD -> PKL -> PKN)
+    const learningModules = [
+        {
+            title: 'Learning Journey MAPABA',
+            description: 'Fondasi awal kader PMII: sejarah, NDP, Aswaja, dan orientasi organisasi.',
+            pathKey: 'MAPABA',
+            requiredPath: null,
+            visibility: 'PUBLIC',
+            requiresAssignment: false,
+            chapters: [
+                { title: 'Sejarah PMII dan Arah Pergerakan', type: 'DOCUMENT', sortOrder: 1, durationMin: 20, article: 'PMII lahir sebagai ruang kaderisasi, gerakan, dan intelektual mahasiswa Islam Indonesia.' },
+                { title: 'Nilai Dasar Pergerakan', type: 'DOCUMENT', sortOrder: 2, durationMin: 25, article: 'NDP menjadi landasan berpikir, bersikap, dan bertindak kader PMII.' },
+                { title: 'Orientasi Kader Baru', type: 'YOUTUBE', youtubeUrl: 'https://youtube.com/watch?v=123', sortOrder: 3, durationMin: 15 }
+            ],
+            quiz: {
+                title: 'Quiz Dasar MAPABA',
+                questions: [
+                    {
+                        question: 'Apa fungsi utama Nilai Dasar Pergerakan bagi kader PMII?',
+                        optionsJson: JSON.stringify(['Landasan berpikir dan bergerak', 'Formalitas administrasi', 'Agenda seremonial']),
+                        correctAnswer: 'Landasan berpikir dan bergerak',
+                        sortOrder: 1
+                    }
                 ]
             }
+        },
+        {
+            title: 'Learning Journey PKD',
+            description: 'Pendalaman kaderisasi untuk membangun kepemimpinan, analisis sosial, dan disiplin organisasi.',
+            pathKey: 'PKD',
+            requiredPath: 'MAPABA',
+            visibility: 'PRIVATE',
+            requiresAssignment: true,
+            assignmentPrompt: 'Tuliskan refleksi singkat tentang problem sosial di komisariat/kampusmu dan rencana advokasi awal.',
+            chapters: [
+                { title: 'Analisis Sosial Dasar', type: 'DOCUMENT', sortOrder: 1, durationMin: 30, article: 'Analisis sosial membantu kader membaca struktur masalah dan merumuskan keberpihakan.' },
+                { title: 'Kepemimpinan Kader', type: 'DOCUMENT', sortOrder: 2, durationMin: 25, article: 'Kepemimpinan kader dibangun dari disiplin, keberanian, dan tanggung jawab kolektif.' }
+            ]
+        },
+        {
+            title: 'Learning Journey PKL',
+            description: 'Kaderisasi lanjutan untuk konsolidasi strategi gerakan dan pengembangan organisasi.',
+            pathKey: 'PKL',
+            requiredPath: 'PKD',
+            visibility: 'PRIVATE',
+            requiresAssignment: true,
+            assignmentPrompt: 'Susun kerangka strategi gerakan dan kaderisasi untuk satu semester.',
+            chapters: [
+                { title: 'Strategi Gerakan', type: 'DOCUMENT', sortOrder: 1, durationMin: 35, article: 'Strategi gerakan menyatukan pembacaan konteks, tujuan, aktor, dan metode perjuangan.' }
+            ]
+        },
+        {
+            title: 'Learning Journey PKN',
+            description: 'Kaderisasi nasional untuk pematangan kepemimpinan, jejaring, dan pengabdian strategis.',
+            pathKey: 'PKN',
+            requiredPath: 'PKL',
+            visibility: 'PRIVATE',
+            requiresAssignment: true,
+            assignmentPrompt: 'Buat rancangan kontribusi strategis kader PMII Balikpapan dalam isu nasional.',
+            chapters: [
+                { title: 'Kepemimpinan Strategis Nasional', type: 'DOCUMENT', sortOrder: 1, durationMin: 40, article: 'Kepemimpinan strategis menuntut kedalaman analisis, jejaring, dan etika gerakan.' }
+            ]
         }
-    });
+    ];
+
+    for (const module of learningModules) {
+        const existing = await prisma.material.findFirst({ where: { title: module.title } });
+        if (existing) continue;
+
+        await prisma.material.create({
+            data: {
+                title: module.title,
+                description: module.description,
+                pathKey: module.pathKey,
+                requiredPath: module.requiredPath,
+                visibility: module.visibility,
+                isPublished: true,
+                requiresAssignment: module.requiresAssignment,
+                assignmentPrompt: module.assignmentPrompt,
+                passingGrade: 70,
+                chapters: {
+                    create: module.chapters
+                },
+                ...(module.quiz ? {
+                    quiz: {
+                        create: {
+                            title: module.quiz.title,
+                            passingGrade: 70,
+                            questions: {
+                                create: module.quiz.questions
+                            }
+                        }
+                    }
+                } : {})
+            }
+        });
+    }
 
     // 6. CREATE TRANSACTIONS (KEUANGAN)
     const transactions = [

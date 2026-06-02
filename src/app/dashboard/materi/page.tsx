@@ -60,12 +60,20 @@ export default async function LearningDashboard({
                     <p className="text-secondary">Kelola modul dan materi pembelajaran.</p>
                 </div>
                 {canEdit && (
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                        href="/dashboard/materi/progress"
+                        className="bg-blue-50 text-primary px-4 py-2 rounded-lg font-bold hover:bg-blue-100 transition flex items-center"
+                    >
+                        <Eye className="w-4 h-4 mr-2" /> Progress Kader
+                    </Link>
                     <Link
                         href="/dashboard/materi/create"
                         className="bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition flex items-center"
                     >
                         <Plus className="w-4 h-4 mr-2" /> Upload Materi Baru
                     </Link>
+                  </div>
                 )}
             </div>
 
