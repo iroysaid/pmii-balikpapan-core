@@ -440,6 +440,7 @@ model MemberCertificate {
   title      String
   issuer     String?
   category   String    @default("Umum")
+  note       String?
   fileUrl    String?
   previewUrl String?
   status     String    @default("PENDING") // VERIFIED, PENDING, DRAFT, REJECTED

@@ -5,11 +5,9 @@ import {
   Award,
   BookOpen,
   CalendarDays,
-  CreditCard,
   FileText,
   Home,
   LogOut,
-  Medal,
   Settings,
   Sparkles,
   UserRound,
@@ -21,11 +19,9 @@ import KaderSignOutButton from "./KaderSignOutButton";
 const navItems = [
   { label: "Beranda", href: "/kader", icon: Home },
   { label: "Profil Kader", href: "/kader/profil", icon: UserRound },
-  { label: "Kartu Anggota", href: "/kader/kartu", icon: CreditCard },
   { label: "Learning Journey", href: "/kader/learning", icon: BookOpen },
   { label: "Agenda Saya", href: "/kader/agenda", icon: CalendarDays },
   { label: "Sertifikat", href: "/kader/sertifikat", icon: Award },
-  { label: "Pencapaian", href: "/kader/pencapaian", icon: Medal },
   { label: "Portofolio", href: "/kader/portofolio", icon: FileText },
   { label: "Riwayat Organisasi", href: "/kader/riwayat", icon: Sparkles },
   { label: "Pengaturan Akun", href: "/kader/settings", icon: Settings },
@@ -46,8 +42,8 @@ export default function KaderShell({
   const canSwitchToAdmin = user.hasAdminWorkspace || isAdminWorkspaceRole(user.role);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(38,46,237,0.16),transparent_30%),linear-gradient(135deg,#f7f9ff,#eef3ff_45%,#fff)] text-secondary">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-white/70 bg-white/72 p-5 shadow-[20px_0_70px_rgba(18,37,98,0.08)] backdrop-blur-2xl md:flex md:flex-col">
+    <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(38,46,237,0.16),transparent_30%),linear-gradient(135deg,#f7f9ff,#eef3ff_45%,#fff)] text-secondary">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 border-r border-white/70 bg-white/72 p-4 shadow-[20px_0_70px_rgba(18,37,98,0.08)] backdrop-blur-2xl md:flex md:flex-col lg:w-64 lg:p-5">
         <Link href="/" className="mb-8 flex items-center gap-3">
           <Image src="/PMII_BPP.png" alt="Logo PMII" width={42} height={42} className="h-11 w-11 object-contain" />
           <div className="leading-tight">
@@ -90,7 +86,7 @@ export default function KaderShell({
         </div>
       </aside>
 
-      <header className="fixed inset-x-3 top-3 z-40 rounded-full border border-white/55 bg-[#262EED]/24 px-4 py-2 shadow-[0_18px_60px_rgba(18,37,98,0.22)] backdrop-blur-2xl backdrop-saturate-200 md:left-80 md:right-6">
+      <header className="fixed inset-x-3 top-3 z-40 rounded-full border border-white/55 bg-[#262EED]/24 px-4 py-2 shadow-[0_18px_60px_rgba(18,37,98,0.22)] backdrop-blur-2xl backdrop-saturate-200 md:left-60 md:right-6 lg:left-72">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
             <Image src="/PMII_BPP.png" alt="Logo PMII" width={32} height={32} className="h-8 w-8 object-contain" />
@@ -114,11 +110,10 @@ export default function KaderShell({
         </div>
       </header>
 
-      <main className="mx-auto min-h-screen w-full max-w-7xl px-4 pb-28 pt-24 md:ml-72 md:max-w-none md:px-8 md:pb-10">
+      <main className="min-h-screen w-full min-w-0 max-w-full overflow-x-hidden px-4 pb-28 pt-24 md:ml-56 md:px-6 md:pb-10 lg:ml-64 lg:px-8">
         {children}
       </main>
       <KaderBottomNav />
     </div>
   );
 }
-

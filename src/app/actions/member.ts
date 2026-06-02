@@ -108,6 +108,7 @@ export async function createMemberCertificate(formData: FormData) {
       title: (formData.get("title") as string) || "Sertifikat Kader",
       issuer: (formData.get("issuer") as string) || "PMII Balikpapan",
       category: (formData.get("category") as string) || "Umum",
+      note: (formData.get("note") as string) || null,
       fileUrl,
       status: "PENDING",
       issuedAt: issuedAt && !Number.isNaN(issuedAt.getTime()) ? issuedAt : null,
@@ -143,6 +144,9 @@ export async function createMemberPortfolio(formData: FormData) {
     fileUrl = await uploadFile(file, "kader/portfolio");
   }
 
+  const issuedAtValue = formData.get("issuedAt") as string;
+  const issuedAt = issuedAtValue ? new Date(issuedAtValue) : null;
+
   await prisma.memberPortfolio.create({
     data: {
       userId: session.user.id,
@@ -151,6 +155,7 @@ export async function createMemberPortfolio(formData: FormData) {
       description: (formData.get("description") as string) || null,
       externalUrl: (formData.get("externalUrl") as string) || null,
       fileUrl,
+      issuedAt: issuedAt && !Number.isNaN(issuedAt.getTime()) ? issuedAt : null,
     },
   });
 

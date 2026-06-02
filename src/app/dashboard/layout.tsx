@@ -21,9 +21,9 @@ export default async function DashboardLayout({
     );
 
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="flex min-h-screen overflow-x-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
             <Sidebar />
-            <main className="w-full max-w-[100vw] flex-1 p-4 pb-28 pt-20 transition-[margin,padding] duration-300 md:ml-56 md:p-6 md:pb-6 md:pt-6 lg:ml-64 lg:p-8">
+            <main className="min-w-0 w-full max-w-[100vw] flex-1 overflow-x-hidden p-4 pb-28 pt-20 transition-[margin,padding] duration-300 md:ml-56 md:p-6 md:pb-6 md:pt-6 lg:ml-64 lg:p-8">
                 <header className="fixed inset-x-3 top-3 z-40 overflow-hidden rounded-full border border-white/45 bg-[#262EED]/24 px-4 py-2 shadow-[0_18px_60px_rgba(38,46,237,0.18)] backdrop-blur-2xl backdrop-saturate-200 md:hidden">
                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.58),rgba(255,255,255,0.10)_42%,rgba(38,46,237,0.22))]" />
                     <div className="relative z-10 flex items-center justify-between gap-3">

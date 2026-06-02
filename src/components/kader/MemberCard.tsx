@@ -9,6 +9,8 @@ export default function MemberCard({
 }: {
   user: {
     name?: string | null;
+    role?: string | null;
+    isActive?: boolean | null;
     image?: string | null;
     kaderProfile?: {
       noInduk?: string | null;
@@ -60,6 +62,9 @@ export default function MemberCard({
           <div className="space-y-2 text-sm">
             <div className="rounded-full bg-white/10 px-3 py-2 font-bold">
               Status: {profile?.status === "VERIFIED" ? "Aktif Terverifikasi" : "Menunggu Verifikasi"}
+            </div>
+            <div className="rounded-full bg-white/10 px-3 py-2 font-bold">
+              Akun: {user?.isActive === false ? "Nonaktif" : "Aktif"} · {(user?.role || "KADER").replace(/_/g, " ")}
             </div>
             <div className="rounded-full bg-white/10 px-3 py-2 font-bold">
               Rayon: {profile?.rayon || "-"}

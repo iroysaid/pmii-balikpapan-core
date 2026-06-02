@@ -8,6 +8,7 @@ type MemberCardActionsProps = {
   komisariat: string;
   status: string;
   verificationUrl: string;
+  compact?: boolean;
 };
 
 export default function MemberCardActions({
@@ -16,6 +17,7 @@ export default function MemberCardActions({
   komisariat,
   status,
   verificationUrl,
+  compact = false,
 }: MemberCardActionsProps) {
   const downloadPng = () => {
     const canvas = document.createElement("canvas");
@@ -91,30 +93,39 @@ export default function MemberCardActions({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className={compact ? "flex items-center justify-end gap-2" : "grid grid-cols-3 gap-2"}>
       <button
         type="button"
         onClick={downloadPng}
-        className="inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-primary px-3 py-3 text-xs font-black text-white transition active:scale-95"
+        title="Export PNG"
+        className={compact
+          ? "inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm transition active:scale-95"
+          : "inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-primary px-3 py-3 text-xs font-black text-white transition active:scale-95"}
       >
-        <Download className="mb-1 h-4 w-4" />
-        PNG
+        <Download className={compact ? "h-4 w-4" : "mb-1 h-4 w-4"} />
+        {!compact && "PNG"}
       </button>
       <button
         type="button"
         onClick={printCard}
-        className="inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-white px-3 py-3 text-xs font-black text-primary shadow-sm transition active:scale-95"
+        title="Export PDF"
+        className={compact
+          ? "inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm transition active:scale-95"
+          : "inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-white px-3 py-3 text-xs font-black text-primary shadow-sm transition active:scale-95"}
       >
-        <FileText className="mb-1 h-4 w-4" />
-        PDF
+        <FileText className={compact ? "h-4 w-4" : "mb-1 h-4 w-4"} />
+        {!compact && "PDF"}
       </button>
       <button
         type="button"
         onClick={shareCard}
-        className="inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-[#F5CA0F] px-3 py-3 text-xs font-black text-secondary transition active:scale-95"
+        title="Share"
+        className={compact
+          ? "inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#F5CA0F] text-secondary shadow-sm transition active:scale-95"
+          : "inline-flex min-h-14 flex-col items-center justify-center rounded-2xl bg-[#F5CA0F] px-3 py-3 text-xs font-black text-secondary transition active:scale-95"}
       >
-        <Share2 className="mb-1 h-4 w-4" />
-        Share
+        <Share2 className={compact ? "h-4 w-4" : "mb-1 h-4 w-4"} />
+        {!compact && "Share"}
       </button>
     </div>
   );

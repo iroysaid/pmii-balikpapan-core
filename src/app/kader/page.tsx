@@ -23,7 +23,7 @@ export default async function KaderHomePage() {
           </h1>
           <p className="mt-4 max-w-2xl text-white/78">
             Portal personal untuk identitas kader, learning journey, agenda, sertifikat,
-            pencapaian, dan portofolio kader PMII Balikpapan.
+            portofolio, dan riwayat organisasi kader PMII Balikpapan.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
             {data.quickActions.map((action) => (
